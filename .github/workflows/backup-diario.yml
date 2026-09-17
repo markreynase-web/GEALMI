@@ -63,7 +63,7 @@ jobs:
       - name: Subir el backup como artifact
         uses: actions/upload-artifact@v4
         with:
-          name: khipucore-backup-${{ github.run_id }}
+          name: gealmi-backup-${{ github.run_id }}
           path: backend/backups/*.dump
           retention-days: 30
           if-no-files-found: error

@@ -26,7 +26,7 @@
 // skipWaiting()/clients.claim(): la versión nueva del service worker toma
 // control apenas se instala, no espera a que se cierren todas las pestañas.
 
-const CACHE = 'khipu-shell-v1';
+const CACHE = 'gealmi-shell-v1';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -36,7 +36,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       // Borra cualquier caché de una versión anterior del service worker --
-      // así un CACHE nuevo (ej. 'khipu-shell-v2' el día que haga falta
+      // así un CACHE nuevo (ej. 'gealmi-shell-v2' el día que haga falta
       // invalidar todo de una) no deja basura vieja ocupando espacio.
       const nombres = await caches.keys();
       await Promise.all(nombres.filter(n => n !== CACHE).map(n => caches.delete(n)));

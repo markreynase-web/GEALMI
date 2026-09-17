@@ -1,4 +1,4 @@
-// src/routes/khipuAi.js
+// src/routes/gealmiAi.js
 // Fase D: "GEALMI AI" -- un solo endpoint que sirve tanto preguntas sueltas
 // como reportes automáticos (son el mismo agente con tool use, solo cambia
 // el mensaje de entrada). Cada llamada es una petición real y facturada a
@@ -15,12 +15,12 @@ import Anthropic from '@anthropic-ai/sdk';
 import { pool } from '../db.js';
 import { auth, requireEmpresa, requireModulo } from '../middleware/auth.js';
 import { verificarPermiso } from '../middleware/permisos.js';
-import { construirHerramientas } from '../khipuAiTools.js';
-import { sanitizarHistorial } from '../khipuAiHistorial.js';
+import { construirHerramientas } from '../gealmiAiTools.js';
+import { sanitizarHistorial } from '../gealmiAiHistorial.js';
 import { logger } from '../logger.js';
 
 const router = Router();
-router.use(auth, requireEmpresa, requireModulo('khipu_ai'));
+router.use(auth, requireEmpresa, requireModulo('gealmi_ai'));
 
 // Si falta la API key, el cliente queda null a propósito -- así el resto del
 // backend arranca normal y esta ruta sola responde 500 con un mensaje claro,
@@ -49,7 +49,7 @@ function excedeLimiteDiario(usuarioId) {
 const MAX_ITERACIONES = 6;   // tope de vueltas del loop, por si Claude insiste en llamar herramientas
 const MAX_LONGITUD_PREGUNTA = 1000; // tope de costo/abuso -- este es un widget de preguntas cortas, no un editor de texto
 
-router.post('/preguntar', verificarPermiso('khipu_ai.ver'), async (req, res) => {
+router.post('/preguntar', verificarPermiso('gealmi_ai.ver'), async (req, res) => {
   if (!client) {
     return res.status(500).json({ error: 'GEALMI AI no está configurado en este servidor (falta ANTHROPIC_API_KEY).' });
   }

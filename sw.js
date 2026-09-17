@@ -48,8 +48,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   // Solo GET, solo mismo origen -- todo lo demás (POST/PUT/DELETE, y
-  // cualquier request a api.khipucore.com u otro origen) pasa de largo sin
-  // que este service worker lo toque para nada.
+  // cualquier request a api.khipucore.com u otro origen -- el dominio del
+  // backend sigue siendo khipucore.com hasta que se compre el de GEALMI)
+  // pasa de largo sin que este service worker lo toque para nada.
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
 
   // Nunca intercepta la API, aunque algún día se sirva desde el mismo

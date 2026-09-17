@@ -80,7 +80,7 @@
     <footer></footer>
   </div>
 </div>
-<div id="khipuAiWidget"></div>
+<div id="gealmiAiWidget"></div>
 
 <script type="module">
   import { haySesionActiva, obtenerSesion } from '../js/sesion.js';
@@ -89,7 +89,7 @@
   import { renderSidebar } from '../components/sidebar.js';
   import { renderTopbar } from '../components/topbar.js';
   import { renderFooter } from '../components/footer.js';
-  import { renderKhipuAiWidget } from '../components/khipuAiWidget.js';
+  import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
   import { abrirPanelLateral, cerrarPanelLateral } from '../components/panelLateral.js';
   import { escapeHtml } from '../js/utils.js';
 
@@ -120,7 +120,7 @@
   renderSidebar(config, 'membresias');
   await renderTopbar(config);
   renderFooter();
-  renderKhipuAiWidget(config);
+  renderGealmiAiWidget(config);
 
   let clientesDisponibles = [];
   let planesDisponibles = [];

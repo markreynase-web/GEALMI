@@ -241,7 +241,7 @@ vez la capa estadística (predicción de ventas, alertas de stock, productos
 de baja rotación, detección de anomalías, recomendación de compras) y la
 capa de lenguaje natural — no son dos sistemas separados: el backend expone
 un set de "herramientas de datos" (consultas SQL parametrizadas, scoped a
-`empresa_id`, ver `backend/src/khipuAiTools.js`), Claude decide cuáles
+`empresa_id`, ver `backend/src/gealmiAiTools.js`), Claude decide cuáles
 necesita para responder, y arma la respuesta final en español. El set de
 herramientas se ajusta según qué módulos tiene habilitados cada empresa.
 
@@ -253,7 +253,10 @@ cortas con tool use, frente a Opus) y **generación en vivo** (cada pregunta
 es una llamada real, sin cachear la respuesta, priorizando frescura sobre
 costo) — con un límite de 40 preguntas/día por usuario como techo barato de
 abuso. Opt-in por empresa,
-igual que Vehículos/Repuestos/Postventa (`backend/migrations/016_khipu_ai.sql`),
+igual que Vehículos/Repuestos/Postventa (creado originalmente como `khipu_ai`
+en `backend/migrations/016_khipu_ai.sql`, renombrado a `gealmi_ai` en
+`backend/migrations/041_rename_khipu_ai_a_gealmi_ai.sql` -- la 016 no se edita
+porque ya corrió en producción),
 habilitable desde el panel de super administrador sin código nuevo (es una
 fila más del catálogo `modulos` que ese panel ya gestiona).
 
@@ -267,7 +270,7 @@ fila más del catálogo `modulos` que ese panel ya gestiona).
   `js/config.js`.
 - **Componentes reutilizables**: ya existen varios en `components/`
   (`sidebar.js`, `panelLateral.js`, `topbar.js`, `footer.js`,
-  `tablaRegistros.js`, `formularioRegistro.js`, `khipuAiWidget.js`) —
+  `tablaRegistros.js`, `formularioRegistro.js`, `gealmiAiWidget.js`) —
   `nav.js` fue el primero y desde entonces fue reemplazado por `sidebar.js`.
   Lo que sigue pendiente: `dashboard.js` todavía escribe el HTML de
   KPIs/gráficos directamente en vez de usar piezas reutilizables tipo
@@ -289,11 +292,11 @@ Khipu1/
     layout.css           → estructura general de página
     panel-lateral.css    → panel lateral deslizable
     tables.css           → tabla de debug, badges de rol
-    khipu-ai-widget.css  → widget flotante de GEALMI AI
+    gealmi-ai-widget.css → widget flotante de GEALMI AI
   js/
     app.js, apiConfig.js, api.js, config.js, dashboard.js, charts.js,
     filters.js, parsing.js, storage.js, utils.js, esquemas.js, sesion.js,
-    modoBackend.js, khipuAi.js
+    modoBackend.js, gealmiAi.js
                           → estado, render, fetch al backend, parsing de
                             CSV/ZIP, y el cliente del widget de GEALMI AI
   components/
@@ -302,7 +305,7 @@ Khipu1/
     topbar.js, footer.js   → cabecera y pie compartidos
     tablaRegistros.js      → tabla editable reutilizable
     formularioRegistro.js  → formulario reutilizable
-    khipuAiWidget.js       → UI del widget flotante de GEALMI AI
+    gealmiAiWidget.js      → UI del widget flotante de GEALMI AI
   pages/
     inicio.html, login.html, ventas.html, inventario.html, compras.html,
     clientes.html, rrhh.html, finanzas.html, produccion.html, marketing.html,
@@ -320,7 +323,7 @@ Khipu1/
       db.js                 → pool de conexión
       crudFactory.js        → genera CRUD estándar por módulo
       registroAuditoria.js  → helper para registrar auditoría (usado por crudFactory y varias rutas manuales)
-      khipuAiTools.js       → herramientas de datos que usa GEALMI AI (tool use)
+      gealmiAiTools.js      → herramientas de datos que usa GEALMI AI (tool use)
       middleware/           → auth.js, permisos.js
       routes/                → una ruta por módulo (auth, clientes, ventas, ...)
     migrations/              → historial de esquema SQL, no se edita retroactivamente

@@ -6,7 +6,7 @@
 // conexiones salientes por SMTP a smtp-relay.brevo.com:587 nunca conectan
 // -- confirmado en los logs: "Connection timeout", con host/usuario/clave
 // correctos. HTTPS no tiene ese problema (es el mismo tipo de llamada que ya
-// hace khipuAiTools.js contra la API de Anthropic, que sí funciona). El
+// hace gealmiAiTools.js contra la API de Anthropic, que sí funciona). El
 // trade-off es real: esto ata el envío de correo específicamente a Brevo, ya
 // no es "cualquier SMTP" -- aceptado a propósito para que la recuperación de
 // contraseña funcione en el hosting real, no solo en teoría.

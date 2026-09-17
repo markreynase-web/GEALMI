@@ -1,4 +1,4 @@
-// src/khipuAiTools.js
+// src/gealmiAiTools.js
 // Fase D: "herramientas de datos" que GEALMI AI (Claude, vía tool use) puede
 // llamar para responder preguntas y armar reportes con cifras reales de la
 // empresa activa -- Claude nunca escribe SQL, cada herramienta es una

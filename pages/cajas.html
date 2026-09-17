@@ -62,7 +62,7 @@
 <script type="module">
 import { cargarConfigEmpresa } from '../js/config.js';
 import { renderSidebar } from '../components/sidebar.js';
-import { renderKhipuAiWidget } from '../components/khipuAiWidget.js';
+import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
 import { renderTopbar } from '../components/topbar.js';
 import { renderFooter } from '../components/footer.js';
 import { obtenerSesion, tienePermiso, haySesionActiva } from '../js/sesion.js';
@@ -324,7 +324,7 @@ async function cargarTurnos() {
 (async function iniciar() {
   config = await cargarConfigEmpresa();
   renderSidebar(config, 'cajas');
-  renderKhipuAiWidget(config);
+  renderGealmiAiWidget(config);
   await renderTopbar(config);
   renderFooter();
 

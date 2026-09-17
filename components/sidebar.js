@@ -14,7 +14,7 @@
 import { modulosHabilitados, buscarModulo } from '../js/config.js';
 import { tienePermiso, tieneAlgunPermiso, haySesionActiva, obtenerSesion, cerrarSesion } from '../js/sesion.js';
 import { escapeHtml } from '../js/utils.js';
-import { ICONO_SPARK } from './khipuAiWidget.js';
+import { ICONO_SPARK } from './gealmiAiWidget.js';
 
 // Grupo de sidebar por id de módulo (Rediseño v3). Client-side a propósito:
 // la tabla `modulos` no tiene columna de categoría y no vale la pena una
@@ -32,7 +32,7 @@ const GRUPOS_ORDEN = [
   { id: 'recursos', label: 'Recursos' }
 ];
 
-const CLAVE_COLAPSADO = 'khipu_sidebar_colapsado';
+const CLAVE_COLAPSADO = 'gealmi_sidebar_colapsado';
 
 // Chevron del botón de colapsar -- apunta a la izquierda ("contraer") por
 // defecto; css/layout.css lo rota 180° cuando .sidebar tiene .colapsado, en
@@ -59,9 +59,9 @@ export function renderSidebar(config, paginaActualId) {
     // panel de super admin pueda habilitarlo/deshabilitarlo por empresa. Sin
     // este filtro caía en la rama de abajo (baseDeDatos:false = "módulo
     // libre, mostrar siempre", pensada para Compras/RRHH) y aparecía como
-    // pestaña rota -> 404 al hacer clic (ver components/khipuAiWidget.js
+    // pestaña rota -> 404 al hacer clic (ver components/gealmiAiWidget.js
     // para el botón flotante, que es la única UI real de este módulo).
-    if (m.id === 'khipu_ai') return false;
+    if (m.id === 'gealmi_ai') return false;
     if (!m.baseDeDatos) return true;
     if (sinSesion) return true; // el guard de app.js ya redirige a login antes si el módulo lo exige
     return tienePermiso(`${m.id}.ver`);
@@ -127,39 +127,39 @@ export function renderSidebar(config, paginaActualId) {
           </div>` : ''}
       </nav>
       <div class="sidebar-footer" id="sidebarFooter"></div>
-      ${khipuAiEntradaHtml(config)}
+      ${gealmiAiEntradaHtml(config)}
     </div>
   `;
 
   renderSidebarFooter();
   asegurarControlesMovil();
   aplicarEstadoColapsado();
-  wireKhipuAiEntrada();
+  wireGealmiAiEntrada();
 }
 
 // Entrada fija de GEALMI AI al pie del sidebar (Rediseño v3): mismo gate que
-// el botón flotante (components/khipuAiWidget.js) -- módulo habilitado por
+// el botón flotante (components/gealmiAiWidget.js) -- módulo habilitado por
 // la empresa Y permiso del usuario -- para que no aparezca una entrada que
 // lleva a algo que ese usuario/empresa no tiene. Al hacer clic dispara un
-// evento global (ver khipuAiWidget.js) en vez de abrir su propia ventana:
+// evento global (ver gealmiAiWidget.js) en vez de abrir su propia ventana:
 // es un segundo punto de entrada al MISMO chat, no un chat aparte.
-function khipuAiEntradaHtml(config) {
-  const habilitado = !!buscarModulo(config, 'khipu_ai') && tienePermiso('khipu_ai.ver');
+function gealmiAiEntradaHtml(config) {
+  const habilitado = !!buscarModulo(config, 'gealmi_ai') && tienePermiso('gealmi_ai.ver');
   if (!habilitado) return '';
   return `
-    <button type="button" class="sidebar-khipu-ai" id="sidebarKhipuAiTrigger" title="Abrir GEALMI AI">
-      <div class="sidebar-khipu-ai-icon">${ICONO_SPARK}</div>
+    <button type="button" class="sidebar-gealmi-ai" id="sidebarGealmiAiTrigger" title="Abrir GEALMI AI">
+      <div class="sidebar-gealmi-ai-icon">${ICONO_SPARK}</div>
       <div class="sidebar-footer-info">
         <div class="sidebar-footer-nombre">GEALMI AI</div>
         <div class="sidebar-footer-rol">Asistente empresarial</div>
       </div>
-      <span class="sidebar-khipu-ai-chevron">›</span>
+      <span class="sidebar-gealmi-ai-chevron">›</span>
     </button>`;
 }
 
-function wireKhipuAiEntrada() {
-  document.getElementById('sidebarKhipuAiTrigger')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('khipu-ai:abrir'));
+function wireGealmiAiEntrada() {
+  document.getElementById('sidebarGealmiAiTrigger')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('gealmi-ai:abrir'));
   });
 }
 

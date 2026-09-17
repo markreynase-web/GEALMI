@@ -5,7 +5,7 @@
 // vez del dashboard genérico de columnas auto-detectadas.
 //
 // Rotación ("Más usados"): mismo cálculo que velocidadDeVentaDeProducto()
-// en backend/src/khipuAiTools.js (rama repuestos) y que ya usa
+// en backend/src/gealmiAiTools.js (rama repuestos) y que ya usa
 // js/inventarioDashboard.js para Inventario -- unidades usadas en los
 // últimos 30 días / 30 = ritmo diario. Acá la fuente es
 // postventa.cantidad_repuesto (no ventas.cantidad), porque Repuestos se

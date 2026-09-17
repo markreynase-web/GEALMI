@@ -267,17 +267,20 @@ body, en vez de resetearla.
 
 Asistente de IA (Claude, vía la API de Anthropic) con acceso de solo lectura
 a los datos de la empresa activa, opt-in por empresa igual que el resto de
-módulos (ver `backend/migrations/016_khipu_ai.sql` -- agrega `khipu_ai` al
-catálogo de `modulos`, sin habilitarlo para ninguna empresa existente). Se
-accede desde el frontend como un widget flotante en toda la app, no una
-página de módulo (ver `components/khipuAiWidget.js`).
+módulos (creado originalmente como `khipu_ai` en
+`backend/migrations/016_khipu_ai.sql` -- sin habilitarlo para ninguna
+empresa existente -- y renombrado a `gealmi_ai` en
+`backend/migrations/041_rename_khipu_ai_a_gealmi_ai.sql`; la 016 no se toca
+porque ya corrió en producción). Se accede desde el frontend como un widget
+flotante en toda la app, no una página de módulo (ver
+`components/gealmiAiWidget.js`).
 
 Un solo endpoint sirve tanto preguntas sueltas del usuario como resúmenes
 automáticos -- son la misma llamada con distinto mensaje de entrada:
 
-- `POST /api/khipu-ai/preguntar` (`{ pregunta, historial? }`, requiere
-  `khipu_ai.ver`) corre un loop agentic manual: Claude recibe un set de
-  "herramientas de datos" (`backend/src/khipuAiTools.js` -- consultas SQL
+- `POST /api/gealmi-ai/preguntar` (`{ pregunta, historial? }`, requiere
+  `gealmi_ai.ver`) corre un loop agentic manual: Claude recibe un set de
+  "herramientas de datos" (`backend/src/gealmiAiTools.js` -- consultas SQL
   parametrizadas y scoped a `empresa_id`, nunca SQL libre), decide cuáles
   necesita, el backend las ejecuta y le devuelve el resultado, y Claude
   arma la respuesta final en español. El set de herramientas se arma según

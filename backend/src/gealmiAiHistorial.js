@@ -1,21 +1,21 @@
-// src/khipuAiHistorial.js
+// src/gealmiAiHistorial.js
 // Sanitización del historial de chat que manda el cliente a POST
-// /api/khipu-ai/preguntar. Separado de routes/khipuAi.js a propósito: es
+// /api/gealmi-ai/preguntar. Separado de routes/gealmiAi.js a propósito: es
 // lógica pura (sin Express, sin el SDK de Anthropic, sin el pool de
 // PostgreSQL) -- así se puede importar y probar directo (ver
-// tests/khipu-ai-security.test.js) sin arrastrar el pool de PRODUCCIÓN que
-// routes/khipuAi.js importa vía db.js, y sin construir un cliente de
+// tests/gealmi-ai-security.test.js) sin arrastrar el pool de PRODUCCIÓN que
+// routes/gealmiAi.js importa vía db.js, y sin construir un cliente de
 // Anthropic solo para probar esta función.
 //
 // El historial lo manda el cliente tal cual (el chat vive en el navegador,
-// ver components/khipuAiWidget.js -- no hay sesión guardada server-side) --
+// ver components/gealmiAiWidget.js -- no hay sesión guardada server-side) --
 // eso incluye los turnos "assistant", que en un request legítimo son la
 // respuesta real que GEALMI AI ya dio, pero que nada impide que alguien
 // fabrique a mano llamando a este endpoint directo (envenenamiento de
 // historial: simular que "Claude" ya aceptó romper sus reglas). No hay
 // forma de verificar server-side que un turno "assistant" sea genuino sin
 // guardar sesión (cambio de arquitectura mayor, fuera de este alcance) --
-// la mitigación real está en el systemPrompt de routes/khipuAi.js, que
+// la mitigación real está en el systemPrompt de routes/gealmiAi.js, que
 // trata TODO el contenido de la conversación como datos, nunca como
 // instrucciones nuevas. Esta función solo acota el tamaño de cada turno
 // (para achicar el margen de cualquier payload de inyección) y descarta lo

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GEALMI — El conocimiento ancestral convertido en inteligencia empresarial</title>
+<title>GEALMI — Un núcleo. Cualquier industria. Decide mejor.</title>
 <meta name="description" content="GEALMI es una plataforma SaaS modular de gestión empresarial e inteligencia operativa: un núcleo compartido (ventas, inventario, clientes, finanzas) más módulos especializados por industria.">
 <link rel="icon" href="assets/logo-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -200,14 +200,24 @@
   .reveal.is-visible{ opacity:1; transform:none; }
   @media (prefers-reduced-motion: reduce){ .reveal{ opacity:1; transform:none; transition:none; } }
 
-  /* ---------- Del quipu al código ---------- */
-  .quipu-narrative{ display:grid; gap:var(--sp-7); align-items:center; }
-  @media (min-width:960px){ .quipu-narrative{ grid-template-columns:0.95fr 1.05fr; } }
-  .quipu-narrative h2{ font-size:clamp(30px,4vw,44px); margin-bottom:var(--sp-4); }
-  .quipu-narrative .lede{ font-size:17.5px; color:var(--text-on-dark-2); max-width:54ch; }
-  .quipu-narrative .lede + .lede{ margin-top:var(--sp-3); }
+  /* ---------- Nuestro origen ---------- */
+  .origen-narrative{ display:grid; gap:var(--sp-7); align-items:center; }
+  @media (min-width:960px){ .origen-narrative{ grid-template-columns:0.95fr 1.05fr; } }
+  .origen-narrative h2{ font-size:clamp(30px,4vw,44px); margin-bottom:var(--sp-4); }
+  .origen-narrative .lede{ font-size:17.5px; color:var(--text-on-dark-2); max-width:54ch; }
+  .origen-narrative .lede + .lede{ margin-top:var(--sp-3); }
 
-  .cordboard{ display:flex; gap:14px; align-items:flex-end; height:280px; padding:var(--sp-5) var(--sp-4); background:#0A153A; border:1px solid var(--border-dark); border-radius:var(--r-lg); overflow:hidden; }
+  .acronimo-list{ list-style:none; padding:0; margin:0 0 var(--sp-4); display:flex; flex-direction:column; gap:5px; }
+  .acronimo-list li{ font-family:var(--font-display); font-size:19px; color:var(--text-on-dark-1); }
+  .acronimo-list strong{ color:var(--cyan); font-weight:800; }
+  .origen-tagline{ margin-top:var(--sp-4); font-family:var(--font-display); font-size:21px; font-weight:700; color:var(--text-on-dark-1); }
+
+  /* Barras agrupadas en 3 columnas (GE / AL / MI) -- refuerza el acrónimo
+     del nombre en vez de ser solo decoración abstracta. */
+  .acro-board{ display:flex; gap:28px; align-items:stretch; height:280px; padding:var(--sp-5) var(--sp-4) var(--sp-4); background:#0A153A; border:1px solid var(--border-dark); border-radius:var(--r-lg); overflow:hidden; }
+  .acro-group{ flex:1; display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .acro-bars{ display:flex; gap:10px; align-items:flex-end; flex:1; min-height:0; }
+  .acro-label{ text-align:center; font-family:var(--font-mono); font-size:12px; letter-spacing:0.14em; color:var(--cyan); text-transform:uppercase; flex-shrink:0; }
   .cord{ position:relative; flex:1; height:100%; border-radius:6px; background:linear-gradient(180deg, rgba(46,226,206,0.05), rgba(28,111,150,0.35)); }
   .cord .knot{ position:absolute; left:50%; width:14px; height:14px; border-radius:50%; background:var(--cyan); transform:translate(-50%,-50%); box-shadow:0 0 0 4px rgba(46,226,206,0.14); animation:knot-float 4.2s ease-in-out infinite; }
   @keyframes knot-float{ 0%,100%{ transform:translate(-50%,-50%) scale(1); } 50%{ transform:translate(-50%,-58%) scale(1.08); } }
@@ -313,7 +323,7 @@
     </a>
     <ul class="nav-links">
       <li><a href="#solucion">Producto</a></li>
-      <li><a href="#quipu">Solución</a></li>
+      <li><a href="#origen">Nosotros</a></li>
       <li><a href="#gealmi-ai">GEALMI AI</a></li>
       <li><a href="#planes">Planes</a></li>
     </ul>
@@ -327,7 +337,7 @@
   </div>
   <nav class="mobile-menu container" id="mobileMenu" aria-label="Menú móvil">
     <a href="#solucion">Producto</a>
-    <a href="#quipu">Solución</a>
+    <a href="#origen">Nosotros</a>
     <a href="#gealmi-ai">GEALMI AI</a>
     <a href="#planes">Planes</a>
     <a href="pages/login.html">Iniciar sesión</a>
@@ -339,12 +349,12 @@
 
   <!-- ================= HERO ================= -->
   <section class="hero band-dark" id="top">
-    <canvas id="quipuCanvas" aria-hidden="true"></canvas>
+    <canvas id="dataCanvas" aria-hidden="true"></canvas>
     <div class="container">
       <div class="hero-inner">
         <span class="eyebrow">Plataforma de gestión empresarial</span>
         <h1>GEALMI</h1>
-        <p class="subhead">El conocimiento ancestral convertido en inteligencia empresarial.</p>
+        <p class="subhead">Un núcleo. Cualquier industria. Decide mejor.</p>
         <p class="lede">Gestiona información, procesos y recursos desde una plataforma inteligente diseñada para impulsar la evolución de tu empresa.</p>
         <div class="cta-row">
           <a class="btn btn-on-dark" href="#contacto">Solicitar demostración</a>
@@ -445,24 +455,46 @@
     </div>
   </section>
 
-  <!-- ================= DEL QUIPU AL CÓDIGO ================= -->
-  <section class="band-dark section-pad" id="quipu">
+  <!-- ================= NUESTRO ORIGEN ================= -->
+  <section class="band-dark section-pad" id="origen">
     <div class="container">
-      <div class="quipu-narrative">
+      <div class="origen-narrative">
         <div class="reveal">
           <span class="eyebrow" style="color:var(--cyan);">Nuestro origen</span>
-          <h2 style="margin-top:12px;">Del quipu al código.</h2>
-          <p class="lede">Hace más de quinientos años, los quipus del Tahuantinsuyo codificaban cifras, inventarios y decisiones de estado en nudos de cuerda — un sistema de registro capaz de organizar la información de todo un territorio sin una sola palabra escrita.</p>
-          <p class="lede">Antes, en la costa norte, la cultura Moche ya sostenía una administración de recursos meticulosa: canales, almacenes, excedentes calculados con precisión. GEALMI retoma ese mismo principio — organizar para decidir mejor — y lo traduce a datos, algoritmos e inteligencia artificial. No es un homenaje al pasado: es su continuación lógica.</p>
+          <h2 style="margin-top:12px;">¿De dónde nace GEALMI?</h2>
+          <ul class="acronimo-list">
+            <li><strong>GE</strong> de Gestión.</li>
+            <li><strong>AL</strong> de Administración y Logística.</li>
+            <li><strong>MI</strong> de Mi empresa.</li>
+          </ul>
+          <p class="lede">Tres conceptos que representan lo esencial de cualquier negocio: gestionar, organizar y tener el control.</p>
+          <p class="lede">De esta unión nace GEALMI, una plataforma diseñada para convertirse en el núcleo operativo de cada empresa, conectando su información, sus procesos y sus necesidades en un solo lugar.</p>
+          <p class="lede">Porque no importa si tienes una tienda, un restaurante, un taller, una clínica o un gimnasio. Cada negocio tiene su propia forma de trabajar. GEALMI se adapta a ella.</p>
+          <p class="origen-tagline">Un núcleo. Cualquier industria.</p>
         </div>
-        <div class="cordboard reveal" role="img" aria-label="Representación abstracta de cuerdas con nudos, evolucionando hacia una red de datos conectada">
-          <div class="cord" style="height:62%;"><span class="knot" style="top:20%; animation-delay:0s;"></span><span class="knot" style="top:70%; animation-delay:.3s;"></span></div>
-          <div class="cord" style="height:85%;"><span class="knot" style="top:35%; animation-delay:.6s;"></span></div>
-          <div class="cord" style="height:48%;"><span class="knot" style="top:15%; animation-delay:.2s;"></span><span class="knot" style="top:55%; animation-delay:.9s;"></span><span class="knot" style="top:88%; animation-delay:1.4s;"></span></div>
-          <div class="cord" style="height:96%;"><span class="knot" style="top:22%; animation-delay:1.1s;"></span><span class="knot" style="top:66%; animation-delay:.4s;"></span></div>
-          <div class="cord" style="height:70%;"><span class="knot" style="top:44%; animation-delay:.8s;"></span></div>
-          <div class="cord" style="height:58%;"><span class="knot" style="top:12%; animation-delay:1.6s;"></span><span class="knot" style="top:60%; animation-delay:.5s;"></span></div>
-          <div class="cord" style="height:80%;"><span class="knot" style="top:30%; animation-delay:1.2s;"></span><span class="knot" style="top:78%; animation-delay:.1s;"></span></div>
+        <div class="acro-board reveal" role="img" aria-label="Representación abstracta de tres pilares de GEALMI conectados como datos -- Gestión, Administración y Logística, y Mi empresa">
+          <div class="acro-group">
+            <div class="acro-bars">
+              <div class="cord" style="height:62%;"><span class="knot" style="top:20%; animation-delay:0s;"></span><span class="knot" style="top:70%; animation-delay:.3s;"></span></div>
+              <div class="cord" style="height:85%;"><span class="knot" style="top:35%; animation-delay:.6s;"></span></div>
+              <div class="cord" style="height:48%;"><span class="knot" style="top:15%; animation-delay:.2s;"></span><span class="knot" style="top:55%; animation-delay:.9s;"></span></div>
+            </div>
+            <span class="acro-label">GE</span>
+          </div>
+          <div class="acro-group">
+            <div class="acro-bars">
+              <div class="cord" style="height:96%;"><span class="knot" style="top:22%; animation-delay:1.1s;"></span><span class="knot" style="top:66%; animation-delay:.4s;"></span></div>
+              <div class="cord" style="height:70%;"><span class="knot" style="top:44%; animation-delay:.8s;"></span></div>
+            </div>
+            <span class="acro-label">AL</span>
+          </div>
+          <div class="acro-group">
+            <div class="acro-bars">
+              <div class="cord" style="height:58%;"><span class="knot" style="top:12%; animation-delay:1.6s;"></span><span class="knot" style="top:60%; animation-delay:.5s;"></span></div>
+              <div class="cord" style="height:80%;"><span class="knot" style="top:30%; animation-delay:1.2s;"></span><span class="knot" style="top:78%; animation-delay:.1s;"></span></div>
+            </div>
+            <span class="acro-label">MI</span>
+          </div>
         </div>
       </div>
     </div>
@@ -689,7 +721,7 @@
         <div>
           <h4>Empresa</h4>
           <ul>
-            <li><a href="#quipu">Nosotros</a></li>
+            <li><a href="#origen">Nosotros</a></li>
             <li><a href="mailto:markreynase@gmail.com">Contacto</a></li>
           </ul>
         </div>
@@ -755,8 +787,8 @@
     revealEls.forEach((el) => el.classList.add('is-visible'));
   }
 
-  /* ---- Hero canvas: digital quipu / data graph ---- */
-  const canvas = document.getElementById('quipuCanvas');
+  /* ---- Hero canvas: red de datos animada ---- */
+  const canvas = document.getElementById('dataCanvas');
   const ctx = canvas.getContext('2d');
   const heroSection = canvas.closest('section');
   const CORDS = 9;

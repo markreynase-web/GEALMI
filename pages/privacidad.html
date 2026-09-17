@@ -21,9 +21,10 @@
 
   .doc-card{ background:#fff; border-radius:14px; padding:40px 44px; box-shadow:var(--card-shadow); }
   .doc-card h1{ font-family:'Inter', sans-serif; font-weight:800; font-size:26px; margin:0 0 6px; color:var(--ink); }
-  .doc-fecha{ font-size:13px; color:var(--muted); margin-bottom:32px; }
-  .doc-card h2{ font-family:'Inter', sans-serif; font-weight:700; font-size:16px; margin:30px 0 10px; color:var(--ink); }
+  .doc-fecha{ font-size:13px; color:var(--muted); margin-bottom:20px; }
+  .doc-card h2{ font-family:'Inter', sans-serif; font-weight:700; font-size:16px; margin:30px 0 10px; color:var(--ink); scroll-margin-top:20px; }
   .doc-card h2:first-of-type{ margin-top:0; }
+  .doc-card h3{ font-family:'Inter', sans-serif; font-weight:700; font-size:14px; margin:18px 0 6px; color:var(--ink); }
   .doc-card p, .doc-card li{ font-size:14px; line-height:1.7; color:var(--ink); }
   .doc-card ul{ margin:8px 0; padding-left:22px; }
   .doc-card li{ margin-bottom:6px; }
@@ -33,8 +34,17 @@
   .doc-tabla th{ text-align:left; background:var(--paper); font-weight:700; padding:8px 10px; border:1px solid var(--paper-line); }
   .doc-tabla td{ padding:8px 10px; border:1px solid var(--paper-line); vertical-align:top; }
 
+  .doc-toc{ margin:0 0 32px; border:1px solid var(--paper-line); border-radius:10px; padding:14px 18px; background:var(--paper); }
+  .doc-toc summary{ cursor:pointer; font-weight:700; font-size:14px; color:var(--ink); }
+  .doc-toc summary::marker{ color:var(--ochre-deep); }
+  .doc-toc ol{ margin:14px 0 2px; padding-left:20px; columns:2; column-gap:28px; }
+  .doc-toc li{ font-size:13px; line-height:1.5; margin-bottom:7px; break-inside:avoid; color:var(--muted); }
+  .doc-toc a{ color:var(--ink); font-weight:500; text-decoration:none; }
+  .doc-toc a:hover{ color:var(--ochre-deep); text-decoration:underline; }
+
   @media (max-width:600px){
     .doc-card{ padding:26px 20px; }
+    .doc-toc ol{ columns:1; }
   }
 </style>
 <!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
@@ -56,76 +66,476 @@
   </div>
 
   <div class="doc-card">
-    <h1>Política de privacidad y tratamiento de datos personales</h1>
-    <div class="doc-fecha">Última actualización: <span id="fechaActualizacion"></span></div>
+    <h1>Política de privacidad y protección de datos personales</h1>
+    <div class="doc-fecha">Última actualización: 17 de setiembre de 2026</div>
 
-    <h2>1. Responsable del tratamiento</h2>
-    <p>
-      Esta plataforma (GEALMI) es operada por
-      <span class="doc-placeholder">[RAZÓN SOCIAL DE TU EMPRESA]</span>,
-      con RUC <span class="doc-placeholder">[RUC]</span> y domicilio en
-      <span class="doc-placeholder">[DIRECCIÓN]</span>
-      ("nosotros", "la empresa"). Para cualquier consulta sobre esta política o sobre
-      tus datos personales, puedes escribir a
-      <span class="doc-placeholder">[CORREO DE CONTACTO]</span>.
-    </p>
-    <p>
-      Este documento se rige por la Ley N° 29733, Ley de Protección de Datos
-      Personales del Perú, y su reglamento (Decreto Supremo N° 003-2013-JUS),
-      bajo supervisión de la Autoridad Nacional de Protección de Datos
-      Personales (ANPD).
-    </p>
+    <details class="doc-toc">
+      <summary>Índice (35 secciones)</summary>
+      <ol>
+        <li><a href="#s1">Identificación del responsable</a></li>
+        <li><a href="#s2">Alcance de esta Política</a></li>
+        <li><a href="#s3">GEALMI como plataforma multiempresa</a></li>
+        <li><a href="#s4">Responsable y encargado del tratamiento</a></li>
+        <li><a href="#s5">Datos personales que podemos tratar</a></li>
+        <li><a href="#s6">Datos sensibles</a></li>
+        <li><a href="#s7">Finalidades del tratamiento</a></li>
+        <li><a href="#s8">Inteligencia artificial y GEALMI AI</a></li>
+        <li><a href="#s9">Proveedores tecnológicos y terceros</a></li>
+        <li><a href="#s10">Transferencias y tratamiento internacional</a></li>
+        <li><a href="#s11">Seguridad de la información</a></li>
+        <li><a href="#s12">Gestión de incidentes de seguridad</a></li>
+        <li><a href="#s13">Acceso del personal de GEALMI</a></li>
+        <li><a href="#s14">Impersonación o acceso de soporte administrativo</a></li>
+        <li><a href="#s15">Confidencialidad de la información empresarial</a></li>
+        <li><a href="#s16">Cookies y tecnologías similares</a></li>
+        <li><a href="#s17">Almacenamiento local y sesiones</a></li>
+        <li><a href="#s18">Conservación de los datos</a></li>
+        <li><a href="#s19">Eliminación de cuentas y datos</a></li>
+        <li><a href="#s20">Datos introducidos por las empresas clientes</a></li>
+        <li><a href="#s21">Derechos de los titulares de datos personales</a></li>
+        <li><a href="#s22">Cómo ejercer los derechos</a></li>
+        <li><a href="#s23">Menores de edad</a></li>
+        <li><a href="#s24">Información financiera y pagos</a></li>
+        <li><a href="#s25">Facturación electrónica</a></li>
+        <li><a href="#s26">Integraciones con terceros</a></li>
+        <li><a href="#s27">Principio de minimización</a></li>
+        <li><a href="#s28">Exactitud y actualización</a></li>
+        <li><a href="#s29">Información empresarial y propiedad de los datos</a></li>
+        <li><a href="#s30">Portabilidad y salida del servicio</a></li>
+        <li><a href="#s31">Modificaciones de la Política</a></li>
+        <li><a href="#s32">Legislación aplicable</a></li>
+        <li><a href="#s33">Autoridad Nacional de Protección de Datos Personales</a></li>
+        <li><a href="#s34">Contacto</a></li>
+        <li><a href="#s35">Declaración final de privacidad</a></li>
+      </ol>
+    </details>
 
-    <h2>2. Qué datos recopilamos</h2>
-    <p>GEALMI es un sistema de gestión interno: los datos que maneja los ingresan directamente las personas autorizadas de la empresa, no público general. Los datos personales que trata son:</p>
-    <table class="doc-tabla">
-      <tr><th>Tipo de dato</th><th>De quién</th><th>Para qué</th></tr>
-      <tr><td>Nombre, correo electrónico, contraseña (cifrada) y rol</td><td>Usuarios del sistema (colaboradores con acceso)</td><td>Autenticación y control de permisos</td></tr>
-      <tr><td>Nombre, correo, teléfono y dirección</td><td>Clientes registrados por la empresa en el módulo Clientes</td><td>Gestión comercial y de ventas</td></tr>
-      <tr><td>Usuario, acción realizada, módulo y fecha/hora</td><td>Usuarios del sistema</td><td>Registro de auditoría interna (trazabilidad de cambios)</td></tr>
-    </table>
-    <p>Los datos de ventas, inventario y finanzas del negocio no son datos personales salvo que incluyan información de una persona identificable (por ejemplo, el nombre de un cliente asociado a una venta).</p>
-
-    <h2>3. Cómo usamos tus datos</h2>
+    <h2 id="s1">1. Identificación del responsable</h2>
+    <p>La presente Política de Privacidad y Protección de Datos Personales regula el tratamiento de los datos personales realizado a través de GEALMI, plataforma SaaS de gestión empresarial e inteligencia operativa.</p>
+    <p>GEALMI es operada por:</p>
     <ul>
-      <li>Permitir el inicio de sesión y aplicar los permisos según el rol de cada usuario.</li>
-      <li>Operar los módulos de Ventas, Inventario, Clientes y Finanzas para la gestión del negocio.</li>
-      <li>Mantener un registro de auditoría de quién hizo qué cambio y cuándo, con fines de seguridad y control interno.</li>
-      <li>No usamos los datos para publicidad, no los vendemos ni los compartimos con terceros para fines comerciales.</li>
+      <li>Razón social: <span class="doc-placeholder">[RAZÓN SOCIAL DE LA EMPRESA]</span></li>
+      <li>RUC: <span class="doc-placeholder">[RUC]</span></li>
+      <li>Domicilio: <span class="doc-placeholder">[DIRECCIÓN FISCAL]</span></li>
+      <li>Correo de contacto: <span class="doc-placeholder">[CORREO DE PRIVACIDAD]</span></li>
+      <li>Sitio web: <span class="doc-placeholder">[DOMINIO OFICIAL DE GEALMI]</span></li>
+    </ul>
+    <p>En adelante, la entidad será denominada "GEALMI", "la empresa", "nosotros" o "el responsable", según corresponda.</p>
+    <p>La presente Política se aplica al tratamiento de datos personales realizado mediante la plataforma, el sitio web, formularios, servicios de soporte y demás funcionalidades asociadas a GEALMI.</p>
+    <p>El tratamiento de datos personales se realiza de conformidad con la Ley N.º 29733, Ley de Protección de Datos Personales, su Reglamento aprobado mediante Decreto Supremo N.º 016-2024-JUS, y las demás normas peruanas aplicables en materia de protección de datos personales.</p>
+
+    <h2 id="s2">2. Alcance de esta Política</h2>
+    <p>Esta Política se aplica a los datos personales que podamos tratar respecto de:</p>
+    <ul>
+      <li>Personas que crean una cuenta en GEALMI.</li>
+      <li>Usuarios y colaboradores autorizados por una empresa cliente.</li>
+      <li>Representantes, administradores o responsables de empresas clientes.</li>
+      <li>Clientes, proveedores, trabajadores y demás personas cuyos datos sean registrados por una empresa cliente dentro de GEALMI.</li>
+      <li>Personas que contacten con GEALMI mediante formularios, correo electrónico, soporte u otros canales oficiales.</li>
+      <li>Visitantes del sitio web de GEALMI, respecto de los datos que eventualmente sean recopilados mediante dicho sitio.</li>
+    </ul>
+    <p>GEALMI es una plataforma empresarial. Por ello, una parte importante de la información almacenada en el sistema es ingresada directamente por las empresas que utilizan el servicio.</p>
+
+    <h2 id="s3">3. GEALMI como plataforma multiempresa</h2>
+    <p>GEALMI funciona bajo un modelo multiempresa (multi-tenant). Esto significa que diferentes empresas pueden utilizar la misma plataforma tecnológica, manteniendo sus datos separados mediante controles de aplicación, autenticación, autorización y mecanismos de aislamiento de información.</p>
+    <p>Cada empresa cliente administra su propio espacio dentro de GEALMI y determina qué usuarios pueden acceder a la información de su organización.</p>
+    <p>Los datos registrados por una empresa dentro de su cuenta no se consideran disponibles para las demás empresas usuarias de GEALMI.</p>
+    <p>GEALMI implementa mecanismos técnicos destinados a impedir que un usuario de una empresa pueda acceder a información perteneciente a otra empresa.</p>
+
+    <h2 id="s4">4. Responsable y encargado del tratamiento</h2>
+    <p>La determinación de quién actúa como responsable del tratamiento puede depender del tipo de información y de la finalidad del tratamiento.</p>
+    <h3>4.1. Datos tratados directamente por GEALMI</h3>
+    <p>Respecto de los datos que GEALMI recopila directamente para prestar, administrar, proteger y mejorar sus propios servicios —por ejemplo, datos de registro de una cuenta, autenticación, soporte y administración de la relación contractual— GEALMI determina las finalidades y medios del tratamiento en los términos establecidos por la normativa aplicable.</p>
+    <h3>4.2. Datos ingresados por una empresa cliente</h3>
+    <p>Cuando una empresa utiliza GEALMI para registrar información de sus propios clientes, trabajadores, proveedores u otras personas, dicha empresa determina principalmente las finalidades para las cuales esos datos fueron recopilados.</p>
+    <p>En estos casos, GEALMI actúa, según corresponda, como proveedor tecnológico o encargado del tratamiento por cuenta de la empresa cliente, tratando la información conforme a las instrucciones y finalidades establecidas por dicha empresa y al servicio contratado.</p>
+    <p>La empresa cliente es responsable de asegurarse de que cuenta con una base jurídica válida para recopilar y utilizar los datos que registra en GEALMI y de proporcionar a los titulares la información que corresponda.</p>
+
+    <h2 id="s5">5. Datos personales que podemos tratar</h2>
+    <p>Dependiendo de la utilización de la plataforma, GEALMI puede tratar las siguientes categorías de datos:</p>
+    <h3>5.1. Datos de cuenta y usuarios</h3>
+    <ul>
+      <li>Nombres y apellidos.</li>
+      <li>Correo electrónico.</li>
+      <li>Número telefónico.</li>
+      <li>Información de contacto.</li>
+      <li>Empresa a la que pertenece el usuario.</li>
+      <li>Cargo o función.</li>
+      <li>Rol y permisos dentro de GEALMI.</li>
+      <li>Información necesaria para autenticación.</li>
+      <li>Información relacionada con recuperación de cuenta.</li>
+    </ul>
+    <p>Las contraseñas no se almacenan en texto plano. Se utilizan mecanismos de protección criptográfica adecuados para su almacenamiento.</p>
+    <h3>5.2. Datos de clientes registrados por una empresa</h3>
+    <p>Dependiendo de los módulos utilizados, una empresa puede registrar:</p>
+    <ul>
+      <li>Nombres y apellidos.</li>
+      <li>Documento de identidad.</li>
+      <li>Correo electrónico.</li>
+      <li>Número telefónico.</li>
+      <li>Dirección.</li>
+      <li>Información comercial.</li>
+      <li>Historial de operaciones.</li>
+      <li>Información relacionada con ventas.</li>
+      <li>Observaciones ingresadas por usuarios autorizados.</li>
+    </ul>
+    <p>La información concreta dependerá de los módulos que la empresa tenga habilitados.</p>
+    <h3>5.3. Datos de proveedores y terceros</h3>
+    <p>Una empresa puede registrar información de proveedores u otros terceros necesaria para administrar sus operaciones.</p>
+    <h3>5.4. Datos laborales</h3>
+    <p>Los módulos correspondientes pueden permitir registrar información relacionada con trabajadores o colaboradores de una empresa, de acuerdo con las funcionalidades contratadas.</p>
+    <p>La empresa cliente es responsable de determinar qué información resulta necesaria para sus propios fines y de cumplir con las obligaciones legales correspondientes.</p>
+    <h3>5.5. Información de operaciones</h3>
+    <p>GEALMI puede procesar información relacionada con:</p>
+    <ul>
+      <li>Ventas.</li>
+      <li>Compras.</li>
+      <li>Inventario.</li>
+      <li>Productos.</li>
+      <li>Clientes.</li>
+      <li>Proveedores.</li>
+      <li>Finanzas.</li>
+      <li>Cajas y turnos.</li>
+      <li>Sucursales.</li>
+      <li>Producción.</li>
+      <li>Recursos humanos.</li>
+      <li>Agenda.</li>
+      <li>Módulos especializados por industria.</li>
+      <li>Otras operaciones registradas por la empresa.</li>
+    </ul>
+    <p>Esta información puede contener datos personales cuando permita identificar directa o indirectamente a una persona.</p>
+    <h3>5.6. Información de auditoría y seguridad</h3>
+    <p>Para proteger la plataforma y mantener trazabilidad, GEALMI puede registrar:</p>
+    <ul>
+      <li>Usuario que realizó una acción.</li>
+      <li>Empresa asociada.</li>
+      <li>Módulo utilizado.</li>
+      <li>Tipo de acción.</li>
+      <li>Fecha y hora.</li>
+      <li>Identificadores técnicos necesarios para seguridad.</li>
+      <li>Información relacionada con autenticación y sesiones.</li>
+      <li>Registros necesarios para investigar incidentes.</li>
+    </ul>
+    <p>Estos registros pueden conservarse durante el tiempo necesario para cumplir finalidades de seguridad, auditoría, prevención de fraude, cumplimiento contractual o legal.</p>
+
+    <h2 id="s6">6. Datos sensibles</h2>
+    <p>GEALMI no tiene como finalidad general recopilar datos personales sensibles.</p>
+    <p>Sin embargo, determinados módulos especializados podrían permitir que una empresa cliente registre información que, dependiendo de su naturaleza, pueda estar comprendida dentro de categorías especialmente protegidas por la normativa.</p>
+    <p>La empresa cliente debe evaluar previamente la necesidad, legitimidad y condiciones aplicables al tratamiento de dichos datos y utilizar GEALMI de acuerdo con la legislación vigente.</p>
+    <p>GEALMI no solicita datos sensibles de manera general para la creación de una cuenta estándar.</p>
+
+    <h2 id="s7">7. Finalidades del tratamiento</h2>
+    <p>Los datos personales pueden ser tratados para las siguientes finalidades:</p>
+    <h3>7.1. Prestación del servicio</h3>
+    <ul>
+      <li>Crear y administrar cuentas.</li>
+      <li>Autenticar usuarios.</li>
+      <li>Gestionar sesiones.</li>
+      <li>Aplicar roles y permisos.</li>
+      <li>Permitir el uso de los módulos contratados.</li>
+      <li>Mantener la disponibilidad y funcionamiento de la plataforma.</li>
+      <li>Procesar las operaciones registradas por las empresas.</li>
+    </ul>
+    <h3>7.2. Seguridad</h3>
+    <ul>
+      <li>Prevenir accesos no autorizados.</li>
+      <li>Detectar actividades anómalas.</li>
+      <li>Investigar incidentes.</li>
+      <li>Mantener registros de auditoría.</li>
+      <li>Proteger la información de las empresas.</li>
+      <li>Prevenir fraude, abuso o uso indebido de la plataforma.</li>
+    </ul>
+    <h3>7.3. Soporte</h3>
+    <ul>
+      <li>Atender consultas.</li>
+      <li>Resolver problemas técnicos.</li>
+      <li>Gestionar solicitudes de los usuarios.</li>
+      <li>Investigar errores.</li>
+      <li>Proporcionar asistencia relacionada con el servicio.</li>
+    </ul>
+    <h3>7.4. Administración de la relación contractual</h3>
+    <ul>
+      <li>Gestionar cuentas y suscripciones.</li>
+      <li>Administrar planes contratados.</li>
+      <li>Procesar pagos mediante proveedores autorizados.</li>
+      <li>Emitir comprobantes o documentación correspondiente.</li>
+      <li>Gestionar renovaciones, cancelaciones y obligaciones contractuales.</li>
+    </ul>
+    <h3>7.5. Comunicaciones relacionadas con el servicio</h3>
+    <p>Podemos utilizar los datos de contacto para enviar:</p>
+    <ul>
+      <li>Comunicaciones sobre la cuenta.</li>
+      <li>Alertas de seguridad.</li>
+      <li>Recuperación de acceso.</li>
+      <li>Cambios relevantes del servicio.</li>
+      <li>Comunicaciones necesarias para prestar el servicio.</li>
+      <li>Información relacionada con mantenimiento o disponibilidad.</li>
+    </ul>
+    <p>Las comunicaciones comerciales estarán sujetas a las condiciones y autorizaciones que correspondan conforme a la normativa aplicable.</p>
+
+    <h2 id="s8">8. Inteligencia artificial y GEALMI AI</h2>
+    <p>GEALMI puede incorporar funcionalidades de inteligencia artificial destinadas a facilitar el análisis y consulta de información empresarial.</p>
+    <p>Estas funcionalidades pueden permitir que un usuario autorizado formule preguntas en lenguaje natural sobre información disponible dentro de su empresa.</p>
+    <p>Cuando una funcionalidad de inteligencia artificial procese información de la empresa:</p>
+    <ul>
+      <li>El procesamiento estará limitado a la finalidad de proporcionar la funcionalidad solicitada.</li>
+      <li>El acceso estará sujeto a la autenticación y permisos correspondientes.</li>
+      <li>La información de una empresa no deberá ponerse a disposición de usuarios pertenecientes a otra empresa.</li>
+      <li>Las solicitudes y respuestas podrán conservarse cuando resulte necesario para mantener el historial de la funcionalidad, seguridad, auditoría o prestación del servicio.</li>
+    </ul>
+    <p>GEALMI podrá utilizar proveedores tecnológicos especializados en inteligencia artificial para prestar determinadas funcionalidades.</p>
+    <p>Cuando corresponda, dichos proveedores actuarán conforme a las condiciones contractuales aplicables y únicamente respecto del tratamiento necesario para prestar el servicio.</p>
+    <p>GEALMI no comercializa los datos personales de sus clientes como producto de datos.</p>
+
+    <h2 id="s9">9. Proveedores tecnológicos y terceros</h2>
+    <p>Para operar GEALMI podemos utilizar proveedores tecnológicos especializados en servicios como:</p>
+    <ul>
+      <li>Alojamiento de aplicaciones.</li>
+      <li>Alojamiento de bases de datos.</li>
+      <li>Infraestructura tecnológica.</li>
+      <li>Envío de correos electrónicos.</li>
+      <li>Recuperación de cuentas.</li>
+      <li>Inteligencia artificial.</li>
+      <li>Procesamiento de pagos.</li>
+      <li>Copias de seguridad.</li>
+      <li>Monitoreo y seguridad.</li>
+      <li>Servicios relacionados con facturación electrónica.</li>
+    </ul>
+    <p>Entre los proveedores tecnológicos utilizados o que pueden utilizarse se encuentran servicios como Supabase, Render, Vercel, Brevo, proveedores de inteligencia artificial y proveedores de pago, según las funcionalidades efectivamente habilitadas.</p>
+    <p>La utilización de estos proveedores podrá implicar que determinados datos sean tratados por terceros que actúen como proveedores o encargados del tratamiento, conforme a las condiciones aplicables.</p>
+    <p>GEALMI procura limitar el acceso de dichos proveedores a la información necesaria para prestar el servicio correspondiente.</p>
+
+    <h2 id="s10">10. Transferencias y tratamiento internacional</h2>
+    <p>Algunos proveedores tecnológicos utilizados por GEALMI pueden operar infraestructura, servidores o servicios ubicados fuera del Perú.</p>
+    <p>En consecuencia, dependiendo de la arquitectura utilizada y de los proveedores contratados, determinados datos personales podrían ser objeto de transferencia o tratamiento internacional.</p>
+    <p>GEALMI adoptará las medidas y condiciones que correspondan conforme a la legislación peruana aplicable para realizar dichas transferencias.</p>
+    <p>La ubicación concreta de la infraestructura puede cambiar debido a actualizaciones, disponibilidad, seguridad, continuidad operativa o modificaciones realizadas por los proveedores tecnológicos.</p>
+
+    <h2 id="s11">11. Seguridad de la información</h2>
+    <p>GEALMI aplica medidas técnicas y organizativas orientadas a proteger los datos personales contra pérdida, destrucción, acceso no autorizado, alteración, divulgación o tratamiento indebido.</p>
+    <p>Entre las medidas implementadas se encuentran, según corresponda:</p>
+    <ul>
+      <li>Autenticación mediante credenciales.</li>
+      <li>Contraseñas almacenadas mediante mecanismos de protección criptográfica.</li>
+      <li>Control de acceso basado en roles.</li>
+      <li>Separación lógica de información entre empresas.</li>
+      <li>Validación de pertenencia a empresa.</li>
+      <li>Restricciones de acceso por sucursal cuando corresponda.</li>
+      <li>Registro de auditoría.</li>
+      <li>Tokens temporales para autenticación.</li>
+      <li>Protección de cabeceras y comunicaciones.</li>
+      <li>Controles de origen y acceso a la API.</li>
+      <li>Copias de seguridad.</li>
+      <li>Pruebas de recuperación y continuidad.</li>
+      <li>Controles destinados a prevenir acceso entre empresas.</li>
+      <li>Monitoreo y revisión de eventos relevantes.</li>
+    </ul>
+    <p>Ningún sistema conectado a Internet puede garantizar seguridad absoluta. Por ello, GEALMI mantiene procesos destinados a identificar, evaluar y mitigar riesgos de seguridad.</p>
+
+    <h2 id="s12">12. Gestión de incidentes de seguridad</h2>
+    <p>En caso de detectar un incidente que pueda comprometer datos personales, GEALMI aplicará sus procedimientos internos de respuesta y contención.</p>
+    <p>Dependiendo de la naturaleza, gravedad y consecuencias del incidente, se adoptarán las medidas que correspondan conforme a la legislación aplicable.</p>
+    <p>Cuando resulte legalmente exigible, GEALMI realizará las comunicaciones o notificaciones correspondientes a las autoridades, clientes o titulares afectados.</p>
+
+    <h2 id="s13">13. Acceso del personal de GEALMI</h2>
+    <p>El acceso interno a información almacenada en la plataforma se encuentra limitado a las funciones necesarias para administrar, mantener, proteger o brindar soporte al servicio.</p>
+    <p>GEALMI podrá acceder a información de una empresa cuando resulte necesario para:</p>
+    <ul>
+      <li>Resolver incidencias técnicas.</li>
+      <li>Atender solicitudes de soporte.</li>
+      <li>Investigar problemas de seguridad.</li>
+      <li>Mantener la plataforma.</li>
+      <li>Cumplir obligaciones legales.</li>
+      <li>Ejecutar procedimientos autorizados de soporte.</li>
+    </ul>
+    <p>Cuando GEALMI cuente con mecanismos de acceso administrativo o soporte que permitan ingresar temporalmente al entorno de una empresa, dicho acceso estará sujeto a controles internos, permisos y mecanismos de trazabilidad.</p>
+
+    <h2 id="s14">14. Impersonación o acceso de soporte administrativo</h2>
+    <p>Para determinadas funciones de soporte, GEALMI puede disponer de mecanismos que permitan a personal autorizado acceder temporalmente al entorno de una empresa.</p>
+    <p>Cuando esta funcionalidad exista:</p>
+    <ul>
+      <li>El acceso estará limitado a personal autorizado.</li>
+      <li>Deberá existir una finalidad legítima de soporte o administración.</li>
+      <li>El acceso será temporal.</li>
+      <li>Se podrán registrar los eventos correspondientes.</li>
+      <li>El acceso no deberá utilizarse para fines comerciales ajenos al servicio.</li>
+      <li>Se aplicarán las restricciones de seguridad existentes en la plataforma.</li>
+    </ul>
+    <p>La finalidad de esta funcionalidad es permitir la resolución de incidencias y administración técnica, no proporcionar acceso indiscriminado a la información de las empresas.</p>
+
+    <h2 id="s15">15. Confidencialidad de la información empresarial</h2>
+    <p>GEALMI reconoce que la información registrada por cada empresa constituye información propia de dicha empresa.</p>
+    <p>GEALMI no vende las bases de datos de sus clientes ni comercializa la información empresarial registrada en la plataforma como un producto independiente.</p>
+    <p>Asimismo, GEALMI no utilizará deliberadamente la información de una empresa para proporcionar acceso a otra empresa.</p>
+    <p>La información será tratada para prestar y proteger el servicio contratado y para las finalidades descritas en esta Política, además de aquellas que resulten exigibles por ley.</p>
+
+    <h2 id="s16">16. Cookies y tecnologías similares</h2>
+    <p>El sitio web y la plataforma pueden utilizar tecnologías necesarias para:</p>
+    <ul>
+      <li>Mantener sesiones.</li>
+      <li>Recordar determinadas configuraciones.</li>
+      <li>Garantizar la seguridad.</li>
+      <li>Detectar actividades anómalas.</li>
+      <li>Mantener el funcionamiento técnico del servicio.</li>
+    </ul>
+    <p>GEALMI no utiliza cookies de rastreo con la finalidad de vender datos personales a terceros.</p>
+    <p>Cuando se incorporen herramientas analíticas, publicitarias o tecnologías adicionales que requieran información al usuario o consentimiento conforme a la legislación aplicable, se proporcionarán los avisos correspondientes.</p>
+
+    <h2 id="s17">17. Almacenamiento local y sesiones</h2>
+    <p>La aplicación puede utilizar mecanismos de almacenamiento del navegador para mantener determinados elementos necesarios para la sesión y funcionamiento de la plataforma.</p>
+    <p>Los mecanismos de autenticación utilizados están destinados a permitir que el usuario acceda de manera segura a su cuenta.</p>
+    <p>El usuario debe cerrar sesión cuando termine de utilizar GEALMI, especialmente cuando utilice un equipo compartido o público.</p>
+    <p>Asimismo, el usuario es responsable de mantener la confidencialidad de sus credenciales de acceso.</p>
+
+    <h2 id="s18">18. Conservación de los datos</h2>
+    <p>GEALMI conservará los datos personales durante el tiempo necesario para cumplir las finalidades descritas en esta Política, prestar el servicio contratado, mantener la seguridad, atender obligaciones contractuales y cumplir las obligaciones legales aplicables.</p>
+    <p>Los períodos de conservación pueden depender de:</p>
+    <ul>
+      <li>La vigencia de la cuenta.</li>
+      <li>El contrato con la empresa cliente.</li>
+      <li>Las obligaciones legales o contables.</li>
+      <li>Las necesidades de auditoría.</li>
+      <li>La seguridad de la plataforma.</li>
+      <li>La existencia de reclamaciones o controversias.</li>
+      <li>Las obligaciones relacionadas con prevención de fraude o incidentes.</li>
+    </ul>
+    <p>Cuando los datos ya no sean necesarios y no exista una obligación que exija conservarlos, podrán ser eliminados, anonimizados o sometidos a medidas de conservación restringida, según corresponda.</p>
+
+    <h2 id="s19">19. Eliminación de cuentas y datos</h2>
+    <p>La eliminación de una cuenta o la terminación de una suscripción no implica necesariamente la eliminación inmediata de toda información.</p>
+    <p>Determinados registros pueden conservarse durante el período necesario para:</p>
+    <ul>
+      <li>Cumplir obligaciones legales.</li>
+      <li>Resolver controversias.</li>
+      <li>Mantener registros contables.</li>
+      <li>Investigar incidentes.</li>
+      <li>Mantener evidencias de seguridad.</li>
+      <li>Cumplir obligaciones contractuales.</li>
+    </ul>
+    <p>Cuando corresponda la eliminación, GEALMI aplicará procedimientos destinados a eliminar o anonimizar la información de acuerdo con sus obligaciones y políticas de conservación.</p>
+
+    <h2 id="s20">20. Datos introducidos por las empresas clientes</h2>
+    <p>Las empresas clientes son responsables de los datos personales que incorporan a GEALMI y de las finalidades para las cuales los utilizan.</p>
+    <p>Cada empresa deberá:</p>
+    <ul>
+      <li>Recopilar los datos de manera lícita.</li>
+      <li>Informar a los titulares cuando corresponda.</li>
+      <li>Obtener los consentimientos necesarios cuando sean exigibles.</li>
+      <li>Registrar únicamente información necesaria para sus finalidades.</li>
+      <li>Mantener actualizada la información.</li>
+      <li>Respetar los derechos de los titulares.</li>
+      <li>Evitar registrar información innecesaria o ilícita.</li>
+      <li>Administrar adecuadamente los usuarios y permisos.</li>
+    </ul>
+    <p>GEALMI proporciona la infraestructura y funcionalidades necesarias para administrar dicha información, pero no determina las finalidades comerciales específicas que cada empresa da a los datos de sus clientes, trabajadores o proveedores.</p>
+
+    <h2 id="s21">21. Derechos de los titulares de datos personales</h2>
+    <p>De acuerdo con la legislación peruana aplicable, los titulares de datos personales pueden ejercer los derechos que les correspondan, incluyendo los derechos de:</p>
+    <ul>
+      <li><b>Información:</b> conocer las condiciones bajo las cuales se recopilan y tratan sus datos.</li>
+      <li><b>Acceso:</b> solicitar información sobre los datos personales objeto de tratamiento y las condiciones de dicho tratamiento.</li>
+      <li><b>Rectificación:</b> solicitar la corrección o actualización de datos personales inexactos, incompletos o desactualizados.</li>
+      <li><b>Cancelación o supresión:</b> solicitar la eliminación de datos personales cuando corresponda conforme a la legislación aplicable.</li>
+      <li><b>Oposición:</b> oponerse al tratamiento de sus datos en los supuestos establecidos por la normativa.</li>
+      <li><b>Otros derechos legalmente reconocidos:</b> los titulares podrán ejercer los demás derechos que reconozca la legislación peruana aplicable.</li>
     </ul>
 
-    <h2>4. Dónde se almacenan los datos</h2>
-    <p>La información se guarda en una base de datos PostgreSQL alojada en Supabase (servidores en Sudamérica). El backend corre en Render y el sitio web en Vercel — ambos actúan como encargados del tratamiento, procesando los datos únicamente para operar la plataforma, bajo sus propias políticas de seguridad.</p>
+    <h2 id="s22">22. Cómo ejercer los derechos</h2>
+    <p>Para ejercer los derechos correspondientes, el titular podrá enviar una solicitud a:</p>
+    <p>Correo: <span class="doc-placeholder">[CORREO DE PRIVACIDAD]</span></p>
+    <p>El asunto recomendado es: "Solicitud de Derechos de Protección de Datos Personales"</p>
+    <p>La solicitud deberá permitir identificar razonablemente al titular y especificar claramente el derecho que desea ejercer y la información relacionada con su solicitud.</p>
+    <p>Cuando sea necesario para proteger la seguridad de la información, GEALMI podrá solicitar información adicional razonablemente necesaria para verificar la identidad del solicitante.</p>
+    <p>Las solicitudes serán atendidas dentro de los plazos y bajo las condiciones establecidos por la legislación peruana aplicable.</p>
+    <p>Cuando la solicitud se refiera a información registrada por una empresa cliente, GEALMI podrá derivar o coordinar la atención con dicha empresa cuando corresponda, debido a que esta puede ser quien determine la finalidad y condiciones del tratamiento.</p>
 
-    <h2>5. Seguridad</h2>
+    <h2 id="s23">23. Menores de edad</h2>
+    <p>GEALMI es una plataforma orientada a la gestión empresarial y no está dirigida específicamente a menores de edad.</p>
+    <p>GEALMI no solicita deliberadamente datos personales de menores para la creación de cuentas empresariales.</p>
+    <p>Cuando una empresa cliente registre información de terceros dentro de la plataforma, dicha empresa será responsable de cumplir las obligaciones que correspondan respecto de esos datos.</p>
+
+    <h2 id="s24">24. Información financiera y pagos</h2>
+    <p>Cuando GEALMI ofrezca planes de suscripción o servicios de pago, determinadas operaciones podrán ser procesadas mediante proveedores externos especializados.</p>
+    <p>GEALMI no necesariamente almacena directamente los datos completos de tarjetas bancarias.</p>
+    <p>Cuando corresponda, los datos de pago serán procesados por el proveedor de pagos seleccionado para la operación, conforme a sus propias condiciones y políticas.</p>
+    <p>GEALMI podrá conservar información necesaria para identificar una transacción, administrar una suscripción, verificar el estado de un pago y cumplir obligaciones legales o contables.</p>
+
+    <h2 id="s25">25. Facturación electrónica</h2>
+    <p>Cuando GEALMI integre servicios de facturación electrónica u otros servicios relacionados con comprobantes electrónicos, determinados datos podrán ser enviados a proveedores tecnológicos o entidades necesarias para procesar dichos comprobantes.</p>
+    <p>El tratamiento estará limitado a las finalidades necesarias para prestar el servicio correspondiente y cumplir las obligaciones tributarias aplicables.</p>
+
+    <h2 id="s26">26. Integraciones con terceros</h2>
+    <p>GEALMI puede incorporar integraciones con servicios externos.</p>
+    <p>Cuando el usuario o la empresa active una integración, determinados datos podrán ser compartidos con el proveedor correspondiente en la medida necesaria para ejecutar dicha integración.</p>
+    <p>El tratamiento realizado directamente por un tercero puede estar sujeto adicionalmente a las condiciones y políticas de privacidad de dicho tercero.</p>
+    <p>GEALMI recomienda revisar las políticas de los servicios externos que sean conectados voluntariamente por el usuario o la empresa.</p>
+
+    <h2 id="s27">27. Principio de minimización</h2>
+    <p>GEALMI procura limitar la recopilación y tratamiento de datos personales a aquellos que resulten necesarios para las finalidades correspondientes.</p>
+    <p>La empresa cliente también deberá evitar registrar información que no sea necesaria para sus procesos empresariales.</p>
+
+    <h2 id="s28">28. Exactitud y actualización</h2>
+    <p>GEALMI busca mantener la información almacenada de manera íntegra y consistente.</p>
+    <p>Sin embargo, la exactitud de la información introducida por una empresa depende de los usuarios autorizados que administran dicha información.</p>
+    <p>Los usuarios y empresas clientes deben procurar mantener actualizados sus registros y corregir oportunamente cualquier información incorrecta.</p>
+
+    <h2 id="s29">29. Información empresarial y propiedad de los datos</h2>
+    <p>La información empresarial registrada por una empresa en GEALMI permanece bajo el control de dicha empresa, de acuerdo con los términos contractuales aplicables.</p>
+    <p>GEALMI proporciona la infraestructura tecnológica necesaria para almacenar, procesar y administrar dicha información.</p>
+    <p>GEALMI no pretende convertir la información de sus clientes en un activo comercial independiente ni utilizarla para impedir su migración o portabilidad.</p>
+    <p>Cuando corresponda y de acuerdo con las funcionalidades y condiciones contratadas, la empresa podrá solicitar mecanismos razonables para obtener o migrar su información.</p>
+
+    <h2 id="s30">30. Portabilidad y salida del servicio</h2>
+    <p>GEALMI busca que la información de las empresas pueda ser gestionada de manera transparente.</p>
+    <p>Cuando una empresa termine su relación con GEALMI, se aplicarán las condiciones establecidas en el contrato o plan contratado respecto de la conservación, exportación y eliminación de la información.</p>
+    <p>Las obligaciones legales de conservación podrán prevalecer sobre una solicitud inmediata de eliminación cuando la legislación así lo exija.</p>
+
+    <h2 id="s31">31. Modificaciones de la Política</h2>
+    <p>GEALMI puede modificar esta Política cuando:</p>
     <ul>
-      <li>Las contraseñas se guardan cifradas (nunca en texto plano).</li>
-      <li>El acceso a cada módulo está controlado por permisos según el rol de cada usuario.</li>
-      <li>Cada sesión usa un token temporal (JWT); al cerrar sesión, el token se elimina del navegador.</li>
-      <li>Toda acción de creación, edición o borrado queda registrada en el módulo de Auditoría.</li>
+      <li>Se incorporen nuevas funcionalidades.</li>
+      <li>Se modifique la arquitectura del servicio.</li>
+      <li>Se incorporen nuevos proveedores.</li>
+      <li>Cambien las condiciones de tratamiento.</li>
+      <li>Se produzcan cambios legislativos o regulatorios.</li>
+      <li>Resulten necesarias mejoras de seguridad o privacidad.</li>
     </ul>
+    <p>La fecha de última actualización aparecerá al inicio de esta Política.</p>
+    <p>Cuando una modificación sea material y resulte necesario comunicarla de acuerdo con la normativa aplicable, GEALMI utilizará medios razonables para informar a los usuarios o clientes afectados.</p>
 
-    <h2>6. Cookies y almacenamiento local</h2>
-    <p>GEALMI no usa cookies de rastreo ni de publicidad. Para mantener la sesión iniciada, guarda un token en el almacenamiento local del navegador (localStorage), que se borra al cerrar sesión.</p>
-
-    <h2>7. Conservación de los datos</h2>
-    <p>Los datos se conservan mientras la cuenta o el registro estén activos en el sistema, o mientras sea necesario para cumplir obligaciones legales o contables de la empresa. Un usuario o cliente puede solicitar la eliminación de sus datos según el punto 8.</p>
-
-    <h2>8. Tus derechos (ARCO)</h2>
-    <p>Como titular de tus datos personales, tienes derecho a:</p>
+    <h2 id="s32">32. Legislación aplicable</h2>
+    <p>Esta Política se encuentra sometida a la legislación peruana en materia de protección de datos personales.</p>
+    <p>Entre las principales normas aplicables se encuentran:</p>
     <ul>
-      <li><b>Acceso:</b> saber qué datos tuyos tenemos registrados.</li>
-      <li><b>Rectificación:</b> corregir datos inexactos o incompletos.</li>
-      <li><b>Cancelación:</b> pedir que eliminemos tus datos cuando ya no sean necesarios.</li>
-      <li><b>Oposición:</b> oponerte a un uso específico de tus datos.</li>
+      <li>Ley N.º 29733, Ley de Protección de Datos Personales.</li>
+      <li>Decreto Supremo N.º 016-2024-JUS, Reglamento de la Ley N.º 29733.</li>
+      <li>Las demás normas modificatorias, complementarias o sustitutorias que resulten aplicables.</li>
     </ul>
-    <p>Para ejercer estos derechos, escríbenos a <span class="doc-placeholder">[CORREO DE CONTACTO]</span>.</p>
+    <p>La Ley N.º 29733 reconoce el derecho fundamental a la protección de los datos personales y establece las reglas generales para su tratamiento.</p>
+    <p>El Reglamento vigente desarrolla las obligaciones aplicables al tratamiento de datos personales, incluyendo el tratamiento realizado en entornos digitales y la actuación de encargados del tratamiento.</p>
 
-    <h2>9. Menores de edad</h2>
-    <p>GEALMI es una herramienta de gestión empresarial y no está dirigida a menores de edad. No solicitamos deliberadamente datos de menores.</p>
+    <h2 id="s33">33. Autoridad Nacional de Protección de Datos Personales</h2>
+    <p>En el Perú, la protección de datos personales se encuentra bajo la competencia de la Autoridad Nacional de Protección de Datos Personales (ANPD).</p>
+    <p>El titular que considere que sus derechos no han sido atendidos adecuadamente podrá recurrir a las vías administrativas y judiciales que correspondan conforme a la legislación vigente.</p>
 
-    <h2>10. Cambios a esta política</h2>
-    <p>Podemos actualizar esta política cuando cambien las funciones del sistema o la normativa aplicable. La fecha de la última actualización aparece al inicio de este documento.</p>
+    <h2 id="s34">34. Contacto</h2>
+    <p>Para consultas relacionadas con esta Política, privacidad, seguridad o protección de datos personales:</p>
+    <ul>
+      <li><span class="doc-placeholder">[RAZÓN SOCIAL DE LA EMPRESA]</span></li>
+      <li>RUC: <span class="doc-placeholder">[RUC]</span></li>
+      <li>Domicilio: <span class="doc-placeholder">[DIRECCIÓN]</span></li>
+      <li>Correo de privacidad: <span class="doc-placeholder">[CORREO DE PRIVACIDAD]</span></li>
+      <li>Sitio web: <span class="doc-placeholder">[DOMINIO DE GEALMI]</span></li>
+    </ul>
+    <p>Asunto recomendado: Protección de Datos Personales – GEALMI</p>
+
+    <h2 id="s35">35. Declaración final de privacidad</h2>
+    <p>En GEALMI entendemos que la información de una empresa no es simplemente información almacenada en un sistema.</p>
+    <p>Es información que representa clientes, trabajadores, operaciones, recursos, decisiones y la historia del negocio.</p>
+    <p>Por ello, nuestro compromiso es construir una plataforma donde la información pueda estar organizada, protegida, controlada y disponible para quienes realmente deben utilizarla.</p>
+    <p>GEALMI no busca apropiarse de los datos de sus clientes.</p>
+    <p>Busca proporcionar el núcleo tecnológico para que cada empresa pueda organizar su información, controlar su operación y tomar mejores decisiones.</p>
+    <p><b>GEALMI — Un núcleo. Cualquier industria.</b></p>
   </div>
 
   <footer></footer>
@@ -134,8 +544,6 @@
 <script type="module">
   import { renderFooter } from '../components/footer.js';
   renderFooter();
-
-  document.getElementById('fechaActualizacion').textContent = new Date().toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' });
 
   document.getElementById('linkVolver').addEventListener('click', (e) => {
     e.preventDefault();

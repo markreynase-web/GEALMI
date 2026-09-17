@@ -313,7 +313,7 @@ function aplicarBranding(config) {
   const topbarSubtitleEl = document.getElementById('topbarSubtitle');
   if (topbarSubtitleEl) topbarSubtitleEl.textContent = subtitleTexto;
 
-  document.title = `${config.bizName || 'KhipuCore'} — ${nombreModulo}`;
+  document.title = `${config.bizName || 'GEALMI'} — ${nombreModulo}`;
 }
 
 // Si el módulo actual tiene baseDeDatos:true en config/company.json, intenta

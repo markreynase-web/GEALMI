@@ -54,7 +54,7 @@ export function renderSidebar(config, paginaActualId) {
   const sinSesion = !haySesionActiva();
 
   const modulosPrincipales = modulosHabilitados(config).filter(m => {
-    // Khipu AI no es una página navegable (no tiene captura/Vista Ejecutiva
+    // GEALMI AI no es una página navegable (no tiene captura/Vista Ejecutiva
     // ni un .html real detrás) -- es solo un flag de catálogo para que el
     // panel de super admin pueda habilitarlo/deshabilitarlo por empresa. Sin
     // este filtro caía en la rama de abajo (baseDeDatos:false = "módulo
@@ -106,7 +106,7 @@ export function renderSidebar(config, paginaActualId) {
   cont.innerHTML = `
     <div class="sidebar-inner">
       <div class="sidebar-brand">
-        <a href="../index.html" title="Ir a la página principal"><img class="mark" src="../assets/logo-icon.png" alt="KhipuCore"></a>
+        <a href="../index.html" title="Ir a la página principal"><img class="mark" src="../assets/logo-icon.png" alt="GEALMI"></a>
         <div class="sidebar-brand-text">
           <input class="biz-name" id="bizName" value="${escapeHtml(config.bizName || 'Gestor de Datos Empresariales')}" />
           <div class="sidebar-subtitle" id="sidebarSubtitle"></div>
@@ -137,7 +137,7 @@ export function renderSidebar(config, paginaActualId) {
   wireKhipuAiEntrada();
 }
 
-// Entrada fija de Khipu AI al pie del sidebar (Rediseño v3): mismo gate que
+// Entrada fija de GEALMI AI al pie del sidebar (Rediseño v3): mismo gate que
 // el botón flotante (components/khipuAiWidget.js) -- módulo habilitado por
 // la empresa Y permiso del usuario -- para que no aparezca una entrada que
 // lleva a algo que ese usuario/empresa no tiene. Al hacer clic dispara un
@@ -147,10 +147,10 @@ function khipuAiEntradaHtml(config) {
   const habilitado = !!buscarModulo(config, 'khipu_ai') && tienePermiso('khipu_ai.ver');
   if (!habilitado) return '';
   return `
-    <button type="button" class="sidebar-khipu-ai" id="sidebarKhipuAiTrigger" title="Abrir Khipu AI">
+    <button type="button" class="sidebar-khipu-ai" id="sidebarKhipuAiTrigger" title="Abrir GEALMI AI">
       <div class="sidebar-khipu-ai-icon">${ICONO_SPARK}</div>
       <div class="sidebar-footer-info">
-        <div class="sidebar-footer-nombre">Khipu AI</div>
+        <div class="sidebar-footer-nombre">GEALMI AI</div>
         <div class="sidebar-footer-rol">Asistente empresarial</div>
       </div>
       <span class="sidebar-khipu-ai-chevron">›</span>

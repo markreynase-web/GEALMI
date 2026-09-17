@@ -1,5 +1,5 @@
 // tests/khipu-ai-security.test.js
-// Fase 3, Eje C -- Khipu AI Security & Guardrails.
+// Fase 3, Eje C -- GEALMI AI Security & Guardrails.
 //
 // Decisión explícita de alcance (mismo criterio que con Brevo en el
 // Sub-bloque 2 de la Suite de Regresión Ampliada): esta suite NUNCA llama a

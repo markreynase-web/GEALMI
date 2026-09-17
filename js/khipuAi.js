@@ -1,5 +1,5 @@
 // js/khipuAi.js
-// Fase D: cliente delgado para el endpoint de Khipu AI. Mismo patrón de
+// Fase D: cliente delgado para el endpoint de GEALMI AI. Mismo patrón de
 // fetch que js/config.js (Authorization: Bearer <token de sesión>).
 
 import { API_BASE_URL } from './apiConfig.js';
@@ -23,7 +23,7 @@ export async function preguntarKhipuAi(pregunta, historial = []) {
   try { json = await res.json(); } catch { /* respuesta sin cuerpo JSON */ }
 
   if (!res.ok) {
-    throw new Error(json?.error || `No se pudo consultar a Khipu AI (HTTP ${res.status}).`);
+    throw new Error(json?.error || `No se pudo consultar a GEALMI AI (HTTP ${res.status}).`);
   }
   return json; // { respuesta, herramientas_usadas }
 }

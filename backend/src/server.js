@@ -1,5 +1,5 @@
 // src/server.js
-// Servidor de la API. Sirve solo /api/*; el frontend (KhipuCore) sigue
+// Servidor de la API. Sirve solo /api/*; el frontend (GEALMI) sigue
 // sirviéndose aparte como archivos estáticos (ej. `python -m http.server`).
 
 import express from 'express';
@@ -120,7 +120,7 @@ app.use(helmet({
 app.use((req, res, next) => {
   // helmet ya no trae un middleware propio de Permissions-Policy (el spec
   // cambió mucho entre versiones) -- se setea a mano, solo con las APIs que
-  // se comprobó que KhipuCore no usa en ningún lado del frontend (grep de
+  // se comprobó que GEALMI no usa en ningún lado del frontend (grep de
   // mediaDevices/geolocation/bluetooth/usb/payment en todo el repo: cero
   // resultados).
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=()');

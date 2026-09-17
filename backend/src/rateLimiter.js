@@ -3,7 +3,7 @@
 // para endpoints públicos de bajo volumen y alto riesgo de abuso (hoy, solo
 // recuperación de contraseña, ver routes/auth.js). Vive en memoria del
 // proceso: se reinicia en cada redeploy y no se comparte entre instancias --
-// para el despliegue actual de KhipuCore (un solo servicio en Render) es
+// para el despliegue actual de GEALMI (un solo servicio en Render) es
 // protección real. Si algún día el backend corre en más de una instancia a
 // la vez, esto deja de ser confiable para todas las instancias juntas y
 // haría falta algo compartido (una tabla, o Redis).

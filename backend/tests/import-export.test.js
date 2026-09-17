@@ -5,7 +5,7 @@
 // del usuario, ver conversación): NO existe ningún endpoint de exportación
 // en el backend -- ni GET /export, ni ninguna ruta que devuelva CSV/
 // Content-Disposition (confirmado con grep exhaustivo sobre backend/src y
-// el frontend). KhipuCore solo tiene IMPORTACIÓN de CSV (POST /import, ver
+// el frontend). GEALMI solo tiene IMPORTACIÓN de CSV (POST /import, ver
 // crudFactory.js). Este archivo cubre exclusivamente lo que sí existe:
 // mapeo flexible de encabezados + sanitización, y aislamiento multi-tenant
 // estricto durante el import. La ausencia de exportación queda documentada

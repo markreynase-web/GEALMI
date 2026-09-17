@@ -76,7 +76,7 @@
 .sidebar-logout:hover{ color:var(--coral); }
 .sidebar-login-link{ font-size:13px; color:#fff; text-decoration:none; font-weight:600; }
 
-/* Entrada fija de Khipu AI (Rediseño v3, ver components/sidebar.js
+/* Entrada fija de GEALMI AI (Rediseño v3, ver components/sidebar.js
    khipuAiEntradaHtml()) -- mismo bloque visual que .sidebar-footer, pero es
    un <button> (dispara el evento 'khipu-ai:abrir'), no información estática. */
 .sidebar-khipu-ai{

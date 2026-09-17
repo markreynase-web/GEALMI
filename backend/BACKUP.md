@@ -1,4 +1,4 @@
-# Backup y restauración de KhipuCore
+# Backup y restauración de GEALMI
 
 ```
 Base de origen (DATABASE_URL / BACKUP_DATABASE_URL)
@@ -40,7 +40,7 @@ npm run backup
 ```
 
 - **Origen configurable**: si `BACKUP_DATABASE_URL` está definida, se usa esa (pensado para respaldar puntualmente un entorno distinto, ej. `TEST_DATABASE_URL`, sin sobrescribir `DATABASE_URL`). Si no, cae a `DATABASE_URL` -- comportamiento normal/futuro sin cambios. Si ambas están definidas y son idénticas, el script aborta (evita un override redundante que suele ser una URL pegada por error).
-- Formato `-Fc -n public` (custom, comprimido, **acotado al schema `public`**). El `-n public` es importante: sin él, un dump completo de una base Supabase puede incluir schemas internos de la plataforma (`auth`, `storage`, `realtime`, etc.) a los que el rol de conexión tenga acceso -- innecesario y un radio de impacto mayor al que hace falta, ya que toda la aplicación real de KhipuCore vive en `public`.
+- Formato `-Fc -n public` (custom, comprimido, **acotado al schema `public`**). El `-n public` es importante: sin él, un dump completo de una base Supabase puede incluir schemas internos de la plataforma (`auth`, `storage`, `realtime`, etc.) a los que el rol de conexión tenga acceso -- innecesario y un radio de impacto mayor al que hace falta, ya que toda la aplicación real de GEALMI vive en `public`.
 - Nombre de archivo con timestamp ISO: `khipucore-postgres-2026-08-25T....dump`.
 - La contraseña nunca se pasa como argumento de proceso ni se imprime en consola -- se traduce a variables de entorno libpq (`PGPASSWORD`, etc.) antes de invocar `pg_dump`.
 - Si `pg_dump` no está instalado, el script falla explícitamente -- nunca hace un backup "de mentira".
@@ -68,14 +68,14 @@ Restaurar un dump completo (`-Fc -n public`) con `pg_restore --clean` contra una
 
 | # | Entrada excluida | Motivo técnico |
 |---|---|---|
-| 1 | `SCHEMA - public` | `--clean` intenta `DROP SCHEMA IF EXISTS public;` antes de recrearlo. En Supabase, la extensión `unaccent` (usada por la búsqueda de KhipuCore, migración 029) vive **dentro** del schema `public` -- Postgres rechaza el DROP porque hay un objeto dependiente, y `pg_restore` no agrega `CASCADE` por defecto. |
+| 1 | `SCHEMA - public` | `--clean` intenta `DROP SCHEMA IF EXISTS public;` antes de recrearlo. En Supabase, la extensión `unaccent` (usada por la búsqueda de GEALMI, migración 029) vive **dentro** del schema `public` -- Postgres rechaza el DROP porque hay un objeto dependiente, y `pg_restore` no agrega `CASCADE` por defecto. |
 | 2 | `COMMENT - SCHEMA public` | Metadata asociada al mismo objeto schema del punto 1 -- se cae junto con él. |
 | 3 | `ACL - SCHEMA public` | Idem -- permisos del objeto schema, no de las tablas. |
 | 4 | `DEFAULT ACL ... FOR TABLES supabase_admin` | `pg_dump` captura, además de los privilegios por defecto que puso nuestro propio rol (`postgres`), los que puso `supabase_admin` (rol de plataforma de Supabase) sobre objetos futuros en `public`. Nuestro rol de conexión (`postgres`, con `BYPASSRLS` pero **sin ser superusuario**) no tiene autoridad para modificar privilegios por defecto establecidos por otro rol -- Postgres exige ser ese rol o superusuario. |
 | 5 | `DEFAULT ACL ... FOR FUNCTIONS supabase_admin` | Mismo motivo que el punto 4, para funciones. |
 | 6 | `DEFAULT ACL ... FOR SEQUENCES supabase_admin` | Mismo motivo que el punto 4, para secuencias. |
 
-**Estas 6 exclusiones NO significan pérdida de tablas, datos, constraints, índices, RLS ni lógica de aplicación.** Son exclusivamente objetos de gestión de plataforma (el schema `public` como objeto en sí, y privilegios por defecto de un rol administrativo de Supabase) -- ninguno de los dos es responsabilidad de KhipuCore ni hace falta para reconstruir su esquema o sus datos. Las 3 entradas `DEFAULT ACL ... postgres` (nuestro propio rol) **sí se conservan e incluyen** en el restore.
+**Estas 6 exclusiones NO significan pérdida de tablas, datos, constraints, índices, RLS ni lógica de aplicación.** Son exclusivamente objetos de gestión de plataforma (el schema `public` como objeto en sí, y privilegios por defecto de un rol administrativo de Supabase) -- ninguno de los dos es responsabilidad de GEALMI ni hace falta para reconstruir su esquema o sus datos. Las 3 entradas `DEFAULT ACL ... postgres` (nuestro propio rol) **sí se conservan e incluyen** en el restore.
 
 Confirmado por la evidencia real de la Fase 1: con estas 6 exclusiones, el restore recuperó **exactamente** el estado pre-pérdida --
 - hash global de datos PRE == POST (comparación determinista por tabla y fila);

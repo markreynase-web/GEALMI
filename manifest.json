@@ -1,0 +1,19 @@
+{
+  "name": "GEALMI",
+  "short_name": "GEALMI",
+  "description": "Gestión empresarial en un solo lugar: ventas, inventario, clientes, finanzas y más.",
+  "id": "/pages/inicio.html",
+  "start_url": "/pages/inicio.html",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "background_color": "#0E1B45",
+  "theme_color": "#0E1B45",
+  "orientation": "any",
+  "lang": "es-PE",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/assets/logo-icon.png", "sizes": "195x195", "type": "image/png", "purpose": "any" }
+  ]
+}

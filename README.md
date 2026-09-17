@@ -1,4 +1,4 @@
-# KhipuCore
+# GEALMI
 
 Reorganización del proyecto original (un solo `index.html` de 822 líneas) en módulos,
 más el fix de un problema de seguridad encontrado en el análisis inicial.
@@ -9,7 +9,7 @@ Necesita servidor local (usa ES modules — `import`/`export` — que los navega
 bloquean sobre `file://`):
 
 ```bash
-cd KhipuCore
+cd GEALMI
 python -m http.server 8000
 # o: npx serve
 ```
@@ -132,7 +132,7 @@ Auditoría — ver `backend/src/middleware/permisos.js`, las migraciones
 
 **Fase A — Plataforma multi-tenant (SaaS)**
 
-KhipuCore deja de ser "un despliegue = una empresa" y pasa a ser un solo
+GEALMI deja de ser "un despliegue = una empresa" y pasa a ser un solo
 backend que sirve a muchas empresas, aisladas por fila (`empresa_id`), no por
 despliegue. Motivación completa en el historial del proyecto; resumen técnico:
 
@@ -169,7 +169,7 @@ despliegue. Motivación completa en el historial del proyecto; resumen técnico:
 **Fase B — Landing page pública**
 
 `index.html` deja de ser un redirect ciego a `pages/inicio.html` y pasa a
-ser una landing real (qué es KhipuCore, el núcleo, módulos por industria,
+ser una landing real (qué es GEALMI, el núcleo, módulos por industria,
 IA como roadmap, planes, contacto) — el login inteligente de Fase A ya era
 la pieza que le faltaba para tener sentido como fachada pública. Quien ya
 tiene sesión sigue yendo directo a su dashboard, sin ver la landing.
@@ -233,7 +233,7 @@ módulos, y agregar su primer administrador — mismo flujo que antes hacía
 admin sigue creándose por terminal (`npm run seed:superadmin`, huevo-y-gallina:
 para crear uno desde la API hace falta ya serlo).
 
-**Khipu AI (Fase D)**
+**GEALMI AI (Fase D)**
 
 Última fase del roadmap post-reunión con la concesionaria: IA real, no solo
 anunciada en el landing. Un solo agente de Claude con tool use resuelve a la
@@ -289,20 +289,20 @@ Khipu1/
     layout.css           → estructura general de página
     panel-lateral.css    → panel lateral deslizable
     tables.css           → tabla de debug, badges de rol
-    khipu-ai-widget.css  → widget flotante de Khipu AI
+    khipu-ai-widget.css  → widget flotante de GEALMI AI
   js/
     app.js, apiConfig.js, api.js, config.js, dashboard.js, charts.js,
     filters.js, parsing.js, storage.js, utils.js, esquemas.js, sesion.js,
     modoBackend.js, khipuAi.js
                           → estado, render, fetch al backend, parsing de
-                            CSV/ZIP, y el cliente del widget de Khipu AI
+                            CSV/ZIP, y el cliente del widget de GEALMI AI
   components/
     sidebar.js            → menú dinámico de módulos (reemplaza al viejo nav.js)
     panelLateral.js        → abre/cierra el panel lateral deslizable
     topbar.js, footer.js   → cabecera y pie compartidos
     tablaRegistros.js      → tabla editable reutilizable
     formularioRegistro.js  → formulario reutilizable
-    khipuAiWidget.js       → UI del widget flotante de Khipu AI
+    khipuAiWidget.js       → UI del widget flotante de GEALMI AI
   pages/
     inicio.html, login.html, ventas.html, inventario.html, compras.html,
     clientes.html, rrhh.html, finanzas.html, produccion.html, marketing.html,
@@ -320,7 +320,7 @@ Khipu1/
       db.js                 → pool de conexión
       crudFactory.js        → genera CRUD estándar por módulo
       registroAuditoria.js  → helper para registrar auditoría (usado por crudFactory y varias rutas manuales)
-      khipuAiTools.js       → herramientas de datos que usa Khipu AI (tool use)
+      khipuAiTools.js       → herramientas de datos que usa GEALMI AI (tool use)
       middleware/           → auth.js, permisos.js
       routes/                → una ruta por módulo (auth, clientes, ventas, ...)
     migrations/              → historial de esquema SQL, no se edita retroactivamente

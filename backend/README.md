@@ -148,9 +148,9 @@ desde el panel de "Gestionar empresa". El frontend lo aplica sobreescribiendo
 las variables CSS `--ochre`/`--ochre-deep` (`aplicarTema()` en `js/config.js`,
 llamada automáticamente dentro de `cargarConfigEmpresa()` -- así ninguna
 página nueva puede olvidarse de aplicarlo, mismo problema que ya pasó con el
-widget de Khipu AI). El tono oscuro (`--ochre-deep`, usado en hover/estados
+widget de GEALMI AI). El tono oscuro (`--ochre-deep`, usado en hover/estados
 activos) se deriva del color elegido, no se pide aparte. Sin color guardado,
-queda el amarillo de KhipuCore de siempre. A propósito es solo un color, no
+queda el amarillo de GEALMI de siempre. A propósito es solo un color, no
 un editor de layout -- personalizar qué se muestra o cómo se organiza la UI
 queda fuera de alcance.
 
@@ -263,7 +263,7 @@ imposible de ignorar. Arreglado: un PUT (`limpiarYValidar(body, {esEdicion:
 true})`) ahora excluye del `UPDATE` cualquier columna que no venga en el
 body, en vez de resetearla.
 
-## Khipu AI (Fase D)
+## GEALMI AI (Fase D)
 
 Asistente de IA (Claude, vía la API de Anthropic) con acceso de solo lectura
 a los datos de la empresa activa, opt-in por empresa igual que el resto de

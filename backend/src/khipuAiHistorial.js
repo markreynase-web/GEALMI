@@ -10,7 +10,7 @@
 // El historial lo manda el cliente tal cual (el chat vive en el navegador,
 // ver components/khipuAiWidget.js -- no hay sesión guardada server-side) --
 // eso incluye los turnos "assistant", que en un request legítimo son la
-// respuesta real que Khipu AI ya dio, pero que nada impide que alguien
+// respuesta real que GEALMI AI ya dio, pero que nada impide que alguien
 // fabrique a mano llamando a este endpoint directo (envenenamiento de
 // historial: simular que "Claude" ya aceptó romper sus reglas). No hay
 // forma de verificar server-side que un turno "assistant" sea genuino sin

@@ -1,5 +1,5 @@
 // components/khipuAiWidget.js
-// Fase D: botón flotante "Khipu AI" + ventana de chat tipo burbuja
+// Fase D: botón flotante "GEALMI AI" + ventana de chat tipo burbuja
 // (Facebook Messenger) -- una ventanita fija que se despliega junto al
 // botón, no el panel lateral de ancho completo que usa el resto de la app
 // (decisión explícita del usuario: NO reutiliza components/panelLateral.js).
@@ -18,11 +18,11 @@ let abierta = false;
 // login/landing: sin emojis como ícono estructural). currentColor hereda el
 // color del elemento que lo contiene, así que no necesita su propio CSS.
 // Exportado para que components/sidebar.js pinte el mismo ícono en su
-// entrada de "Khipu AI" sin duplicar el path SVG.
+// entrada de "GEALMI AI" sin duplicar el path SVG.
 export const ICONO_SPARK = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2L11.8 7.4L17 10L11.8 12.6L10 18L8.2 12.6L3 10L8.2 7.4L10 2Z" fill="currentColor"/></svg>';
 
 // Evento global para abrir el chat desde fuera de este módulo (ej. la
-// entrada de "Khipu AI" en el sidebar) sin que sidebar.js tenga que
+// entrada de "GEALMI AI" en el sidebar) sin que sidebar.js tenga que
 // importar directo este archivo -- mismo criterio de desacople por eventos
 // que ya usa accionExtra en components/formularioRegistro.js. Se registra
 // una sola vez al cargar el módulo (top-level, no dentro de una función),
@@ -113,16 +113,16 @@ function asegurarWidget() {
   wrap.innerHTML = `
     <div class="khipu-ai-ventana" id="khipuAiVentana">
       <div class="khipu-ai-ventana-header">
-        <span class="khipu-ai-ventana-titulo">${ICONO_SPARK} Khipu AI</span>
+        <span class="khipu-ai-ventana-titulo">${ICONO_SPARK} GEALMI AI</span>
         <button type="button" class="khipu-ai-ventana-cerrar" id="khipuAiCerrar" aria-label="Cerrar">✕</button>
       </div>
       <div class="khipu-ai-mensajes" id="khipuAiMensajes"></div>
       <form class="khipu-ai-form" id="khipuAiForm">
-        <input type="text" id="khipuAiInput" placeholder="Pregúntale a Khipu AI..." autocomplete="off" />
+        <input type="text" id="khipuAiInput" placeholder="Pregúntale a GEALMI AI..." autocomplete="off" />
         <button type="submit" class="btn btn-ochre" id="khipuAiEnviarBtn">Enviar</button>
       </form>
     </div>
-    <button type="button" class="khipu-ai-boton" id="khipuAiBoton" aria-label="Abrir Khipu AI"><span>${ICONO_SPARK}</span></button>
+    <button type="button" class="khipu-ai-boton" id="khipuAiBoton" aria-label="Abrir GEALMI AI"><span>${ICONO_SPARK}</span></button>
   `;
   document.body.appendChild(wrap);
 
@@ -158,7 +158,7 @@ function renderMensajes() {
 
   if (!historial.length) {
     const chips = `<div class="khipu-ai-sugerencias">${sugerenciasActuales().map(p => `<button type="button" class="khipu-ai-chip">${escaparHtml(p)}</button>`).join('')}</div>`;
-    cont.innerHTML = `<div class="khipu-ai-msg khipu-ai-msg-asistente">Hola, soy Khipu AI 👋 Pregúntame sobre tus ventas, inventario, finanzas o clientes.</div>${chips}`;
+    cont.innerHTML = `<div class="khipu-ai-msg khipu-ai-msg-asistente">Hola, soy GEALMI AI 👋 Pregúntame sobre tus ventas, inventario, finanzas o clientes.</div>${chips}`;
   } else {
     cont.innerHTML = historial.map(m => {
       const clase = m.rol === 'user' ? 'khipu-ai-msg-user' : 'khipu-ai-msg-asistente';

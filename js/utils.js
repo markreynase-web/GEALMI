@@ -72,7 +72,7 @@ export function parseNumeroFlexible(v) {
 
 // Convierte un teléfono guardado libremente (con +, espacios, guiones,
 // paréntesis) al formato que exige wa.me: solo dígitos, con código de país
-// adelante. KhipuCore no tiene un campo de país/código separado -- solo
+// adelante. GEALMI no tiene un campo de país/código separado -- solo
 // `telefono` como texto libre (ver esquemas.js: clientes/conductores) -- así
 // que la única señal disponible es la cantidad de dígitos:
 //   - 9 dígitos exactos => se asume Perú (+51) y se antepone '51'.

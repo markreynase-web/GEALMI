@@ -4,7 +4,7 @@
 // (abrir -> operar -> cerrar con arqueo).
 //
 // SUPUESTO EXPLÍCITO DEL ARQUEO (documentado a pedido, ver migración 040 y
-// la conversación de diseño): KhipuCore HOY NO distingue medio de pago en
+// la conversación de diseño): GEALMI HOY NO distingue medio de pago en
 // el flujo genérico de ventas/finanzas (no hay columna medio_pago en
 // ninguna de las dos -- lo único parecido es pagos_membresia del vertical
 // Gimnasio, una tabla completamente aparte). El cálculo de monto_cierre_

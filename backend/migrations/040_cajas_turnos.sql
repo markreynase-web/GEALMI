@@ -1,7 +1,7 @@
 -- Sub-fase E (roadmap competitivo, Nivel 2): módulo de Cajas/Turno.
 --
 -- SUPUESTO EXPLÍCITO DEL ARQUEO (documentado a pedido, no implementado en
--- silencio): el sistema genérico de ventas/finanzas de KhipuCore HOY NO
+-- silencio): el sistema genérico de ventas/finanzas de GEALMI HOY NO
 -- distingue medio de pago -- no hay columna medio_pago en ventas ni en
 -- finanzas. Lo único parecido en todo el proyecto es pagos_membresia del
 -- vertical Gimnasio (migración 027), una tabla completamente aparte que no

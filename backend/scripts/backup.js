@@ -90,7 +90,7 @@ const envLibpq = {
 // Nunca loguear PGPASSWORD ni la URL completa -- solo host/base, que no son secretos.
 console.log(`[backup] Iniciando pg_dump de "${nombreBaseOrigen}" en "${url.hostname}" -> ${archivoDestino}`);
 
-// -n public: todo lo real de KhipuCore vive en el schema public (verificado
+// -n public: todo lo real de GEALMI vive en el schema public (verificado
 // contra information_schema.tables al validar el esquema de testing). Sin
 // esto, un dump de la base completa incluiría cualquier schema al que el
 // rol "postgres" tenga acceso -- en un proyecto Supabase eso puede incluir

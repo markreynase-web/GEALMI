@@ -19,14 +19,14 @@
 
 const BREVO_ENDPOINT = 'https://api.brevo.com/v3/smtp/email';
 
-// EMAIL_FROM ya viene como "KhipuCore <correo@dominio.com>" (ver
+// EMAIL_FROM ya viene como "GEALMI <correo@dominio.com>" (ver
 // .env.example) -- se reutiliza el mismo valor en vez de pedir variables
 // nuevas, porque ya está bien cargado tanto en local como en Render.
 function remitenteConfigurado() {
   const from = process.env.EMAIL_FROM || '';
   const m = from.match(/^(.*)<(.+)>$/);
-  if (m) return { name: m[1].trim() || 'KhipuCore', email: m[2].trim() };
-  return from ? { name: 'KhipuCore', email: from.trim() } : null;
+  if (m) return { name: m[1].trim() || 'GEALMI', email: m[2].trim() };
+  return from ? { name: 'GEALMI', email: from.trim() } : null;
 }
 
 function plantillaRecuperacion({ nombre, resetUrl }) {
@@ -43,14 +43,14 @@ function plantillaRecuperacion({ nombre, resetUrl }) {
       <table role="presentation" width="100%" style="max-width:480px; background:#FFFFFF; border-radius:16px; overflow:hidden;">
         <tr>
           <td style="background:#0E1B45; padding:28px 32px;">
-            <span style="font-size:20px; font-weight:700; color:#F3F8FC;">Khipu<span style="color:#2EE2CE;">Core</span></span>
+            <span style="font-size:20px; font-weight:700; color:#F3F8FC;"><span style="color:#2EE2CE;">G</span>EALMI</span>
           </td>
         </tr>
         <tr>
           <td style="padding:32px;">
             <p style="margin:0 0 16px; font-size:15px; line-height:1.55; color:#16295C;">Hola${nombre ? ` ${nombre}` : ''},</p>
             <p style="margin:0 0 24px; font-size:15px; line-height:1.55; color:#16295C;">
-              Recibimos una solicitud para restablecer la contraseña de tu cuenta de KhipuCore.
+              Recibimos una solicitud para restablecer la contraseña de tu cuenta de GEALMI.
               Haz clic en el siguiente botón para crear una nueva contraseña:
             </p>
             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 24px;">
@@ -64,7 +64,7 @@ function plantillaRecuperacion({ nombre, resetUrl }) {
         </tr>
         <tr>
           <td style="padding:20px 32px; border-top:1px solid #E1E7F0;">
-            <p style="margin:0; font-size:12px; color:#9AA6C0;">KhipuCore -- El conocimiento ancestral convertido en inteligencia empresarial.</p>
+            <p style="margin:0; font-size:12px; color:#9AA6C0;">GEALMI -- El conocimiento ancestral convertido en inteligencia empresarial.</p>
           </td>
         </tr>
       </table>
@@ -95,7 +95,7 @@ export async function enviarCorreoRecuperacion({ to, nombre, resetUrl }) {
       body: JSON.stringify({
         sender,
         to: [{ email: to, name: nombre || undefined }],
-        subject: 'Restablece tu contraseña de KhipuCore',
+        subject: 'Restablece tu contraseña de GEALMI',
         htmlContent: plantillaRecuperacion({ nombre, resetUrl })
       })
     });

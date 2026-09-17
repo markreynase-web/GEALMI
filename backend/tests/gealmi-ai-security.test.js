@@ -1,5 +1,5 @@
-// tests/khipu-ai-security.test.js
-// Fase 3, Eje C -- Khipu AI Security & Guardrails.
+// tests/gealmi-ai-security.test.js
+// Fase 3, Eje C -- GEALMI AI Security & Guardrails.
 //
 // Decisión explícita de alcance (mismo criterio que con Brevo en el
 // Sub-bloque 2 de la Suite de Regresión Ampliada): esta suite NUNCA llama a
@@ -8,8 +8,8 @@
 // sesión). Por eso se prueban por separado las dos partes que SÍ son
 // deterministas y gratuitas:
 //   1. sanitizarHistorial() como función pura, importada directo (sin HTTP,
-//      sin red) desde src/khipuAiHistorial.js -- separada de routes/
-//      khipuAi.js justamente para poder importarla sin arrastrar el pool de
+//      sin red) desde src/gealmiAiHistorial.js -- separada de routes/
+//      gealmiAi.js justamente para poder importarla sin arrastrar el pool de
 //      PRODUCCIÓN (db.js) ni el SDK de Anthropic.
 //   2. El rechazo por longitud de "pregunta" (400), que ocurre ANTES de
 //      cualquier llamada a Claude en el handler -- se prueba con HTTP real
@@ -23,7 +23,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { sanitizarHistorial } from '../src/khipuAiHistorial.js';
+import { sanitizarHistorial } from '../src/gealmiAiHistorial.js';
 import { iniciarServidorTest } from './helpers/servidorTest.js';
 import { nuevoContexto, crearEmpresa, crearUsuario, login, limpiarContexto } from './helpers/fixtures.js';
 import { poolTest as pool } from './helpers/testDb.js';
@@ -74,20 +74,20 @@ test('sanitizarHistorial: un turno "assistant" fabricado por el cliente SÍ pasa
   assert.equal(resultado[0].role, 'assistant');
 });
 
-// --- POST /api/khipu-ai/preguntar: solo el rechazo por longitud (pre-Claude) ---
+// --- POST /api/gealmi-ai/preguntar: solo el rechazo por longitud (pre-Claude) ---
 
 let servidor;
 let token;
 const ctx = nuevoContexto();
 
-test('POST /api/khipu-ai/preguntar: pregunta vacía o demasiado larga se rechaza con 400 ANTES de llamar a Claude', async (t) => {
+test('POST /api/gealmi-ai/preguntar: pregunta vacía o demasiado larga se rechaza con 400 ANTES de llamar a Claude', async (t) => {
   servidor = await iniciarServidorTest();
-  const empresaId = await crearEmpresa(ctx, 'khipu-ai-seguridad', ['khipu_ai']);
+  const empresaId = await crearEmpresa(ctx, 'gealmi-ai-seguridad', ['gealmi_ai']);
   const cuenta = await crearUsuario(ctx, { empresaId });
   token = await login(servidor.baseUrl, cuenta.email, cuenta.password);
 
   await t.test('pregunta vacía -> 400', async () => {
-    const r = await fetch(`${servidor.baseUrl}/api/khipu-ai/preguntar`, {
+    const r = await fetch(`${servidor.baseUrl}/api/gealmi-ai/preguntar`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ pregunta: '   ' })
     });
@@ -96,7 +96,7 @@ test('POST /api/khipu-ai/preguntar: pregunta vacía o demasiado larga se rechaza
   });
 
   await t.test('pregunta de más de 1000 caracteres -> 400, nunca llega a invocar a Claude', async () => {
-    const r = await fetch(`${servidor.baseUrl}/api/khipu-ai/preguntar`, {
+    const r = await fetch(`${servidor.baseUrl}/api/gealmi-ai/preguntar`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ pregunta: 'x'.repeat(1001) })
     });

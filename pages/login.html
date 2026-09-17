@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iniciar sesión — KhipuCore</title>
+<title>Iniciar sesión — GEALMI</title>
 <link rel="icon" href="../assets/logo-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,7 +96,7 @@
   .login-aside-mid p{ font-size:14.5px; line-height:1.55; color:var(--text-on-dark-2); max-width:380px; margin:0; }
 
   /* Composición de dispositivos: la misma captura real del panel de Inicio
-     de KhipuCore (assets/loginpreviw.jpeg), recortada distinto en cada
+     de GEALMI (assets/loginpreviw.jpeg), recortada distinto en cada
      marco -- laptop ancla arriba-izquierda (marca + KPIs), teléfono hace
      zoom a esa misma esquina para simular una vista "móvil". No es una
      captura móvil real (no existe todavía una vista responsive dedicada),
@@ -245,6 +245,15 @@
     .login-main{ padding:36px 24px; }
   }
 </style>
+<!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
+     igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
+     (importado por todas las páginas), no acá. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E1B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GEALMI">
+<link rel="apple-touch-icon" href="/assets/logo-icon.png">
 </head>
 <body>
 
@@ -252,8 +261,8 @@
   <aside class="login-aside">
     <div>
       <div class="login-brand">
-        <img src="../assets/logo-icon.png" alt="KhipuCore">
-        <span class="word"><span class="acc">K</span>hipu<span class="acc">C</span>ore</span>
+        <img src="../assets/logo-icon.png" alt="GEALMI">
+        <span class="word"><span class="acc">G</span>EALMI</span>
       </div>
       <div class="login-eyebrow">Organiza · Controla · Conecta · Crece</div>
     </div>
@@ -283,7 +292,7 @@
 
   <div class="login-main">
     <div class="login-card">
-      <h2>Bienvenido a KhipuCore</h2>
+      <h2>Bienvenido a GEALMI</h2>
       <p class="sub" id="loginSub">Inicia sesión para continuar gestionando tu empresa.</p>
 
       <div id="pasoCredenciales">

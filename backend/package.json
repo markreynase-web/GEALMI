@@ -1,7 +1,7 @@
 {
-  "name": "khipucore-backend",
+  "name": "gealmi-backend",
   "version": "1.0.0",
-  "description": "API de KhipuCore: recibe datos del formulario y de importación CSV, y los persiste en PostgreSQL.",
+  "description": "API de GEALMI: recibe datos del formulario y de importación CSV, y los persiste en PostgreSQL.",
   "main": "src/server.js",
   "type": "module",
   "scripts": {

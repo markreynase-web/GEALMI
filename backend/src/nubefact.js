@@ -5,7 +5,7 @@
 //
 // Cliente delgado, SIN builder de negocio todavía: arma exactamente el
 // payload que se le pase y lo manda. Construir el contenido real de una
-// factura (montos, IGV, líneas -- "esto es lo que KhipuCore le cobró a la
+// factura (montos, IGV, líneas -- "esto es lo que GEALMI le cobró a la
 // empresa X por su suscripción del mes Y") depende del sistema de
 // Contratación/Pagos, que todavía no existe (ver el documento maestro
 // "Contratación y Facturación"). Este módulo solo resuelve la parte de

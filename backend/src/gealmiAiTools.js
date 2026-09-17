@@ -1,5 +1,5 @@
-// src/khipuAiTools.js
-// Fase D: "herramientas de datos" que Khipu AI (Claude, vía tool use) puede
+// src/gealmiAiTools.js
+// Fase D: "herramientas de datos" que GEALMI AI (Claude, vía tool use) puede
 // llamar para responder preguntas y armar reportes con cifras reales de la
 // empresa activa -- Claude nunca escribe SQL, cada herramienta es una
 // consulta parametrizada fija (mismo patrón de pool.query(sql, [empresa_id,

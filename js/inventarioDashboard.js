@@ -1,8 +1,8 @@
 // js/inventarioDashboard.js
 // Dashboard bespoke de Inventario (Rediseño v3): "inventory management" --
 // valor real del stock (a costo, no a precio de venta), alertas con días
-// restantes estimados (mismo cálculo que la herramienta de Khipu AI
-// velocidadDeVentaDeProducto en backend/src/khipuAiTools.js: unidades
+// restantes estimados (mismo cálculo que la herramienta de GEALMI AI
+// velocidadDeVentaDeProducto en backend/src/gealmiAiTools.js: unidades
 // vendidas en los últimos 30 días / 30), y detección de stock sin
 // movimiento. Reemplaza el motor genérico de js/dashboard.js para este
 // módulo, igual que ya se hizo con Ventas/Clientes/Finanzas.
@@ -39,7 +39,7 @@ function diasHasta(fechaStr) {
 }
 
 // Mismo cálculo que velocidadDeVentaDeProducto() en
-// backend/src/khipuAiTools.js: unidades vendidas en los últimos 30 días,
+// backend/src/gealmiAiTools.js: unidades vendidas en los últimos 30 días,
 // dividido 30 -- ritmo diario. Con eso, días de stock restantes al ritmo
 // actual (null si no se vendió nada en la ventana: no hay ritmo que
 // proyectar, no es "infinito", es "sin datos suficientes").

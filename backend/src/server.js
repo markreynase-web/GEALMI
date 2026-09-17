@@ -1,5 +1,5 @@
 // src/server.js
-// Servidor de la API. Sirve solo /api/*; el frontend (KhipuCore) sigue
+// Servidor de la API. Sirve solo /api/*; el frontend (GEALMI) sigue
 // sirviéndose aparte como archivos estáticos (ej. `python -m http.server`).
 
 import express from 'express';
@@ -33,7 +33,7 @@ import comprasRouter from './routes/compras.js';
 import rrhhRouter from './routes/rrhh.js';
 import produccionRouter from './routes/produccion.js';
 import superadminRouter from './routes/superadmin.js';
-import khipuAiRouter from './routes/khipuAi.js';
+import gealmiAiRouter from './routes/gealmiAi.js';
 import mascotasRouter from './routes/mascotas.js';
 import atencionesVeterinariasRouter from './routes/atencionesVeterinarias.js';
 import planesVeterinariosRouter from './routes/planesVeterinarios.js';
@@ -120,7 +120,7 @@ app.use(helmet({
 app.use((req, res, next) => {
   // helmet ya no trae un middleware propio de Permissions-Policy (el spec
   // cambió mucho entre versiones) -- se setea a mano, solo con las APIs que
-  // se comprobó que KhipuCore no usa en ningún lado del frontend (grep de
+  // se comprobó que GEALMI no usa en ningún lado del frontend (grep de
   // mediaDevices/geolocation/bluetooth/usb/payment en todo el repo: cero
   // resultados).
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=()');
@@ -207,7 +207,7 @@ app.use('/api/compras', comprasRouter);
 app.use('/api/rrhh', rrhhRouter);
 app.use('/api/produccion', produccionRouter);
 app.use('/api/superadmin', superadminRouter);
-app.use('/api/khipu-ai', khipuAiRouter);
+app.use('/api/gealmi-ai', gealmiAiRouter);
 app.use('/api/mascotas', mascotasRouter);
 app.use('/api/atenciones_veterinarias', atencionesVeterinariasRouter);
 app.use('/api/planes_veterinarios', planesVeterinariosRouter);

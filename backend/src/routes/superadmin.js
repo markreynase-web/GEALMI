@@ -72,7 +72,7 @@ router.post('/empresas', async (req, res) => {
 });
 
 // color_primario: null/'' = "quitar personalización, volver al color de
-// KhipuCore por defecto". A diferencia de nombre/logo/activo, un PUT que
+// GEALMI por defecto". A diferencia de nombre/logo/activo, un PUT que
 // no lo manda debe DEJARLO IGUAL (no borrarlo) -- COALESCE no alcanza para
 // eso, porque no distingue "no vino en el body" de "vino vacío a propósito
 // para borrarlo"; ambos casos necesitan comportamiento distinto acá. Por

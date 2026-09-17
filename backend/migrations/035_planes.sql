@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS planes (
 -- migración -- sin límite -- en vez de romperse por falta de dato.
 ALTER TABLE empresas ADD COLUMN IF NOT EXISTS plan_id INTEGER REFERENCES planes(id);
 
--- Semilla de los 3 planes actuales de KhipuCore. Los valores de
+-- Semilla de los 3 planes actuales de GEALMI. Los valores de
 -- limite_usuarios son un punto de partida editable (vía
 -- PUT /api/superadmin/planes/:id más adelante, o SQL directo por ahora),
 -- no una decisión comercial definitiva.

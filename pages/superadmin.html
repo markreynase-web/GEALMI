@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhipuCore — Super administrador</title>
+<title>GEALMI — Super administrador</title>
 <link rel="icon" href="../assets/logo-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -32,14 +32,23 @@
   .sa-acceso-denegado h2{ font-family:'Inter', sans-serif; color:var(--ink); }
   .sa-subtitulo{ font-family:'Inter', sans-serif; font-size:13px; margin:20px 0 8px; color:var(--ink); font-weight:700; }
 </style>
+<!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
+     igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
+     (importado por todas las páginas), no acá. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E1B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GEALMI">
+<link rel="apple-touch-icon" href="/assets/logo-icon.png">
 </head>
 <body>
 
 <div class="sa-shell">
   <div class="sa-header">
     <a class="sa-brand" href="../index.html" title="Ir a la página principal">
-      <img src="../assets/logo-icon.png" alt="KhipuCore">
-      <div class="sa-brand-text">KhipuCore <span class="sa-brand-tag">Super Admin</span></div>
+      <img src="../assets/logo-icon.png" alt="GEALMI">
+      <div class="sa-brand-text">GEALMI <span class="sa-brand-tag">Super Admin</span></div>
     </a>
     <button type="button" class="btn btn-ghost" id="btnCerrarSesion" style="color:var(--ink); border:1px solid var(--paper-line);">Cerrar sesión</button>
   </div>
@@ -383,7 +392,7 @@
           <div class="sa-subtitulo">Color de marca</div>
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
             <input type="color" id="colorPrimario" value="${empresa.color_primario || '#E3B23C'}" style="width:44px; height:34px; padding:2px; border:1px solid var(--paper-line); border-radius:8px; cursor:pointer;">
-            <button type="button" class="btn btn-ghost" id="btnQuitarColor" style="${empresa.color_primario ? '' : 'display:none;'}">Usar el de KhipuCore</button>
+            <button type="button" class="btn btn-ghost" id="btnQuitarColor" style="${empresa.color_primario ? '' : 'display:none;'}">Usar el de GEALMI</button>
             <span class="form-status" id="colorStatus"></span>
           </div>
 

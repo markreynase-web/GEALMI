@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhipuCore — El conocimiento ancestral convertido en inteligencia empresarial</title>
-<meta name="description" content="KhipuCore es una plataforma SaaS modular de gestión empresarial e inteligencia operativa: un núcleo compartido (ventas, inventario, clientes, finanzas) más módulos especializados por industria.">
+<title>GEALMI — El conocimiento ancestral convertido en inteligencia empresarial</title>
+<meta name="description" content="GEALMI es una plataforma SaaS modular de gestión empresarial e inteligencia operativa: un núcleo compartido (ventas, inventario, clientes, finanzas) más módulos especializados por industria.">
 <link rel="icon" href="assets/logo-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -291,6 +291,15 @@
   .footer-cols a:hover{ color:var(--cyan); }
   .footer-bottom{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:var(--sp-2); padding-top:var(--sp-5); font-size:13px; color:var(--text-on-dark-2); }
 </style>
+<!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
+     igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
+     (importado por todas las páginas), no acá. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E1B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GEALMI">
+<link rel="apple-touch-icon" href="/assets/logo-icon.png">
 </head>
 <body>
 
@@ -298,14 +307,14 @@
 
 <header class="nav band-dark" id="siteNav">
   <div class="container nav-row">
-    <a class="brand-mark" href="#top" aria-label="KhipuCore, inicio">
+    <a class="brand-mark" href="#top" aria-label="GEALMI, inicio">
       <img src="assets/logo-icon.png" alt="">
-      <span class="logotype">KhipuCore</span>
+      <span class="logotype">GEALMI</span>
     </a>
     <ul class="nav-links">
       <li><a href="#solucion">Producto</a></li>
       <li><a href="#quipu">Solución</a></li>
-      <li><a href="#khipu-ai">Khipu AI</a></li>
+      <li><a href="#gealmi-ai">GEALMI AI</a></li>
       <li><a href="#planes">Planes</a></li>
     </ul>
     <div class="nav-actions">
@@ -319,7 +328,7 @@
   <nav class="mobile-menu container" id="mobileMenu" aria-label="Menú móvil">
     <a href="#solucion">Producto</a>
     <a href="#quipu">Solución</a>
-    <a href="#khipu-ai">Khipu AI</a>
+    <a href="#gealmi-ai">GEALMI AI</a>
     <a href="#planes">Planes</a>
     <a href="pages/login.html">Iniciar sesión</a>
     <a href="#contacto" class="btn btn-on-dark btn-sm" style="margin-top:8px; justify-content:center;">Solicitar demostración</a>
@@ -334,7 +343,7 @@
     <div class="container">
       <div class="hero-inner">
         <span class="eyebrow">Plataforma de gestión empresarial</span>
-        <h1>KhipuCore</h1>
+        <h1>GEALMI</h1>
         <p class="subhead">El conocimiento ancestral convertido en inteligencia empresarial.</p>
         <p class="lede">Gestiona información, procesos y recursos desde una plataforma inteligente diseñada para impulsar la evolución de tu empresa.</p>
         <div class="cta-row">
@@ -389,7 +398,7 @@
       <div class="section-head reveal">
         <span class="eyebrow">La solución</span>
         <h2>Un ecosistema, no una colección de herramientas sueltas.</h2>
-        <p>KhipuCore conecta cada área de tu empresa sobre una misma base de datos, en tiempo real.</p>
+        <p>GEALMI conecta cada área de tu empresa sobre una misma base de datos, en tiempo real.</p>
       </div>
       <div class="grid grid-4">
         <div class="card reveal">
@@ -430,7 +439,7 @@
         <div class="card reveal">
           <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M11 2V5.4M11 16.6V20M20 11H16.6M5.4 11H2M17.4 4.6L15 7M7 15L4.6 17.4M17.4 17.4L15 15M7 7L4.6 4.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
           <h3>Inteligencia artificial</h3>
-          <p>Khipu AI responde preguntas de negocio en lenguaje natural, con tus datos reales.</p>
+          <p>GEALMI AI responde preguntas de negocio en lenguaje natural, con tus datos reales.</p>
         </div>
       </div>
     </div>
@@ -444,7 +453,7 @@
           <span class="eyebrow" style="color:var(--cyan);">Nuestro origen</span>
           <h2 style="margin-top:12px;">Del quipu al código.</h2>
           <p class="lede">Hace más de quinientos años, los quipus del Tahuantinsuyo codificaban cifras, inventarios y decisiones de estado en nudos de cuerda — un sistema de registro capaz de organizar la información de todo un territorio sin una sola palabra escrita.</p>
-          <p class="lede">Antes, en la costa norte, la cultura Moche ya sostenía una administración de recursos meticulosa: canales, almacenes, excedentes calculados con precisión. KhipuCore retoma ese mismo principio — organizar para decidir mejor — y lo traduce a datos, algoritmos e inteligencia artificial. No es un homenaje al pasado: es su continuación lógica.</p>
+          <p class="lede">Antes, en la costa norte, la cultura Moche ya sostenía una administración de recursos meticulosa: canales, almacenes, excedentes calculados con precisión. GEALMI retoma ese mismo principio — organizar para decidir mejor — y lo traduce a datos, algoritmos e inteligencia artificial. No es un homenaje al pasado: es su continuación lógica.</p>
         </div>
         <div class="cordboard reveal" role="img" aria-label="Representación abstracta de cuerdas con nudos, evolucionando hacia una red de datos conectada">
           <div class="cord" style="height:62%;"><span class="knot" style="top:20%; animation-delay:0s;"></span><span class="knot" style="top:70%; animation-delay:.3s;"></span></div>
@@ -459,12 +468,12 @@
     </div>
   </section>
 
-  <!-- ================= KHIPU AI ================= -->
-  <section class="band-light section-pad" id="khipu-ai">
+  <!-- ================= GEALMI AI ================= -->
+  <section class="band-light section-pad" id="gealmi-ai">
     <div class="container">
       <div class="section-head reveal">
         <span class="eyebrow">Inteligencia artificial — ya disponible</span>
-        <h2>Khipu AI, tu asistente de negocio.</h2>
+        <h2>GEALMI AI, tu asistente de negocio.</h2>
         <p>No es un roadmap — es un asistente que ya responde con la información real de tu empresa, activable desde el panel de administración.</p>
       </div>
       <div class="ai-layout">
@@ -494,7 +503,7 @@
         <div class="chat-mock reveal">
           <div class="chat-head">
             <span class="dot" aria-hidden="true"></span>
-            <span>Khipu AI · en vivo</span>
+            <span>GEALMI AI · en vivo</span>
           </div>
           <div class="bubble bubble-user">¿Qué productos están por agotarse este mes?</div>
           <div class="bubble bubble-ai">Reviso tu inventario en tiempo real y calculo el ritmo de venta de los últimos 30 días de cada producto contra su stock actual — así sé cuáles llegan primero al mínimo, no solo cuáles ya están bajos hoy.</div>
@@ -515,7 +524,7 @@
       <div class="browser-frame reveal">
         <div class="browser-chrome">
           <div class="dots"><span></span><span></span><span></span></div>
-          <div class="url">app.khipucore.com/inicio</div>
+          <div class="url">app.gealmi.com/inicio</div>
         </div>
         <div class="dash-body">
           <div class="dash-side">
@@ -551,7 +560,7 @@
             <div class="chart-wrap">
               <div class="chart-legend">
                 <span class="lg"><span class="sw" style="background:var(--brand-2);"></span>Ventas</span>
-                <span class="lg"><span class="sw" style="background:var(--cyan);"></span>Tendencia (Khipu AI)</span>
+                <span class="lg"><span class="sw" style="background:var(--cyan);"></span>Tendencia (GEALMI AI)</span>
               </div>
               <canvas id="mockChart" height="140" role="img" aria-label="Gráfico de ventas mensuales con tendencia, en ascenso"></canvas>
             </div>
@@ -613,7 +622,7 @@
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Recordatorios automáticos (SMS/WhatsApp)</li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Personalización de marca en documentos</li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Exportación de datos + API</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Khipu AI (créditos mensuales)</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>GEALMI AI (créditos mensuales)</li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Soporte prioritario</li>
           </ul>
           <a class="btn btn-primary btn-block" href="#contacto">Contáctanos</a>
@@ -628,7 +637,7 @@
           <ul class="plan-list">
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Todo lo del plan Profesional</li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Módulo especializado de tu industria</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Khipu AI ilimitado</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>GEALMI AI ilimitado</li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Panel multi-sucursal centralizado</li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Seguridad avanzada (SSO, 2FA)</li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Integraciones a medida</li>
@@ -664,7 +673,7 @@
       <div class="footer-brand">
         <img src="assets/logo-icon.png" alt="">
         <div class="footer-brand-text">
-          <span class="logotype">KhipuCore</span>
+          <span class="logotype">GEALMI</span>
           <p>Organizando información. Potenciando decisiones.</p>
         </div>
       </div>
@@ -673,7 +682,7 @@
           <h4>Producto</h4>
           <ul>
             <li><a href="#solucion">Solución</a></li>
-            <li><a href="#khipu-ai">Khipu AI</a></li>
+            <li><a href="#gealmi-ai">GEALMI AI</a></li>
             <li><a href="#planes">Planes</a></li>
           </ul>
         </div>
@@ -693,7 +702,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© <span id="year">2026</span> KhipuCore. Todos los derechos reservados.</span>
+      <span>© <span id="year">2026</span> GEALMI. Todos los derechos reservados.</span>
       <span>Lima, Perú</span>
     </div>
   </div>

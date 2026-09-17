@@ -3,13 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhipuCore — Sucursales</title>
+<title>GEALMI — Sucursales</title>
 <link rel="stylesheet" href="../css/base.css">
 <link rel="stylesheet" href="../css/layout.css">
 <link rel="stylesheet" href="../css/cards.css">
 <link rel="stylesheet" href="../css/forms.css">
 <link rel="stylesheet" href="../css/tables.css">
 <link rel="stylesheet" href="../css/panel-lateral.css">
+<!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
+     igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
+     (importado por todas las páginas), no acá. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E1B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GEALMI">
+<link rel="apple-touch-icon" href="/assets/logo-icon.png">
 </head>
 <body data-modulo="sucursales">
 
@@ -59,7 +68,7 @@
 <script type="module">
 import { cargarConfigEmpresa } from '../js/config.js';
 import { renderSidebar } from '../components/sidebar.js';
-import { renderKhipuAiWidget } from '../components/khipuAiWidget.js';
+import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
 import { renderTopbar } from '../components/topbar.js';
 import { renderFooter } from '../components/footer.js';
 import { obtenerSesion, tienePermiso, haySesionActiva } from '../js/sesion.js';
@@ -245,7 +254,7 @@ async function cargarGanancia() {
 (async function iniciar() {
   config = await cargarConfigEmpresa();
   renderSidebar(config, 'sucursales');
-  renderKhipuAiWidget(config);
+  renderGealmiAiWidget(config);
   await renderTopbar(config);
   renderFooter();
 

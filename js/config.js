@@ -43,7 +43,7 @@ function oscurecer(hex, factor = 0.78) {
 // quedó de un diseño anterior y nunca se actualizó. Sin sobreescribir
 // --coral también, el color elegido no se veía en ningún botón real (solo
 // en detalles menores: bordes de foco, la pestaña "activo", el widget de
-// Khipu AI) -- por eso "no se notaba en la interfaz".
+// GEALMI AI) -- por eso "no se notaba en la interfaz".
 //
 // Aviso: --coral también se usa para indicadores de "peligro/negativo"
 // (botones de eliminar, KPIs en rojo, la flecha de tendencia hacia abajo).
@@ -53,7 +53,7 @@ function oscurecer(hex, factor = 0.78) {
 // cambio más grande que se puede hacer después si hace falta.
 //
 // Sin color guardado (o si llega mal formado), no se toca nada y quedan
-// los colores de KhipuCore de siempre.
+// los colores de GEALMI de siempre.
 function aplicarTema(config) {
   const raiz = document.documentElement.style;
   if (config.colorPrimario && /^#[0-9a-fA-F]{6}$/.test(config.colorPrimario)) {

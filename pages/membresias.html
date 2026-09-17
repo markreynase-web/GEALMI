@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhipuCore — Socios</title>
+<title>GEALMI — Socios</title>
 
 <link rel="stylesheet" href="../css/base.css">
 <link rel="stylesheet" href="../css/layout.css">
@@ -17,6 +17,15 @@
   @media (max-width:900px){ .socios-kpis{ grid-template-columns:repeat(2, 1fr); } }
   .pago-form-resumen{ font-size:12px; color:var(--muted); margin:-4px 0 12px; }
 </style>
+<!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
+     igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
+     (importado por todas las páginas), no acá. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E1B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GEALMI">
+<link rel="apple-touch-icon" href="/assets/logo-icon.png">
 </head>
 <body data-modulo="membresias">
 
@@ -71,8 +80,6 @@
     <footer></footer>
   </div>
 </div>
-<div id="khipuAiWidget"></div>
-
 <script type="module">
   import { haySesionActiva, obtenerSesion } from '../js/sesion.js';
   import { API_BASE_URL } from '../js/apiConfig.js';
@@ -80,7 +87,7 @@
   import { renderSidebar } from '../components/sidebar.js';
   import { renderTopbar } from '../components/topbar.js';
   import { renderFooter } from '../components/footer.js';
-  import { renderKhipuAiWidget } from '../components/khipuAiWidget.js';
+  import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
   import { abrirPanelLateral, cerrarPanelLateral } from '../components/panelLateral.js';
   import { escapeHtml } from '../js/utils.js';
 
@@ -111,7 +118,7 @@
   renderSidebar(config, 'membresias');
   await renderTopbar(config);
   renderFooter();
-  renderKhipuAiWidget(config);
+  renderGealmiAiWidget(config);
 
   let clientesDisponibles = [];
   let planesDisponibles = [];

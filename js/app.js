@@ -8,7 +8,7 @@ import { guardarDatosLocal, cargarDatosLocal, borrarDatosLocal } from './storage
 import { renderTodo, redimensionarTodosLosGraficos } from './dashboard.js';
 import { cargarConfigEmpresa, buscarModulo } from './config.js';
 import { renderSidebar } from '../components/sidebar.js';
-import { renderKhipuAiWidget } from '../components/khipuAiWidget.js';
+import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
 import { renderTopbar } from '../components/topbar.js';
 import { renderFooter } from '../components/footer.js';
 import { iniciarModoBackend } from './modoBackend.js';
@@ -313,7 +313,7 @@ function aplicarBranding(config) {
   const topbarSubtitleEl = document.getElementById('topbarSubtitle');
   if (topbarSubtitleEl) topbarSubtitleEl.textContent = subtitleTexto;
 
-  document.title = `${config.bizName || 'KhipuCore'} — ${nombreModulo}`;
+  document.title = `${config.bizName || 'GEALMI'} — ${nombreModulo}`;
 }
 
 // Si el módulo actual tiene baseDeDatos:true en config/company.json, intenta
@@ -564,7 +564,7 @@ async function iniciar() {
   }
 
   renderSidebar(config, NAMESPACE);
-  renderKhipuAiWidget(config);
+  renderGealmiAiWidget(config);
   aplicarBranding(config);
   await renderTopbar(config);
   renderFooter();

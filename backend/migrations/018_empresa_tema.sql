@@ -1,7 +1,7 @@
 -- Personalización de marca por empresa: un solo color primario (hex), que
 -- el frontend usa para sobreescribir --ochre/--ochre-deep (las variables
 -- CSS que ya manejan botones primarios, estados activos del sidebar, etc.)
--- Nula = usa el color de KhipuCore por defecto (el de css/base.css), sin
+-- Nula = usa el color de GEALMI por defecto (el de css/base.css), sin
 -- tocar nada.
 --
 -- A propósito UN solo color, no un tema completo -- personalizar layout o

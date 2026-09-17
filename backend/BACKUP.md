@@ -41,7 +41,7 @@ npm run backup
 
 - **Origen configurable**: si `BACKUP_DATABASE_URL` está definida, se usa esa (pensado para respaldar puntualmente un entorno distinto, ej. `TEST_DATABASE_URL`, sin sobrescribir `DATABASE_URL`). Si no, cae a `DATABASE_URL` -- comportamiento normal/futuro sin cambios. Si ambas están definidas y son idénticas, el script aborta (evita un override redundante que suele ser una URL pegada por error).
 - Formato `-Fc -n public` (custom, comprimido, **acotado al schema `public`**). El `-n public` es importante: sin él, un dump completo de una base Supabase puede incluir schemas internos de la plataforma (`auth`, `storage`, `realtime`, etc.) a los que el rol de conexión tenga acceso -- innecesario y un radio de impacto mayor al que hace falta, ya que toda la aplicación real de GEALMI vive en `public`.
-- Nombre de archivo con timestamp ISO: `khipucore-postgres-2026-08-25T....dump`.
+- Nombre de archivo con timestamp ISO: `gealmi-postgres-2026-08-25T....dump`.
 - La contraseña nunca se pasa como argumento de proceso ni se imprime en consola -- se traduce a variables de entorno libpq (`PGPASSWORD`, etc.) antes de invocar `pg_dump`.
 - Si `pg_dump` no está instalado, el script falla explícitamente -- nunca hace un backup "de mentira".
 - **Verificación obligatoria post-backup**: exit code 0, el archivo existe, tamaño > 0, y SHA-256 del `.dump` calculado y registrado -- se vuelve a verificar ese mismo hash justo antes de cada intento de restore, para confirmar que el archivo no cambió entre medio.
@@ -51,7 +51,7 @@ npm run backup
 ```
 RESTORE_TARGET_URL=<base de destino, EXPLÍCITA y AISLADA -- nunca producción>
 RESTORE_LIST_FILE=<opcional: lista TOC filtrada, ver sección de exclusiones>
-npm run restore -- ./backups/khipucore-postgres-....dump
+npm run restore -- ./backups/gealmi-postgres-....dump
 ```
 
 - `RESTORE_TARGET_URL` es obligatoria, sin fallback a `DATABASE_URL`. Si coincide con `DATABASE_URL`, el script se niega a correr.

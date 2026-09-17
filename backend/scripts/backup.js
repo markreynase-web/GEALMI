@@ -75,7 +75,7 @@ const dirDestino = process.env.BACKUP_DIR || path.join(process.cwd(), 'backups')
 if (!existsSync(dirDestino)) mkdirSync(dirDestino, { recursive: true });
 
 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-const archivoDestino = path.join(dirDestino, `khipucore-${nombreBaseOrigen}-${timestamp}.dump`);
+const archivoDestino = path.join(dirDestino, `gealmi-${nombreBaseOrigen}-${timestamp}.dump`);
 
 const envLibpq = {
   ...process.env,

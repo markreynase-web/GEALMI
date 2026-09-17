@@ -11,7 +11,7 @@
 // "cuánto stock tengo y qué riesgo corre" es una foto de ahora mismo, no
 // algo que tenga sentido comparar contra "el mes pasado". La única parte
 // con ventana de tiempo (velocidad de venta, productos sin movimiento,
-// top vendidos) usa un fijo de 30 días, igual que la herramienta de Khipu
+// top vendidos) usa un fijo de 30 días, igual que la herramienta de GEALMI
 // AI que ya usa ese mismo criterio -- así ambos coinciden si el usuario
 // compara lo que ve acá con lo que le contesta el asistente.
 //

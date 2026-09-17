@@ -106,6 +106,24 @@ export function respaldarSesionSuperAdmin() {
   if (actual) sessionStorage.setItem(CLAVE_BACKUP_SUPER_ADMIN, JSON.stringify(actual));
 }
 
+// PWA instalable (Nivel 3 del roadmap): se registra acá, no en cada página
+// por separado, porque este archivo ya lo importa literalmente cada .html
+// del sitio (la landing y las ~35 páginas de la app) -- un solo lugar para
+// que el service worker (sw.js, ver ese archivo para la estrategia de
+// caché) quede activo en todas. Ruta absoluta ('/sw.js') a propósito: así
+// funciona igual desde index.html (raíz) que desde pages/*.html (un nivel
+// abajo), sin tener que ajustar la ruta relativa según la profundidad.
+// serviceWorker requiere contexto seguro (https) -- 'in navigator' ya lo
+// filtra solo en navegadores/contextos que no lo soportan (ej. si algún
+// día se abre por http a propósito en un entorno de pruebas).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => {
+      console.warn('No se pudo registrar el service worker:', err.message);
+    });
+  });
+}
+
 export function restaurarSesionSuperAdmin() {
   const cruda = sessionStorage.getItem(CLAVE_BACKUP_SUPER_ADMIN);
   sessionStorage.removeItem(CLAVE_BACKUP_SUPER_ADMIN);

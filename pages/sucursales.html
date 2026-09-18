@@ -96,7 +96,7 @@ function dibujarKpis(sucursales) {
   const principal = sucursales.find(s => s.principal);
   document.getElementById('sucKpis').innerHTML = [
     kpiCard({ acento: 'blue', icono: '🏢', label: 'Sucursales', value: fmtNum(sucursales.length), sub: `${activas} activa(s)` }),
-    kpiCard({ acento: 'teal', icono: '⭐', label: 'Principal', value: principal ? principal.nombre : '—', sub: 'creada automáticamente' })
+    kpiCard({ acento: 'teal', icono: '⭐', label: 'Principal', value: principal ? escapeHtml(principal.nombre) : '—', sub: 'creada automáticamente' })
   ].join('');
 }
 

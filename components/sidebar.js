@@ -81,6 +81,12 @@ export function renderSidebar(config, paginaActualId) {
   if (sinSesion || tieneAlgunPermiso('cajas')) {
     seccionAdmin.push({ id: 'cajas', label: 'Cajas', icon: '🧾', href: 'cajas.html' });
   }
+  // API pública (Nivel 3): también transversal, gateada por permiso -- el
+  // acceso real lo decide el plan de la empresa (planes.acceso_api), que el
+  // backend revalida en cada request (ver backend/src/routes/apiKeys.js).
+  if (sinSesion || tieneAlgunPermiso('api_keys')) {
+    seccionAdmin.push({ id: 'api-keys', label: 'API pública', icon: '🔑', href: 'api-keys.html' });
+  }
   if (sinSesion || tieneAlgunPermiso('auditoria')) {
     seccionAdmin.push({ id: 'auditoria', label: 'Auditoría', icon: '🛡️', href: 'auditoria.html' });
   }

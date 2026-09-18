@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEALMI — API pública</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/cards.css">
+<link rel="stylesheet" href="../css/forms.css">
+<link rel="stylesheet" href="../css/tables.css">
+<link rel="stylesheet" href="../css/panel-lateral.css">
+<!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
+     igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
+     (importado por todas las páginas), no acá. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E1B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GEALMI">
+<link rel="apple-touch-icon" href="/assets/logo-icon.png">
+<style>
+  .api-code{
+    display:block; margin:6px 0 14px; padding:10px 12px;
+    background:var(--ink); color:#E8F0FF; border-radius:8px;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size:12px; line-height:1.55; overflow-x:auto; white-space:pre;
+  }
+  .api-doc h4{ margin:16px 0 4px; font-size:13px; }
+  .api-doc p, .api-doc li{ font-size:12.5px; color:var(--muted); line-height:1.55; }
+  .api-doc ul{ margin:4px 0 0; padding-left:18px; }
+  .api-doc code.inline{
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size:11.5px; background:var(--paper); padding:1px 5px; border-radius:4px; color:var(--ink);
+  }
+  .key-prefijo{ font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; }
+  .key-aviso{
+    padding:12px 14px; border-radius:8px; background:#FFF4E0; border:1px solid #F0C36B;
+    color:#7A4E00; font-size:13px; line-height:1.5; margin-bottom:16px;
+  }
+  .key-caja{
+    padding:12px; border-radius:8px; background:var(--ink); color:#E8F0FF; margin-bottom:12px;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12.5px;
+    word-break:break-all; user-select:all;
+  }
+</style>
+</head>
+<body data-modulo="api-keys">
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1 id="topbarTitle">API pública</h1>
+        <div class="topbar-subtitle" id="topbarSubtitle">CONECTA GEALMI CON TUS OTRAS HERRAMIENTAS</div>
+      </div>
+      <div class="topbar-search" id="topbarSearch"></div>
+      <div id="sesionWidget" class="sesion-widget"></div>
+    </header>
+
+    <main>
+      <div class="kpis" id="keyKpis"></div>
+
+      <div class="inicio-columnas">
+        <div class="inicio-col">
+          <section class="panel captura-panel" id="capturaSection">
+            <div class="captura-header">
+              <h3>API keys</h3>
+              <div class="captura-header-acciones">
+                <button type="button" class="btn btn-ochre" id="btnNuevaKey" style="display:none;">+ Nueva API key</button>
+              </div>
+            </div>
+            <span id="formStatus" class="form-status"></span>
+            <div id="tablaKeys">Cargando…</div>
+          </section>
+        </div>
+        <div class="inicio-col inicio-col-angosta">
+          <div class="panel api-doc" style="padding:20px;" id="docApi">
+            <h3 style="margin-bottom:4px;">Cómo usar la API</h3>
+            <div style="font-size:12px; color:var(--muted);">Solo lectura. Incluida en los planes Profesional y Empresarial.</div>
+
+            <h4>URL base</h4>
+            <code class="api-code" id="docBase"></code>
+
+            <h4>Autenticación</h4>
+            <p>Manda tu API key en cada solicitud, en el encabezado <code class="inline">Authorization</code>:</p>
+            <code class="api-code">Authorization: Bearer &lt;tu_api_key&gt;</code>
+
+            <h4>Recursos</h4>
+            <ul>
+              <li><code class="inline">GET /ventas</code></li>
+              <li><code class="inline">GET /inventario</code></li>
+              <li><code class="inline">GET /clientes</code></li>
+              <li><code class="inline">GET /finanzas</code></li>
+              <li><code class="inline">GET /{recurso}/{id}</code> — un registro puntual</li>
+            </ul>
+
+            <h4>Parámetros</h4>
+            <ul>
+              <li><code class="inline">desde</code>, <code class="inline">hasta</code> — fechas <code class="inline">AAAA-MM-DD</code></li>
+              <li><code class="inline">sucursal_id</code> — en ventas, inventario y finanzas</li>
+              <li><code class="inline">pagina</code> (desde 1) y <code class="inline">limite</code> (100 por defecto, máximo 500)</li>
+            </ul>
+
+            <h4>Respuesta</h4>
+            <code class="api-code">{ "datos": [ … ],
+  "meta": { "total": 250, "pagina": 1,
+            "limite": 100, "paginasTotales": 3 } }</code>
+
+            <h4>Ejemplo</h4>
+            <code class="api-code" id="docEjemplo"></code>
+
+            <h4>Límites</h4>
+            <p>120 solicitudes por minuto por API key. Si tu plan deja de incluir la API, las keys existentes dejan de funcionar hasta que vuelva a incluirla.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer></footer>
+  </div>
+</div>
+
+<script type="module">
+import { cargarConfigEmpresa } from '../js/config.js';
+import { renderSidebar } from '../components/sidebar.js';
+import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
+import { renderTopbar } from '../components/topbar.js';
+import { renderFooter } from '../components/footer.js';
+import { tienePermiso, haySesionActiva } from '../js/sesion.js';
+import { listarRegistros, crearRegistro, eliminarRegistro, ultimoErrorAPI } from '../js/api.js';
+import { abrirPanelLateral, cerrarPanelLateral } from '../components/panelLateral.js';
+import { escapeHtml, fmtNum } from '../js/utils.js';
+import { kpiCard } from '../js/kpiCard.js';
+
+if (!haySesionActiva()) location.replace('login.html');
+
+let config;
+
+const fmtFechaHora = iso => new Date(iso).toLocaleString('es-PE', {
+  day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+});
+
+function badgeEstado(activa) {
+  return activa
+    ? `<span class="role-badge role-numerico">Activa</span>`
+    : `<span class="role-badge role-fecha">Revocada</span>`;
+}
+
+function dibujarKpis(keys) {
+  const activas = keys.filter(k => k.activa).length;
+  const usos = keys.filter(k => k.ultimo_uso_el).map(k => new Date(k.ultimo_uso_el).getTime());
+  const ultimoUso = usos.length ? fmtFechaHora(new Date(Math.max(...usos)).toISOString()) : 'Nunca';
+  document.getElementById('keyKpis').innerHTML = [
+    kpiCard({ acento: 'blue', icono: '🔑', label: 'API keys activas', value: fmtNum(activas), sub: `${keys.length - activas} revocada(s)` }),
+    kpiCard({ acento: 'teal', icono: '⚡', label: 'Último uso', value: escapeHtml(ultimoUso), sub: 'de cualquiera de tus keys' })
+  ].join('');
+}
+
+async function cargarTabla() {
+  const cont = document.getElementById('tablaKeys');
+  const keys = await listarRegistros(config.apiBaseUrl, 'api-keys');
+  if (!keys) { cont.innerHTML = '<p class="tabla-vacia">No se pudo conectar con el backend.</p>'; return; }
+  dibujarKpis(keys);
+  if (!keys.length) {
+    cont.innerHTML = '<p class="tabla-vacia">Todavía no creaste ninguna API key. Crea una para conectar GEALMI con tu contador, tu BI u otro sistema.</p>';
+    return;
+  }
+
+  const puedeRevocar = tienePermiso('api_keys.eliminar');
+
+  cont.innerHTML = `
+    <div class="tabla-registros-wrap" style="margin-top:14px;">
+      <table class="tabla-registros">
+        <thead><tr><th>Nombre</th><th>Key</th><th>Creada</th><th>Último uso</th><th>Estado</th>${puedeRevocar ? '<th class="col-acciones"></th>' : ''}</tr></thead>
+        <tbody>
+          ${keys.map(k => `
+            <tr data-id="${k.id}">
+              <td>${escapeHtml(k.nombre)}<div style="font-size:11px; color:var(--muted);">${k.creado_por_nombre ? `por ${escapeHtml(k.creado_por_nombre)}` : ''}</div></td>
+              <td><span class="key-prefijo">${escapeHtml(k.prefijo)}…</span></td>
+              <td>${fmtFechaHora(k.creado_el)}</td>
+              <td>${k.ultimo_uso_el ? fmtFechaHora(k.ultimo_uso_el) : '<span style="color:var(--muted);">Nunca</span>'}</td>
+              <td>${badgeEstado(k.activa)}</td>
+              ${puedeRevocar ? `<td class="col-acciones"><div class="acciones-icono">${
+                k.activa ? `<button type="button" class="icon-btn peligro" data-accion="revocar" title="Revocar">🗑️</button>` : ''
+              }</div></td>` : ''}
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  cont.querySelectorAll('[data-accion="revocar"]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.closest('tr').dataset.id;
+      const key = keys.find(k => String(k.id) === id);
+      if (!confirm(`¿Revocar la API key "${key.nombre}"?\n\nLas integraciones que la usen dejarán de funcionar de inmediato. No se puede deshacer.`)) return;
+      btn.disabled = true;
+      const res = await eliminarRegistro(config.apiBaseUrl, 'api-keys', id);
+      if (res) { cargarTabla(); return; }
+      btn.disabled = false;
+      alert(ultimoErrorAPI() || 'No se pudo revocar la API key.');
+    });
+  });
+}
+
+// La key completa solo existe en la respuesta del POST -- el backend guarda
+// únicamente su hash. Esta vista es la única oportunidad de copiarla.
+function mostrarKeyCreada(body, creada) {
+  body.innerHTML = `
+    <div class="key-aviso">
+      <strong>Copia tu API key ahora.</strong> Por seguridad no vamos a volver a mostrarla.
+      Si la pierdes, tendrás que crear una nueva y revocar esta.
+    </div>
+    <div class="campo"><label>${escapeHtml(creada.nombre)}</label></div>
+    <div class="key-caja" id="keyCompleta"></div>
+    <button type="button" class="btn btn-ochre" id="btnCopiarKey" style="width:100%; justify-content:center; margin-bottom:8px;">📋 Copiar API key</button>
+    <button type="button" class="btn" id="btnListoKey" style="width:100%; justify-content:center;">Ya la guardé</button>
+    <span class="form-status" id="copiaStatus" style="display:block; margin-top:8px;"></span>
+  `;
+  document.getElementById('keyCompleta').textContent = creada.key;
+
+  document.getElementById('btnCopiarKey').addEventListener('click', async () => {
+    const status = document.getElementById('copiaStatus');
+    try {
+      await navigator.clipboard.writeText(creada.key);
+      status.textContent = 'Copiada al portapapeles.';
+      status.style.color = 'var(--teal)';
+    } catch {
+      status.textContent = 'No se pudo copiar automáticamente. Selecciona la key y cópiala con Ctrl+C.';
+      status.style.color = 'var(--coral)';
+    }
+  });
+  document.getElementById('btnListoKey').addEventListener('click', cerrarPanelLateral);
+}
+
+function abrirNuevaKey() {
+  abrirPanelLateral({
+    titulo: 'Nueva API key',
+    icono: '🔑',
+    // cerrarPanelLateral() solo oculta el panel, no vacía su contenido -- sin
+    // esto, la key completa seguiría en el DOM (fuera de pantalla) hasta que
+    // se abriera otro panel. Cubre todas las vías de cierre (botón, X, Esc,
+    // clic afuera).
+    onCerrar: () => {
+      const caja = document.getElementById('keyCompleta');
+      if (caja) caja.textContent = '';
+      cargarTabla();
+    },
+    montar: (body) => {
+      body.innerHTML = `
+        <form class="form-registro" style="grid-template-columns:1fr;" id="formNuevaKey">
+          <div class="campo">
+            <label for="keyNombre">Nombre</label>
+            <input type="text" id="keyNombre" required maxlength="100" placeholder="Ej. Integración con mi contador">
+            <span class="campo-ayuda" style="color:var(--muted);">Te sirve para reconocerla después y saber qué revocar si hace falta.</span>
+          </div>
+          <div class="campo campo-accion">
+            <button type="submit" class="btn btn-ochre" style="width:100%; justify-content:center;">Crear API key</button>
+            <span class="form-status" id="keyStatus"></span>
+          </div>
+        </form>
+      `;
+      document.getElementById('formNuevaKey').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre = document.getElementById('keyNombre').value.trim();
+        const statusEl = document.getElementById('keyStatus');
+        const btn = e.target.querySelector('button[type="submit"]');
+        if (!nombre) { statusEl.textContent = 'Ponle un nombre.'; statusEl.style.color = 'var(--coral)'; return; }
+        btn.disabled = true;
+        const creada = await crearRegistro(config.apiBaseUrl, 'api-keys', { nombre });
+        if (!creada) {
+          btn.disabled = false;
+          statusEl.textContent = ultimoErrorAPI() || 'No se pudo crear la API key.';
+          statusEl.style.color = 'var(--coral)';
+          return;
+        }
+        mostrarKeyCreada(body, creada);
+      });
+    }
+  });
+}
+
+function dibujarDocs() {
+  const base = `${config.apiBaseUrl}/v1`;
+  document.getElementById('docBase').textContent = base;
+  document.getElementById('docEjemplo').textContent =
+    `curl "${base}/ventas?desde=2026-01-01&limite=50" \\\n  -H "Authorization: Bearer <tu_api_key>"`;
+}
+
+(async function iniciar() {
+  config = await cargarConfigEmpresa();
+  renderSidebar(config, 'api-keys');
+  renderGealmiAiWidget(config);
+  await renderTopbar(config);
+  renderFooter();
+  dibujarDocs();
+
+  if (!tienePermiso('api_keys.ver')) {
+    document.getElementById('tablaKeys').innerHTML = '<p class="tabla-vacia">Tu rol no tiene permiso para ver esta sección.</p>';
+    return;
+  }
+
+  const btnNueva = document.getElementById('btnNuevaKey');
+  if (tienePermiso('api_keys.crear')) {
+    btnNueva.style.display = 'inline-flex';
+    btnNueva.addEventListener('click', abrirNuevaKey);
+  }
+
+  cargarTabla();
+})();
+</script>
+</body>
+</html>

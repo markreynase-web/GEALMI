@@ -18,6 +18,7 @@ import { abrirPanelLateral, cerrarPanelLateral } from '../components/panelLatera
 import { tienePermiso, haySesionActiva, obtenerSesion } from './sesion.js';
 import { ESQUEMAS } from './esquemas.js';
 import { crearRegistro } from './api.js';
+import { exportarFilasCSV, LIMITE_FILAS_EXPORT } from './exportarCSV.js';
 import { renderVentasDashboard } from './ventasDashboard.js';
 import { renderClientesDashboard } from './clientesDashboard.js';
 import { renderFinanzasDashboard } from './finanzasDashboard.js';
@@ -515,6 +516,49 @@ async function activarCapturaSiCorresponde(config) {
     statusEl.style.color = res.errores ? 'var(--ochre-deep)' : 'var(--teal)';
     refrescar();
   });
+
+  // Exportación a CSV (Nivel 3, Parte A). El botón se crea acá, no en cada
+  // HTML, para que los ~30 módulos lo tengan sin tocar sus páginas. Pide las
+  // filas frescas con el mismo rango de fechas de los filtros -- y por ser el
+  // mismo GET que llena la tabla, el alcance (empresa, sucursal, permisos) es
+  // idéntico al de lo que el usuario ya puede ver.
+  if (tienePermiso(`${NAMESPACE}.ver`)) {
+    const btnExportar = document.createElement('button');
+    btnExportar.type = 'button';
+    btnExportar.className = 'btn btn-ghost';
+    btnExportar.id = 'btnExportarCSVDB';
+    btnExportar.textContent = 'Exportar CSV';
+    document.getElementById('btnImportarCSVDB').insertAdjacentElement('afterend', btnExportar);
+
+    btnExportar.addEventListener('click', async () => {
+      const statusEl = document.getElementById('importDBStatus');
+      const filtros = {
+        desde: document.getElementById('fechaDesde').value || undefined,
+        hasta: document.getElementById('fechaHasta').value || undefined
+      };
+      btnExportar.disabled = true;
+      statusEl.textContent = 'Preparando exportación…';
+      statusEl.style.color = 'var(--muted)';
+
+      const filas = await backend.listarCrudo(filtros);
+      btnExportar.disabled = false;
+
+      if (!filas.length) {
+        // listarCrudo devuelve [] tanto si no hay datos como si la llamada
+        // falló -- ultimoError() distingue una cosa de la otra.
+        const motivo = backend.ultimoError();
+        statusEl.textContent = motivo ? `No se pudo exportar: ${motivo}` : 'No hay registros para exportar en este rango de fechas.';
+        statusEl.style.color = motivo ? 'var(--coral)' : 'var(--muted)';
+        return;
+      }
+
+      exportarFilasCSV({ filas, columnas: backend.esquema.columnasTabla, modulo: NAMESPACE, filtros });
+      const truncado = filas.length >= LIMITE_FILAS_EXPORT;
+      statusEl.textContent = `Exportadas ${filas.length} fila(s)` +
+        (truncado ? `. Es el máximo por exportación: acota el rango de fechas para exportar el resto.` : '.');
+      statusEl.style.color = truncado ? 'var(--ochre-deep)' : 'var(--teal)';
+    });
+  }
 
   await refrescarTablaBackend();
 }

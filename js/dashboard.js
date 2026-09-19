@@ -33,7 +33,7 @@ function renderSecundarios(mapa, actual, tieneFecha, tieneCat1) {
     const modoFecha = tieneFecha;
     const tag = modoFecha ? 'por fecha' : `por ${mapa.colCat1}`;
     grid.insertAdjacentHTML('beforeend',
-      `<div class="sec-chart-panel"><h4>${escapeHtml(col)} <span class="tag">${escapeHtml(tag)}</span></h4><div class="chart-wrap" style="height:200px;"><canvas id="${canvasId}"></canvas></div></div>`
+      `<div class="sec-chart-panel"><h4>${escapeHtml(col)} <span class="tag">${escapeHtml(tag)}</span></h4><div class="chart-wrap"><canvas id="${canvasId}"></canvas></div></div>`
     );
 
     const agrupado = {};

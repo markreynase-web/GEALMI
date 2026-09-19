@@ -196,8 +196,18 @@
   border:1px solid var(--paper-line); color:var(--ink); color-scheme:light;
 }
 
-.chart-wrap{ position:relative; height:280px; width:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+/* Tamaño de los gráficos, definido UNA sola vez acá. Antes cada página fijaba
+   200-240px en línea (más de 40 sitios) y la grilla de 3-4 columnas los dejaba
+   de ~300px de ancho: chicos y difíciles de leer. Los gráficos principales
+   (dentro de .panel) son más altos que los secundarios (.sec-chart-panel).
+   Prima el tamaño sobre la compacidad: que ocupen lo que necesiten. */
+:root{ --alto-grafico:340px; --alto-grafico-principal:400px; }
+.chart-wrap{ position:relative; height:var(--alto-grafico-principal); width:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.sec-chart-panel .chart-wrap{ height:var(--alto-grafico); }
 .chart-wrap canvas{ max-width:100%; max-height:100%; }
+@media (max-width:600px){
+  :root{ --alto-grafico:300px; --alto-grafico-principal:320px; }
+}
 
 /* Paneles de Inicio (gráfico + tarjetas de resumen): dos columnas
    independientes en vez de grid-2 fila por fila. Con grid, cada fila toma
@@ -208,8 +218,16 @@
 .inicio-columnas{ display:flex; align-items:flex-start; gap:22px; margin-bottom:28px; }
 .inicio-col{ flex:1.6; min-width:0; display:flex; flex-direction:column; gap:22px; }
 .inicio-col-angosta{ flex:1; }
+/* .captura-panel tiene margin:auto a los lados (para centrarse en <main>); dentro
+   de una columna flex eso le quita el estiramiento y el panel mide lo que pida
+   su tabla, pasándose de la columna. width:100% lo ata al ancho de la columna y
+   la tabla hace scroll dentro de su .tabla-registros-wrap. */
+.inicio-col > .captura-panel{ width:100%; }
 @media (max-width:900px){
-  .inicio-columnas{ flex-direction:column; }
+  /* stretch: con flex-start (el de escritorio) cada columna medía lo que pide su
+     contenido, y una tabla ancha empujaba toda la página en vez de hacer scroll
+     dentro de su .tabla-registros-wrap. */
+  .inicio-columnas{ flex-direction:column; align-items:stretch; }
 }
 .chart-empty{ color:var(--muted); font-size:13px; text-align:center; padding:0 20px; }
 
@@ -302,7 +320,18 @@
 .timeline-texto{ font-size:13px; color:var(--ink); }
 .timeline-fecha{ font-size:11.5px; color:var(--muted); margin-top:2px; }
 
-.secundarios-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; align-items:stretch; }
+/* Gráficos secundarios: 2 columnas (antes auto-fit de 260px = hasta 4 columnas
+   de ~300px, y con 4 gráficos en 3 columnas uno quedaba solo en la segunda
+   fila). Con cantidad impar, el último ocupa todo el ancho para que no quede
+   un hueco al lado. Una sola columna en pantallas angostas. */
+.secundarios-grid{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:20px; align-items:stretch; }
+.secundarios-grid > :last-child:nth-child(odd){ grid-column:1 / -1; }
+/* minmax(0, 1fr), no 1fr a secas: 1fr tiene mínimo "auto" y una columna se
+   ensancha por el contenido (un canvas con ancho fijo desde el primer dibujo
+   hacía desbordar la página en celular). */
+@media (max-width:900px){
+  .secundarios-grid{ grid-template-columns:minmax(0, 1fr); }
+}
 .sec-chart-panel{ background:#fff; border:1px solid var(--paper-line); border-radius:14px; padding:16px; box-shadow:var(--card-shadow); }
 .sec-chart-panel h4{ font-family:var(--font-display); font-size:14px; font-weight:700; margin:0 0 10px 0; display:flex; align-items:center; justify-content:space-between; }
 .sec-chart-panel .tag{ font-family:var(--font-mono); font-size:10px; font-weight:600; color:var(--muted); background:var(--paper); padding:2px 7px; border-radius:20px; border:1px solid var(--paper-line); }

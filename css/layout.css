@@ -295,7 +295,11 @@ main{ max-width:1180px; margin:0 auto; padding:28px 32px; }
 }
 
 @media (max-width: 900px){
-  .app-shell{ flex-direction:column; }
+  /* En columna, align-items:flex-start (el de escritorio) deja a .main-area con
+     ancho "de contenido": lo ensanchaba cualquier elemento cuyo mínimo pasara
+     del ancho de la pantalla y toda la página se desbordaba en horizontal.
+     stretch lo ata al ancho de la ventana. */
+  .app-shell{ flex-direction:column; align-items:stretch; }
   .sidebar{ position:relative; width:100%; height:auto; flex-direction:row; align-items:center; overflow-x:auto; border-radius:0; }
   .sidebar-brand{ border-bottom:none; border-right:1px solid rgba(255,255,255,0.08); }
   .sidebar-nav{ display:flex; padding:8px; overflow-x:auto; }

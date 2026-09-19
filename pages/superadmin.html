@@ -157,6 +157,33 @@
     }
   }
 
+  // Catálogo de planes (GET /superadmin/planes), cargado una sola vez: alimenta
+  // la columna "Plan" de la tabla de empresas y el selector de gestionarEmpresa().
+  let planes = [];
+  const nombrePlan = (planId) => planes.find(p => p.id === planId)?.nombre;
+
+  // Qué le da un plan a la empresa, en una línea -- se muestra ANTES de
+  // guardar, para que cambiar de plan no sea a ciegas. "Sin plan" (plan_id
+  // NULL) no es lo mismo que Básico: no limita usuarios, pero tampoco da
+  // acceso a la API pública ni al 2FA.
+  function describirPlan(planId, empresa) {
+    const plan = planes.find(p => String(p.id) === String(planId));
+    const actual = planes.find(p => p.id === empresa.plan_id);
+    const resumen = `${plan ? plan.nombre : 'Sin plan'}: ` + [
+      !plan || plan.limite_usuarios == null ? 'usuarios sin límite' : `hasta ${plan.limite_usuarios} usuarios`,
+      plan?.acceso_api ? 'API pública' : 'sin API pública',
+      plan?.acceso_2fa ? 'verificación en dos pasos' : 'sin verificación en dos pasos'
+    ].join(' · ');
+
+    const avisos = [];
+    if (plan && plan.limite_usuarios != null && Number(empresa.usuarios_count) > plan.limite_usuarios) {
+      avisos.push(`Esta empresa ya tiene ${empresa.usuarios_count} usuarios, más que el límite: no podrá agregar más hasta bajar de ${plan.limite_usuarios}.`);
+    }
+    if (actual?.acceso_api && !plan?.acceso_api) avisos.push('Sus API keys actuales dejarán de funcionar.');
+    if (actual?.acceso_2fa && !plan?.acceso_2fa) avisos.push('Quienes ya tengan 2FA activo lo conservan; nadie más podrá activarlo.');
+    return { resumen, avisos };
+  }
+
   async function iniciar() {
     contenido.innerHTML = `
       <div class="sa-panel">
@@ -327,17 +354,19 @@
     const empresas = await api('/superadmin/empresas');
     if (!empresas) { cont.innerHTML = '<p class="tabla-vacia">No se pudo conectar con el backend.</p>'; return; }
     if (!empresas.length) { cont.innerHTML = '<p class="tabla-vacia">Todavía no hay empresas. Usa "+ Nueva empresa" para crear la primera.</p>'; return; }
+    if (!planes.length) planes = (await api('/superadmin/planes')) || [];
 
     cont.innerHTML = `
       <div class="tabla-registros-wrap">
         <table class="tabla-registros">
-          <thead><tr><th>Nombre</th><th>Usuarios</th><th>Módulos</th><th>Estado</th><th class="col-acciones"></th></tr></thead>
+          <thead><tr><th>Nombre</th><th>Usuarios</th><th>Módulos</th><th>Plan</th><th>Estado</th><th class="col-acciones"></th></tr></thead>
           <tbody>
             ${empresas.map(e => `
               <tr data-id="${e.id}">
                 <td>${escapeHtml(e.nombre)}</td>
                 <td>${e.usuarios_count}</td>
                 <td>${e.modulos_count}</td>
+                <td>${e.plan_id ? escapeHtml(nombrePlan(e.plan_id) || `#${e.plan_id}`) : '<span style="color:var(--muted);">Sin plan</span>'}</td>
                 <td><span class="sa-estado-badge ${e.activo ? 'activo' : 'inactivo'}">${e.activo ? 'Activa' : 'Inactiva'}</span></td>
                 <td class="col-acciones"><button type="button" class="icon-btn" data-accion="gestionar" title="Gestionar">⚙️</button></td>
               </tr>`).join('')}
@@ -362,6 +391,11 @@
         body.innerHTML = 'Cargando módulos…';
         const modulos = await api(`/superadmin/empresas/${empresa.id}/modulos`);
         if (!modulos) { body.innerHTML = 'No se pudieron cargar los módulos.'; return; }
+        // Sin el catálogo, el selector no tendría de dónde armar las opciones y
+        // mostraría "Sin plan asignado" aunque la empresa tenga uno: guardar
+        // así le QUITARÍA el plan. Por eso, sin catálogo, se deshabilita.
+        if (!planes.length) planes = (await api('/superadmin/planes')) || [];
+        const planesCargados = planes.length > 0;
 
         body.innerHTML = `
           <div class="sa-subtitulo">Nombre</div>
@@ -377,6 +411,18 @@
             Empresa activa (si se desmarca, nadie de esta empresa puede iniciar sesión)
           </label>
           <div class="form-status" id="activoStatus" style="margin-bottom:20px;"></div>
+
+          <div class="sa-subtitulo">Plan</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <select id="empresaPlan" ${planesCargados ? '' : 'disabled'} style="flex:1; font-family:'Inter',sans-serif; font-size:13px; padding:9px 11px; border:1px solid var(--paper-line); border-radius:8px; background:#fff; color:var(--ink);">
+              <option value="">Sin plan asignado</option>
+              ${planes.map(p => `<option value="${p.id}" ${empresa.plan_id === p.id ? 'selected' : ''}>${escapeHtml(p.nombre)}</option>`).join('')}
+              ${empresa.plan_id && !nombrePlan(empresa.plan_id) ? `<option value="${empresa.plan_id}" selected>Plan #${empresa.plan_id} (fuera del catálogo)</option>` : ''}
+            </select>
+            <button type="button" class="btn btn-ochre" id="btnGuardarPlan" ${planesCargados ? '' : 'disabled'}>Guardar</button>
+          </div>
+          <div id="planDetalle" style="font-size:12px; color:var(--muted); line-height:1.55; margin-top:8px;"></div>
+          <div class="form-status" id="planStatus" style="margin-bottom:20px;"></div>
 
           <div class="sa-subtitulo">Soporte</div>
           <div style="margin-bottom:20px;">
@@ -489,6 +535,43 @@
             statusEl.textContent = 'No se pudo guardar el cambio.';
             statusEl.style.color = 'var(--coral)';
           }
+        });
+
+        // Plan: el resumen de lo que incluye se muestra al ELEGIR (antes de
+        // guardar); el cambio real ocurre con el botón, igual que el nombre.
+        const selectPlan = document.getElementById('empresaPlan');
+        function pintarDetallePlan() {
+          if (!planesCargados) {
+            document.getElementById('planDetalle').textContent = 'No se pudo cargar el catálogo de planes. Recarga la página para cambiar el plan.';
+            return;
+          }
+          const { resumen, avisos } = describirPlan(selectPlan.value, empresa);
+          document.getElementById('planDetalle').innerHTML =
+            escapeHtml(resumen) + avisos.map(a => `<div style="color:#8A5A00;">⚠ ${escapeHtml(a)}</div>`).join('');
+        }
+        pintarDetallePlan();
+        selectPlan.addEventListener('change', () => {
+          pintarDetallePlan();
+          document.getElementById('planStatus').textContent = '';
+        });
+        document.getElementById('btnGuardarPlan').addEventListener('click', async () => {
+          const statusEl = document.getElementById('planStatus');
+          const btn = document.getElementById('btnGuardarPlan');
+          btn.disabled = true;
+          const res = await api(`/superadmin/empresas/${empresa.id}`, {
+            method: 'PUT', body: JSON.stringify({ plan_id: selectPlan.value ? Number(selectPlan.value) : null })
+          });
+          btn.disabled = false;
+          if (!res) {
+            statusEl.textContent = 'No se pudo guardar.';
+            statusEl.style.color = 'var(--coral)';
+            return;
+          }
+          empresa.plan_id = res.plan_id ?? null;
+          statusEl.textContent = 'Plan guardado.';
+          statusEl.style.color = 'var(--teal)';
+          pintarDetallePlan();
+          await cargarEmpresas(); // refresca la columna "Plan" de la tabla de fondo
         });
 
         document.getElementById('btnImpersonar').addEventListener('click', async () => {

@@ -387,6 +387,7 @@
     abrirPanelLateral({
       titulo: `Gestionar: ${empresa.nombre}`,
       icono: '🏢',
+      ancho: 'amplio',
       montar: async (body) => {
         body.innerHTML = 'Cargando módulos…';
         const modulos = await api(`/superadmin/empresas/${empresa.id}/modulos`);

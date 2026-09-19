@@ -1,31 +1,46 @@
 /* css/panel-lateral.css
-   Panel lateral (drawer) para formularios de "Nuevo registro".
-   Usa las mismas variables de tema definidas en base.css, así que
-   no hace falta tocar colores ni tipografía (--ink, --paper, --ochre...). */
- 
+   Ventana modal centrada (antes un cajón lateral) para formularios de "Nuevo
+   registro", edición, detalle, etc. -- ver components/panelLateral.js. Se
+   conservan los nombres de clase (.panel-lateral*) porque otros archivos los
+   referencian; solo cambió la forma. Usa las variables de tema de base.css. */
+
 .panel-lateral-overlay{
-  position:fixed; inset:0; background:rgba(20,33,61,0.45);
+  position:fixed; inset:0; background:rgba(14,27,69,0.55);
+  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
   opacity:0; pointer-events:none; transition:opacity 0.2s ease;
-  z-index:40;
+  z-index:200;
 }
 .panel-lateral-overlay.activo{ opacity:1; pointer-events:auto; }
- 
+
+/* Centrado con top/left 50% + translate. Cerrado: transparente, sin
+   visibility (ni Tab ni lectores de pantalla lo alcanzan) y apenas más chico y
+   más abajo, para que al abrir "suba" y crezca. El delay de visibility deja
+   terminar el fade de salida antes de ocultarlo del todo. */
 .panel-lateral{
-  position:fixed; top:0; right:0; height:100%;
-  width:min(440px, 100%);
-  background:#fff;
-  box-shadow:-8px 0 24px -8px rgba(20,33,61,0.35);
-  transform:translateX(100%); transition:transform 0.22s ease;
-  z-index:41; display:flex; flex-direction:column;
-  border-radius:16px 0 0 16px;
+  position:fixed; top:50%; left:50%; z-index:201;
+  width:min(560px, calc(100vw - 32px));
+  max-height:min(88vh, 880px);
+  display:flex; flex-direction:column;
+  background:#fff; border-radius:18px; overflow:hidden;
+  box-shadow:0 32px 80px -24px rgba(14,27,69,0.6), 0 2px 10px rgba(14,27,69,0.14);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transform:translate(-50%, -47%) scale(0.97);
+  transition:opacity 0.18s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+  outline:none;
 }
-.panel-lateral.activo{ transform:translateX(0); }
- 
+.panel-lateral.activo{
+  opacity:1; visibility:visible; pointer-events:auto;
+  transform:translate(-50%, -50%) scale(1);
+  transition-delay:0s;
+}
+/* Para formularios largos (los "+ Nuevo" de los módulos) y contenido denso. */
+.panel-lateral--amplio{ width:min(780px, calc(100vw - 32px)); }
+
 .panel-lateral-header{
   display:flex; align-items:center; justify-content:space-between;
-  padding:18px 22px; border-bottom:1px solid var(--paper-line);
+  padding:18px 24px; border-bottom:1px solid var(--paper-line); flex-shrink:0;
 }
-.panel-lateral-titulo-wrap{ display:flex; align-items:center; gap:12px; }
+.panel-lateral-titulo-wrap{ display:flex; align-items:center; gap:12px; min-width:0; }
 .panel-lateral-icono{
   display:flex; align-items:center; justify-content:center;
   width:38px; height:38px; border-radius:10px;
@@ -33,22 +48,30 @@
 }
 .panel-lateral-header h3{
   font-family:var(--font-display); font-size:16px; font-weight:700; margin:0; color:var(--ink);
+  overflow-wrap:anywhere;
 }
 .panel-lateral-cerrar{
   background:var(--paper); border:none; cursor:pointer; border-radius:50%;
-  width:30px; height:30px; display:flex; align-items:center; justify-content:center;
-  font-size:14px; color:var(--muted); line-height:1;
+  width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+  font-size:14px; color:var(--muted); line-height:1; flex-shrink:0; margin-left:12px;
 }
 .panel-lateral-cerrar:hover{ color:var(--ink); background:var(--paper-line); }
- 
-.panel-lateral-body{ padding:20px 22px; overflow-y:auto; flex:1; }
- 
-/* El formulario genérico (.form-registro) fue pensado para el panel ancho
-   de antes del rediseño (grid de 4 columnas). Dentro de los 420px del panel
-   lateral eso queda apretado, así que acá se sobreescribe a una sola
-   columna: cada campo ocupa todo el ancho, apilado. */
+.panel-lateral-cerrar:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+
+/* min-height:0: sin esto un hijo flex con overflow no se achica y el modal
+   crecería más que la pantalla en vez de hacer scroll adentro. */
+.panel-lateral-body{ padding:20px 24px 24px; overflow-y:auto; flex:1; min-height:0; }
+
+/* El formulario genérico (.form-registro) trae un grid de 4 columnas, pensado
+   para la página ancha de antes del rediseño: dentro del modal se apila en una
+   sola columna. En el modal amplio pasa a 2 columnas -- salvo los formularios
+   armados a mano con grid-template-columns inline (pocos campos), que se
+   quedan de una columna para no verse a medias. */
 .panel-lateral .form-registro{
   grid-template-columns:1fr !important; gap:16px;
+}
+.panel-lateral--amplio .form-registro:not([style*="grid-template-columns"]){
+  grid-template-columns:1fr 1fr !important;
 }
 .panel-lateral .form-registro .campo-ancho-2{
   grid-column:1 / -1 !important;
@@ -57,15 +80,34 @@
 .panel-lateral .form-registro select{
   padding:10px 12px; font-size:14px; border-radius:8px;
 }
-.panel-lateral .form-registro .campo-accion{ margin-top:8px; }
+/* Botón y mensaje de estado apilados (no en fila): en fila, el mensaje vacío
+   más el hueco le quitaban unos píxeles al botón y no llegaba al ancho de los
+   campos. */
+.panel-lateral .form-registro .campo-accion{
+  margin-top:8px; grid-column:1 / -1; flex-direction:column; align-items:stretch; gap:8px;
+}
 .panel-lateral .form-registro .campo-accion button{
   width:100%; justify-content:center; padding:12px 14px; font-size:14px;
 }
- 
-/* Evita el scroll del fondo mientras el panel está abierto. */
+
+/* Evita el scroll del fondo mientras el modal está abierto. */
 body.panel-lateral-abierto{ overflow:hidden; }
- 
-@media (max-width: 520px){
-  .panel-lateral{ width:100%; border-radius:0; }
+
+/* Celular: casi pantalla completa, con un margen mínimo, y una sola columna
+   siempre. 100dvh cuida las barras del navegador móvil que suben y bajan. */
+@media (max-width: 600px){
+  .panel-lateral, .panel-lateral--amplio{
+    width:calc(100vw - 16px);
+    max-height:calc(100vh - 16px); max-height:calc(100dvh - 16px);
+    border-radius:16px;
+  }
+  .panel-lateral-header{ padding:14px 16px; }
+  .panel-lateral-body{ padding:16px; }
+  .panel-lateral--amplio .form-registro:not([style*="grid-template-columns"]){
+    grid-template-columns:1fr !important;
+  }
 }
- 
+
+@media (prefers-reduced-motion: reduce){
+  .panel-lateral, .panel-lateral-overlay{ transition:none; }
+}

@@ -55,6 +55,15 @@ const RENDERERS_BESPOKE = {
   compras: renderComprasDashboard, rrhh: renderRrhhDashboard, produccion: renderProduccionDashboard
 };
 
+// Etiquetas de formulario (`etiqueta` en js/esquemas.js) que son femeninas: el
+// título del modal dice "Nueva venta", no "Nuevo venta". Lista explícita en vez
+// de adivinar por la terminación ("plan" y "turno" son masculinos, "orden" y
+// "atención" femeninos). Una etiqueta nueva que no esté acá sale en masculino.
+const ETIQUETAS_FEMENINAS = new Set([
+  'venta', 'orden de servicio', 'cita', 'receta', 'orden', 'mascota', 'atención',
+  'unidad', 'ruta', 'mesa', 'comanda', 'venta de combo', 'compra', 'orden de producción'
+]);
+
 // Namespace de esta página dentro de localStorage. Cada página de módulo (ventas.html,
 // inventario.html, clientes.html, ...) declara el suyo en <body data-modulo="...">,
 // así cada módulo guarda sus datos por separado y no se pisan entre sí.
@@ -463,8 +472,9 @@ async function activarCapturaSiCorresponde(config) {
       const esquema = await esquemaConOpcionesFrescas();
       const moduloActual = buscarModulo(config, NAMESPACE);
       abrirPanelLateral({
-        titulo: `Nuevo${esquema.etiqueta ? ' ' + esquema.etiqueta : ' registro'}`,
+        titulo: `${ETIQUETAS_FEMENINAS.has(esquema.etiqueta) ? 'Nueva' : 'Nuevo'}${esquema.etiqueta ? ' ' + esquema.etiqueta : ' registro'}`,
         icono: moduloActual?.icon || '📝',
+        ancho: 'amplio',
         montar: (body) => {
           function dibujarFormularioVenta() {
             body.innerHTML = '<div id="formularioCaptura"></div>';

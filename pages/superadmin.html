@@ -501,7 +501,7 @@
             empresa.nombre = nuevoNombre;
             document.getElementById('panelLateralTitulo').textContent = `Gestionar: ${nuevoNombre}`;
             statusEl.textContent = 'Guardado.';
-            statusEl.style.color = 'var(--teal)';
+            statusEl.style.color = 'var(--teal-strong)';
             await cargarEmpresas();
           } else {
             statusEl.textContent = 'No se pudo guardar.';
@@ -528,7 +528,7 @@
           if (res) {
             empresa.activo = activo;
             statusEl.textContent = activo ? 'Guardado: empresa activa.' : 'Guardado: empresa desactivada.';
-            statusEl.style.color = 'var(--teal)';
+            statusEl.style.color = 'var(--teal-strong)';
             await cargarEmpresas(); // refresca el badge de estado en la tabla de fondo
           } else {
             e.target.checked = !activo; // revertir si falló
@@ -569,7 +569,7 @@
           }
           empresa.plan_id = res.plan_id ?? null;
           statusEl.textContent = 'Plan guardado.';
-          statusEl.style.color = 'var(--teal)';
+          statusEl.style.color = 'var(--teal-strong)';
           pintarDetallePlan();
           await cargarEmpresas(); // refresca la columna "Plan" de la tabla de fondo
         });
@@ -602,7 +602,7 @@
           if (res) {
             empresa.color_primario = e.target.value;
             statusEl.textContent = 'Guardado.';
-            statusEl.style.color = 'var(--teal)';
+            statusEl.style.color = 'var(--teal-strong)';
             document.getElementById('btnQuitarColor').style.display = '';
             await cargarEmpresas();
           }
@@ -681,7 +681,7 @@
           });
           if (res) {
             statusEl.textContent = 'Administrador agregado.';
-            statusEl.style.color = 'var(--teal)';
+            statusEl.style.color = 'var(--teal-strong)';
             document.getElementById('formAdmin').reset();
             await cargarEmpresas();
           }

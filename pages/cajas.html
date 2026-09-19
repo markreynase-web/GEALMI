@@ -312,7 +312,7 @@ async function cargarTurnos() {
               <td>${fmtNum(Number(t.monto_apertura))}</td>
               <td>${t.monto_cierre_declarado !== null ? fmtNum(Number(t.monto_cierre_declarado)) : '—'}</td>
               <td>${t.monto_cierre_sistema !== null ? fmtNum(Number(t.monto_cierre_sistema)) : '—'}</td>
-              <td style="color:${diferencia === null ? 'inherit' : diferencia === 0 ? 'var(--teal)' : 'var(--coral)'};">${diferencia !== null ? (diferencia > 0 ? '+' : '') + fmtNum(diferencia) : '—'}</td>
+              <td style="color:${diferencia === null ? 'inherit' : diferencia === 0 ? 'var(--teal-strong)' : 'var(--coral)'};">${diferencia !== null ? (diferencia > 0 ? '+' : '') + fmtNum(diferencia) : '—'}</td>
             </tr>`;
           }).join('')}
         </tbody>

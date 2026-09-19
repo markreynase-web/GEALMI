@@ -242,7 +242,7 @@ async function cargarGanancia() {
     ? filas.map(f => `
       <div class="rank-row">
         <span class="rank-name">${escapeHtml(f.sucursal_nombre)}</span>
-        <span class="rank-val" style="color:${f.ganancia >= 0 ? 'var(--teal)' : 'var(--coral)'};">S/ ${fmtNum(f.ganancia)}</span>
+        <span class="rank-val" style="color:${f.ganancia >= 0 ? 'var(--teal-strong)' : 'var(--coral)'};">S/ ${fmtNum(f.ganancia)}</span>
       </div>`).join('') + `
       <div class="rank-row" style="border-top:1px solid var(--borde); margin-top:6px; padding-top:10px; font-weight:600;">
         <span class="rank-name">Total</span>

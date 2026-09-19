@@ -231,7 +231,7 @@ export function renderFormulario(contenedorId, esquema, onGuardar, { puedeCrear 
     // saber el género gramatical de cada etiqueta ('cita', 'compra',
     // 'receta' son femeninas; 'cliente', 'vehículo' son masculinas).
     statusEl.textContent = `Se guardó: ${esquema.etiqueta}.`;
-    statusEl.style.color = 'var(--teal)';
+    statusEl.style.color = 'var(--teal-strong)';
     esquema.campos.forEach(c => {
       if (c.buscar && comboboxes[c.id]) { comboboxes[c.id].limpiar(); return; }
       const input = document.getElementById(idInput(c));

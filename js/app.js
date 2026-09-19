@@ -145,7 +145,7 @@ async function refrescarDesdeBackend() {
 function mostrarEstado(msg, tipo) {
   const el = document.getElementById('uploadStatus');
   el.textContent = msg;
-  el.style.color = tipo === 'error' ? 'var(--coral)' : (tipo === 'ok' ? 'var(--teal)' : 'var(--muted)');
+  el.style.color = tipo === 'error' ? 'var(--coral)' : (tipo === 'ok' ? 'var(--teal-strong)' : 'var(--muted)');
 }
 
 async function manejarArchivo(file) {
@@ -301,7 +301,7 @@ function aplicarBranding(config) {
   // '.subtitle' es del header viejo (páginas que todavía no migraron al
   // sidebar); '#sidebarSubtitle'/'#topbarTitle'/'#topbarSubtitle' son del
   // layout nuevo. Se actualizan los que existan en la página actual.
-  const subtitleTexto = `PANEL DE ${nombreModulo.toUpperCase()} · SE ADAPTA A CUALQUIER CSV`;
+  const subtitleTexto = `PANEL DE ${nombreModulo.toUpperCase()}`;
   const subtitleEl = document.querySelector('.subtitle');
   if (subtitleEl) subtitleEl.textContent = subtitleTexto;
 
@@ -513,7 +513,7 @@ async function activarCapturaSiCorresponde(config) {
       return;
     }
     statusEl.textContent = `Importadas ${res.insertadas} fila(s)` + (res.errores ? `, ${res.errores} con error.` : '.');
-    statusEl.style.color = res.errores ? 'var(--ochre-deep)' : 'var(--teal)';
+    statusEl.style.color = res.errores ? 'var(--ochre-deep)' : 'var(--teal-strong)';
     refrescar();
   });
 
@@ -556,7 +556,7 @@ async function activarCapturaSiCorresponde(config) {
       const truncado = filas.length >= LIMITE_FILAS_EXPORT;
       statusEl.textContent = `Exportadas ${filas.length} fila(s)` +
         (truncado ? `. Es el máximo por exportación: acota el rango de fechas para exportar el resto.` : '.');
-      statusEl.style.color = truncado ? 'var(--ochre-deep)' : 'var(--teal)';
+      statusEl.style.color = truncado ? 'var(--ochre-deep)' : 'var(--teal-strong)';
     });
   }
 

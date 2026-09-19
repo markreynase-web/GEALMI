@@ -125,7 +125,7 @@ const enviar = (ruta, datos = {}) => crearRegistro(config.apiBaseUrl, `2fa/${rut
 
 function pintarEstado(el, texto, tipo) {
   el.textContent = texto;
-  el.style.color = tipo === 'error' ? 'var(--coral)' : (tipo === 'ok' ? 'var(--teal)' : 'var(--muted)');
+  el.style.color = tipo === 'error' ? 'var(--coral)' : (tipo === 'ok' ? 'var(--teal-strong)' : 'var(--muted)');
 }
 
 function badge(activada) {

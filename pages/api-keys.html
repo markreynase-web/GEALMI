@@ -227,7 +227,7 @@ function mostrarKeyCreada(body, creada) {
     try {
       await navigator.clipboard.writeText(creada.key);
       status.textContent = 'Copiada al portapapeles.';
-      status.style.color = 'var(--teal)';
+      status.style.color = 'var(--teal-strong)';
     } catch {
       status.textContent = 'No se pudo copiar automáticamente. Selecciona la key y cópiala con Ctrl+C.';
       status.style.color = 'var(--coral)';

@@ -31,7 +31,7 @@
   font-family:var(--font-body); font-weight:700; font-size:14px; color:#fff;
 }
 .sidebar-brand .biz-name:focus{ outline:none; }
-.sidebar-subtitle{ font-size:10px; letter-spacing:0.05em; text-transform:uppercase; color:rgba(255,255,255,0.45); margin-top:3px; }
+.sidebar-subtitle{ font-size:10px; letter-spacing:0.05em; text-transform:uppercase; color:rgba(255,255,255,0.65); margin-top:3px; }
 .sidebar-collapse-btn{
   flex-shrink:0; width:22px; height:22px; border-radius:50%; border:none; cursor:pointer;
   background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.6);
@@ -51,7 +51,7 @@
 .sidebar-nav::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.18); border-radius:10px; }
 .sidebar-nav::-webkit-scrollbar-thumb:hover{ background:rgba(255,255,255,0.32); }
 .sidebar-group{ margin-bottom:20px; }
-.sidebar-group-label{ font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:rgba(255,255,255,0.35); font-weight:600; padding:0 10px; margin-bottom:6px; }
+.sidebar-group-label{ font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:rgba(255,255,255,0.62); font-weight:600; padding:0 10px; margin-bottom:6px; }
 .sidebar-item{
   position:relative; display:flex; align-items:center; gap:10px; padding:9px 12px;
   border-radius:10px;
@@ -59,11 +59,12 @@
   transition:background 0.14s ease, color 0.14s ease;
 }
 .sidebar-item:hover{ background:rgba(255,255,255,0.06); color:#fff; }
-.sidebar-item.active{ background:var(--teal); color:#fff; box-shadow:0 4px 14px -4px rgba(15,166,156,0.55); }
+.sidebar-item.active{ background:var(--teal-strong); color:#fff; box-shadow:0 4px 14px -4px rgba(11,124,117,0.55); }
 .sidebar-item.active .sidebar-icon{ color:#fff; }
 .sidebar-icon{ font-size:15px; line-height:1; width:18px; text-align:center; flex-shrink:0; }
 
-.sidebar-footer{ border-top:1px solid rgba(255,255,255,0.08); padding:14px 16px; display:flex; align-items:center; gap:10px; }
+.sidebar-footer{ border-top:1px solid rgba(255,255,255,0.08); padding:14px 16px; display:flex; flex-direction:column; align-items:stretch; gap:12px; }
+.sidebar-footer-usuario{ display:flex; align-items:center; gap:10px; min-width:0; }
 .sidebar-avatar{
   width:32px; height:32px; border-radius:50%; background:var(--teal); color:var(--ink);
   display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'Inter', sans-serif;
@@ -71,9 +72,19 @@
 }
 .sidebar-footer-info{ min-width:0; flex:1; }
 .sidebar-footer-nombre{ font-size:12.5px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.sidebar-footer-rol{ font-size:9.5px; text-transform:uppercase; letter-spacing:0.04em; color:rgba(255,255,255,0.45); }
-.sidebar-logout{ font-size:15px; color:rgba(255,255,255,0.6); background:none; border:none; cursor:pointer; padding:2px; line-height:1; flex-shrink:0; }
-.sidebar-logout:hover{ color:var(--coral); }
+.sidebar-footer-rol{ font-size:9.5px; text-transform:uppercase; letter-spacing:0.04em; color:rgba(255,255,255,0.65); }
+/* Cerrar sesión: antes era un "⎋" de 15px al 60% de blanco que no se veía. Ahora
+   es un botón con texto, de ancho completo y color propio (coral). */
+.sidebar-logout{
+  display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
+  padding:10px 12px; border:none; border-radius:10px; cursor:pointer;
+  background:var(--coral); color:#fff;
+  font-family:'Inter', sans-serif; font-size:13px; font-weight:600; line-height:1;
+  transition:background 0.15s ease;
+}
+.sidebar-logout:hover{ background:var(--coral-deep); }
+.sidebar-logout:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+.sidebar-logout-icono{ flex-shrink:0; }
 .sidebar-login-link{ font-size:13px; color:#fff; text-decoration:none; font-weight:600; }
 
 /* Entrada fija de GEALMI AI (Rediseño v3, ver components/sidebar.js
@@ -116,12 +127,16 @@
   .sidebar.colapsado .sidebar-group-label,
   .sidebar.colapsado .sidebar-item span:not(.sidebar-icon),
   .sidebar.colapsado .sidebar-footer-info,
-  .sidebar.colapsado .sidebar-logout,
+  .sidebar.colapsado .sidebar-logout-texto,
   .sidebar.colapsado .sidebar-gealmi-ai-chevron{ display:none; }
   .sidebar.colapsado .sidebar-collapse-btn{ position:absolute; top:14px; right:-10px; background:var(--ink); border:1px solid rgba(255,255,255,0.14); }
   .sidebar.colapsado .sidebar-collapse-btn svg{ transform:rotate(180deg); }
   .sidebar.colapsado .sidebar-item{ justify-content:center; padding-left:8px; padding-right:8px; }
-  .sidebar.colapsado .sidebar-footer{ justify-content:center; }
+  /* Colapsado: solo el avatar y el ícono de cerrar sesión (el botón se queda
+     visible, sin texto). Al pasar el mouse vuelve a mostrarse completo. */
+  .sidebar.colapsado .sidebar-footer{ align-items:center; }
+  .sidebar.colapsado .sidebar-footer-usuario{ justify-content:center; }
+  .sidebar.colapsado .sidebar-logout{ width:40px; padding:10px 0; }
   .sidebar.colapsado .sidebar-gealmi-ai{ justify-content:center; padding-left:8px; padding-right:8px; }
 
   /* Al pasar el mouse, el flyout se ve exactamente como el sidebar expandido
@@ -132,13 +147,15 @@
   .sidebar.colapsado:hover .sidebar-group-label{ display:block; }
   .sidebar.colapsado:hover .sidebar-item span:not(.sidebar-icon){ display:inline; }
   .sidebar.colapsado:hover .sidebar-footer-info{ display:block; }
-  .sidebar.colapsado:hover .sidebar-logout{ display:inline-block; }
+  .sidebar.colapsado:hover .sidebar-logout-texto{ display:inline; }
+  .sidebar.colapsado:hover .sidebar-logout{ width:100%; padding:10px 12px; }
   .sidebar.colapsado:hover .sidebar-gealmi-ai-chevron{ display:inline; }
   /* El chevron se queda apuntando "expandir" durante el hover a propósito:
      el clic todavía fija el sidebar expandido (el hover es solo una vista
      previa temporal), así que el ícono debe seguir prometiendo esa acción. */
   .sidebar.colapsado:hover .sidebar-item{ justify-content:flex-start; padding-left:12px; padding-right:12px; }
-  .sidebar.colapsado:hover .sidebar-footer{ justify-content:flex-start; }
+  .sidebar.colapsado:hover .sidebar-footer{ align-items:stretch; }
+  .sidebar.colapsado:hover .sidebar-footer-usuario{ justify-content:flex-start; }
   .sidebar.colapsado:hover .sidebar-gealmi-ai{ justify-content:flex-start; padding-left:16px; padding-right:16px; }
 }
 

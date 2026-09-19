@@ -262,12 +262,17 @@ function renderSidebarFooter() {
     ? `<div class="sidebar-footer-rol" title="Empresa activa">${escapeHtml(sesion.usuario.rol)} · ${escapeHtml(sesion.usuario.empresa_nombre)}</div>`
     : `<div class="sidebar-footer-rol">${escapeHtml(sesion.usuario.rol)}</div>`;
   cont.innerHTML = `
-    <div class="sidebar-avatar">${inicial}</div>
-    <div class="sidebar-footer-info">
-      <div class="sidebar-footer-nombre">${escapeHtml(sesion.usuario.nombre)}</div>
-      ${empresaHtml}
+    <div class="sidebar-footer-usuario">
+      <div class="sidebar-avatar">${inicial}</div>
+      <div class="sidebar-footer-info">
+        <div class="sidebar-footer-nombre">${escapeHtml(sesion.usuario.nombre)}</div>
+        ${empresaHtml}
+      </div>
     </div>
-    <button type="button" class="sidebar-logout" id="btnCerrarSesionSidebar" title="Cerrar sesión">⎋</button>
+    <button type="button" class="sidebar-logout" id="btnCerrarSesionSidebar" title="Cerrar sesión">
+      <svg class="sidebar-logout-icono" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      <span class="sidebar-logout-texto">Cerrar sesión</span>
+    </button>
   `;
   document.getElementById('btnCerrarSesionSidebar').addEventListener('click', () => {
     cerrarSesion();

@@ -21,11 +21,13 @@
   --teal:#0FA69C;
   --teal-deep:#1C6F96;
   --teal-soft:#E3FBF6;
-  --coral:#C4544B;
-  --coral-deep:#99423B;
+  --teal-strong:#0B7C75; /* teal para TEXTO y para fondos con texto blanco (AA); --teal queda para rellenos */
+  --placeholder:#66708C;
+  --coral:#AF4B43;
+  --coral-deep:#8A3A34;
   --blue:#1C6F96;
   --blue-soft:#DDEEF4;
-  --green:#0C8E6B;
+  --green:#0A7A5C;
   --green-soft:#DFF4EC;
   --orange:#C98A3C;
   --orange-soft:#F8EAD4;
@@ -35,7 +37,7 @@
   --card-shadow: 0 1px 2px rgba(14,27,69,0.04), 0 8px 24px -12px rgba(14,27,69,0.18);
 
   --cyan:#2EE2CE;
-  --danger:#C4544B;
+  --danger:#AF4B43;
   --font-display:'Bricolage Grotesque','Inter',sans-serif;
   --font-body:'Inter','Segoe UI',sans-serif;
   --font-mono:'IBM Plex Mono', ui-monospace, monospace;
@@ -57,8 +59,9 @@ h1,h2,h3,h4{ font-family:var(--font-display); }
 .btn-ochre{ background:var(--coral); color:#fff; }
 .btn-ochre:hover{ background:var(--coral-deep); }
 .btn-ochre:disabled{ opacity:0.6; cursor:not-allowed; }
-.btn-ghost{ background:transparent; color:var(--paper); border-color:rgba(250,247,240,0.35); }
-.btn-ghost:hover{ border-color:var(--paper); }
+.btn-ghost{ background:transparent; color:var(--ink); border-color:var(--paper-line); }
+.btn-ghost:hover{ border-color:var(--ink); }
+::placeholder{ color:var(--placeholder); opacity:1; }
 select.period{ background:transparent; color:var(--paper); border:1px solid rgba(250,247,240,0.35); border-radius:9px; padding:8px 10px; font-family:'Inter'; font-size:13px; }
 .date-range{ display:flex; align-items:center; gap:8px; }
 input.period{ background:transparent; color:var(--paper); border:1px solid rgba(250,247,240,0.35); border-radius:9px; padding:7px 8px; font-family:'Inter'; font-size:13px; color-scheme:dark; }
@@ -69,7 +72,7 @@ main{ max-width:1180px; margin:0 auto; padding:32px; }
 .hero-figure .label{ font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); font-weight:600; }
 .hero-figure .value{ font-size:56px; font-weight:700; line-height:1; margin-top:6px; }
 .stamp{ display:inline-flex; align-items:center; gap:6px; border:1.5px dashed currentColor; border-radius:5px; padding:6px 12px; font-size:13px; font-weight:700; transform: rotate(-3deg); margin-top:14px; }
-.stamp.up{ color:var(--teal); }
+.stamp.up{ color:var(--teal-strong); }
 .stamp.down{ color:var(--coral); }
 .stamp.neutral{ color:var(--muted); }
 .hero-meta{ text-align:right; font-size:13px; color:var(--muted); max-width:280px; }

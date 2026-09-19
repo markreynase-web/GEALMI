@@ -14,6 +14,7 @@ import inventarioRouter from './routes/inventario.js';
 import sucursalesRouter from './routes/sucursales.js';
 import cajasRouter from './routes/cajas.js';
 import apiKeysRouter from './routes/apiKeys.js';
+import twoFactorRouter from './routes/twoFactor.js';
 import publicApiRouter from './routes/publicApi.js';
 import clientesRouter from './routes/clientes.js';
 import finanzasRouter from './routes/finanzas.js';
@@ -191,6 +192,7 @@ app.use('/api/inventario', inventarioRouter);
 app.use('/api/sucursales', sucursalesRouter);
 app.use('/api/cajas', cajasRouter);
 app.use('/api/api-keys', apiKeysRouter);
+app.use('/api/2fa', twoFactorRouter);
 // /api/v1: API PÚBLICA para integraciones de terceros -- autenticada con
 // API keys (middleware/apiKeyAuth.js), nunca con el JWT de sesión que usa
 // todo lo de arriba. Prefijo propio a propósito, ver routes/publicApi.js.

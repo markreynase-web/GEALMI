@@ -32,6 +32,11 @@ export const logger = pino({
       // POST /login/empresa recibe un JWT de corta duración (preAuthToken)
       // en el body -- mismo criterio que cualquier otro token.
       'body.preAuthToken',
+      // 2FA (POST /login/2fa, /2fa/activar, /2fa/desactivar): el código de la
+      // app, el de recuperación y el desafío del login son credenciales.
+      'body.codigo',
+      'body.codigoRecuperacion',
+      'body.desafioToken',
       // GET /reset-password/validar recibe el token de reset por query
       // string, no por body -- mismo criterio que body.token, ruta distinta.
       'query.token',

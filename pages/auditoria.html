@@ -105,7 +105,8 @@ const ETIQUETA_MODULO = {
   ventas: 'una venta', inventario: 'un producto', clientes: 'un cliente',
   finanzas: 'un movimiento', usuarios: 'un usuario',
   postventa: 'una orden de servicio', vehiculos: 'un vehículo', repuestos: 'un repuesto',
-  superadmin: 'soporte técnico'
+  superadmin: 'soporte técnico',
+  auth: 'seguridad de la cuenta'
 };
 
 // Color del marcador/badge de cada acción -- reutiliza los mismos tokens
@@ -117,7 +118,21 @@ const ETIQUETA_ACCION = {
   editar: { texto: 'Editó', color: 'blue' },
   eliminar: { texto: 'Eliminó', color: 'danger' },
   importar: { texto: 'Importó', color: 'purple' },
-  impersonar: { texto: 'Soporte', color: 'purple' }
+  impersonar: { texto: 'Soporte', color: 'purple' },
+  // Verificación en dos pasos (2FA) -- ver routes/twoFactor.js, routes/auth.js
+  // y POST /usuarios/:id/reset-2fa.
+  activar_2fa: { texto: 'Activó 2FA', color: 'teal' },
+  desactivar_2fa: { texto: 'Desactivó 2FA', color: 'danger' },
+  reset_2fa: { texto: 'Restableció 2FA', color: 'purple' },
+  login_2fa_fallo: { texto: 'Código 2FA fallido', color: 'danger' },
+  usar_cod_recup: { texto: 'Código de recuperación', color: 'purple' }
+};
+
+const DESCRIPCION_2FA = {
+  activar_2fa: 'Activó la verificación en dos pasos de su cuenta.',
+  desactivar_2fa: 'Desactivó la verificación en dos pasos de su cuenta.',
+  login_2fa_fallo: 'Escribió un código de verificación incorrecto al iniciar sesión.',
+  usar_cod_recup: 'Inició sesión con un código de recuperación (no tenía a mano su app).'
 };
 
 function formatoFechaHora(iso) {
@@ -174,6 +189,9 @@ function generarDescripcion(f) {
     const motivo = detalle?.motivo;
     return `Un representante de soporte técnico entró a esta cuenta${motivo ? `: "${motivo}"` : '.'}`;
   }
+  if (DESCRIPCION_2FA[f.accion]) return DESCRIPCION_2FA[f.accion];
+  // Un admin le restableció el 2FA a otra persona: registro_id es esa persona.
+  if (f.accion === 'reset_2fa') return `Restableció la verificación en dos pasos del usuario #${f.registro_id ?? '—'}.`;
   return detalle ? `${f.accion} en ${f.modulo}.` : `${f.accion} en ${f.modulo} (sin más detalle disponible).`;
 }
 

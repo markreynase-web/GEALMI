@@ -198,6 +198,11 @@ async function cargarTabla() {
             const esUnoMismo = String(u.id) === String(miId);
             const botones = [
               puedeEditar ? `<button type="button" class="icon-btn" data-accion="editar" title="Editar">✏️</button>` : '',
+              // Restablecer 2FA: para quien perdió el celular Y sus códigos de
+              // recuperación. Nadie se lo restablece a sí mismo (ver el
+              // backend: POST /api/usuarios/:id/reset-2fa) -- para eso está
+              // "Desactivar" en Seguridad.
+              (puedeEditar && u.tiene_2fa && !esUnoMismo) ? `<button type="button" class="icon-btn" data-accion="reset2fa" title="Restablecer verificación en dos pasos">🔓</button>` : '',
               puedeVerActividad ? `<button type="button" class="icon-btn" data-accion="actividad" title="Ver actividad">📋</button>` : '',
               (puedeEliminar && !esUnoMismo) ? `<button type="button" class="icon-btn peligro" data-accion="eliminar" title="Quitar acceso">🗑️</button>` : ''
             ].join('');
@@ -207,7 +212,7 @@ async function cargarTabla() {
             const sucursalTexto = u.sucursal_id ? escapeHtml(u.sucursal_nombre) : 'Todas';
             return `
             <tr data-id="${u.id}">
-              <td>${escapeHtml(u.nombre)}</td>
+              <td>${escapeHtml(u.nombre)}${u.tiene_2fa ? ' <span class="role-badge role-categoria" title="Verificación en dos pasos activada">🔐 2FA</span>' : ''}</td>
               <td>${escapeHtml(u.email)}</td>
               <td>${badgeRol(u.rol)}</td>
               <td>${sucursalTexto}</td>
@@ -225,6 +230,19 @@ async function cargarTabla() {
       const id = btn.closest('tr').dataset.id;
       const usuario = usuarios.find(u => String(u.id) === id);
       abrirEdicion(usuario);
+    });
+  });
+
+  cont.querySelectorAll('[data-accion="reset2fa"]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.closest('tr').dataset.id;
+      const usuario = usuarios.find(u => String(u.id) === id);
+      if (!confirm(`¿Restablecer la verificación en dos pasos de "${usuario.nombre}"?\n\nDejará de pedirle el código al iniciar sesión (solo su contraseña) hasta que la vuelva a activar desde Seguridad. Úsalo solo si perdió su celular y sus códigos de recuperación. Queda registrado en Auditoría.`)) return;
+      btn.disabled = true;
+      const res = await crearRegistro(config.apiBaseUrl, `usuarios/${id}/reset-2fa`, {});
+      if (res) { cargarTabla(); return; }
+      btn.disabled = false;
+      alert(ultimoErrorAPI() || 'No se pudo restablecer la verificación en dos pasos.');
     });
   });
 

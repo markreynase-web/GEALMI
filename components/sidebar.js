@@ -90,6 +90,10 @@ export function renderSidebar(config, paginaActualId) {
   if (sinSesion || tieneAlgunPermiso('auditoria')) {
     seccionAdmin.push({ id: 'auditoria', label: 'Auditoría', icon: '🛡️', href: 'auditoria.html' });
   }
+  // Seguridad de la PROPIA cuenta (verificación en dos pasos): para cualquier
+  // persona con sesión, sin permiso de rol -- la pantalla misma explica si su
+  // plan lo incluye.
+  seccionAdmin.push({ id: 'seguridad', label: 'Seguridad', icon: '🔐', href: 'seguridad.html' });
 
   // Agrupa los módulos habilitados según GRUPO_POR_MODULO, preservando el
   // orden de GRUPOS_ORDEN -- un grupo sin módulos simplemente no se pinta.

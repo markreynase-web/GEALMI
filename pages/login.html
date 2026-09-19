@@ -364,6 +364,30 @@
         <button type="button" class="login-volver" id="btnVolverLogin">← Usar otra cuenta</button>
       </div>
 
+      <!-- 2FA (Nivel 3): oculto salvo que el login diga que esta cuenta tiene
+           activada la verificación en dos pasos. -->
+      <div id="paso2FA" hidden>
+        <form id="form2FA" novalidate>
+          <div class="field" id="campoCodigo">
+            <label for="codigo2FA" id="label2FA">Código de verificación</label>
+            <div class="field-shell">
+              <span class="ico" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l5 2v3c0 3.5-2.3 5.8-5 6.7-2.7-.9-5-3.2-5-6.7v-3l5-2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.8 8l1.4 1.4L10.4 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <input type="text" id="codigo2FA" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="123 456" required>
+            </div>
+          </div>
+          <p id="ayuda2FA" style="font-size:12.5px; color:var(--text-2); line-height:1.5; margin:10px 0 0;"></p>
+          <div class="login-error" id="error2FA" role="alert" aria-live="assertive"></div>
+          <button type="submit" class="btn-submit" id="btn2FA">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="btn-label">Verificar</span>
+          </button>
+        </form>
+        <button type="button" class="login-volver" id="btnAlternarCodigo2FA"></button><br>
+        <button type="button" class="login-volver" id="btnVolverLogin2FA">← Usar otra cuenta</button>
+      </div>
+
       <footer></footer>
     </div>
   </div>
@@ -388,6 +412,19 @@
   const empresaErrorEl = document.getElementById('empresaError');
   const campoEmail = document.getElementById('campoEmail');
   const campoPassword = document.getElementById('campoPassword');
+
+  // 2FA: el desafioToken vive solo en memoria (dura 5 min, no se guarda).
+  const paso2FA = document.getElementById('paso2FA');
+  const form2FA = document.getElementById('form2FA');
+  const campoCodigo = document.getElementById('campoCodigo');
+  const inputCodigo = document.getElementById('codigo2FA');
+  const label2FA = document.getElementById('label2FA');
+  const ayuda2FA = document.getElementById('ayuda2FA');
+  const error2FA = document.getElementById('error2FA');
+  const btn2FA = document.getElementById('btn2FA');
+  const btnAlternarCodigo = document.getElementById('btnAlternarCodigo2FA');
+  let desafio2FA = null;
+  let usandoRecuperacion = false;
 
   // Sub-bloque B1 (Fase 3, Eje B): tanto el interceptor de 401 (js/api.js)
   // como el guard de página (js/app.js) redirigen acá con ?expirado=true
@@ -420,6 +457,7 @@
 
   function mostrarSelectorEmpresas(empresas) {
     pasoCredenciales.hidden = true;
+    paso2FA.hidden = true;
     pasoEmpresa.hidden = false;
     subEl.textContent = 'Tu cuenta administra más de una empresa. Elige con cuál quieres entrar:';
     listaEmpresas.innerHTML = '';
@@ -435,12 +473,110 @@
 
   function volverALogin() {
     borrarPreAuth();
+    desafio2FA = null;
     pasoEmpresa.hidden = true;
+    paso2FA.hidden = true;
     pasoCredenciales.hidden = false;
     subEl.textContent = 'Inicia sesión para continuar gestionando tu empresa.';
     empresaErrorEl.textContent = '';
+    error2FA.textContent = '';
+    inputCodigo.value = '';
   }
   document.getElementById('btnVolverLogin').addEventListener('click', volverALogin);
+  document.getElementById('btnVolverLogin2FA').addEventListener('click', volverALogin);
+
+  // Un código de la app son 6 dígitos; uno de recuperación, 10 caracteres
+  // (XXXXX-XXXXX). Solo cambia lo que se le pide a la persona.
+  function elegirModoCodigo(recuperacion) {
+    usandoRecuperacion = recuperacion;
+    inputCodigo.value = '';
+    error2FA.textContent = '';
+    campoCodigo.classList.remove('has-error');
+    if (recuperacion) {
+      label2FA.textContent = 'Código de recuperación';
+      inputCodigo.placeholder = 'XXXXX-XXXXX';
+      inputCodigo.maxLength = 11;
+      inputCodigo.inputMode = 'text';
+      inputCodigo.autocomplete = 'off';
+      ayuda2FA.textContent = 'Escribe uno de los códigos de recuperación que guardaste al activar la verificación. Cada código sirve una sola vez.';
+      btnAlternarCodigo.textContent = '← Usar el código de mi app';
+    } else {
+      label2FA.textContent = 'Código de verificación';
+      inputCodigo.placeholder = '123 456';
+      inputCodigo.maxLength = 7;
+      inputCodigo.inputMode = 'numeric';
+      inputCodigo.autocomplete = 'one-time-code';
+      ayuda2FA.textContent = 'Abre tu app autenticadora (Google Authenticator, Authy…) y escribe el código de 6 dígitos de GEALMI.';
+      btnAlternarCodigo.textContent = 'No tengo mi celular: usar un código de recuperación';
+    }
+    inputCodigo.focus();
+  }
+  btnAlternarCodigo.addEventListener('click', () => elegirModoCodigo(!usandoRecuperacion));
+
+  function mostrarPaso2FA(desafioToken) {
+    desafio2FA = desafioToken;
+    pasoCredenciales.hidden = true;
+    pasoEmpresa.hidden = true;
+    paso2FA.hidden = false;
+    subEl.textContent = 'Verificación en dos pasos';
+    elegirModoCodigo(false);
+  }
+
+  // Con el código de la app, se envía solo al completar los 6 dígitos.
+  inputCodigo.addEventListener('input', () => {
+    campoCodigo.classList.remove('has-error');
+    if (!usandoRecuperacion && inputCodigo.value.replace(/\D/g, '').length === 6 && !btn2FA.disabled) {
+      form2FA.requestSubmit();
+    }
+  });
+
+  form2FA.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    error2FA.textContent = '';
+    const valor = inputCodigo.value.trim();
+    if (!valor) { campoCodigo.classList.add('has-error'); return; }
+
+    const config = await cargarConfigEmpresa();
+    btn2FA.disabled = true;
+    btn2FA.classList.add('is-loading');
+    try {
+      const res = await fetch(`${config.apiBaseUrl}/auth/login/2fa`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(usandoRecuperacion
+          ? { desafioToken: desafio2FA, codigoRecuperacion: valor }
+          : { desafioToken: desafio2FA, codigo: valor })
+      });
+      const cuerpo = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        // El desafío vence a los 5 minutos: no hay nada que reintentar, se
+        // vuelve al inicio con el motivo a la vista.
+        if (res.status === 401 && /venci/i.test(cuerpo.error || '')) {
+          volverALogin();
+          errorEl.textContent = cuerpo.error;
+          return;
+        }
+        throw new Error(cuerpo.error || 'No se pudo verificar el código.');
+      }
+
+      if (cuerpo.requiereSeleccionEmpresa) {
+        guardarPreAuth({ preAuthToken: cuerpo.preAuthToken, empresas: cuerpo.empresas });
+        mostrarSelectorEmpresas(cuerpo.empresas);
+        return;
+      }
+      guardarSesion(cuerpo);
+      location.replace('../index.html');
+    } catch (err) {
+      campoCodigo.classList.add('has-error');
+      error2FA.textContent = err.message.includes('fetch') || err.message.includes('Failed')
+        ? 'No se pudo conectar con el servidor. Revisa que el backend esté corriendo.'
+        : err.message;
+      inputCodigo.select();
+    } finally {
+      btn2FA.disabled = false;
+      btn2FA.classList.remove('is-loading');
+    }
+  });
 
   async function elegirEmpresa(empresaId) {
     empresaErrorEl.textContent = '';
@@ -486,6 +622,11 @@
       });
       const cuerpo = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(cuerpo.error || 'No se pudo iniciar sesión.');
+
+      if (cuerpo.requiere2FA) {
+        mostrarPaso2FA(cuerpo.desafioToken);
+        return;
+      }
 
       if (cuerpo.requiereSeleccionEmpresa) {
         guardarPreAuth({ preAuthToken: cuerpo.preAuthToken, empresas: cuerpo.empresas });

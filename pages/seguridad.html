@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEALMI — Seguridad</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/cards.css">
+<link rel="stylesheet" href="../css/forms.css">
+<link rel="stylesheet" href="../css/tables.css">
+<link rel="stylesheet" href="../css/panel-lateral.css">
+<!-- QR de la verificación en dos pasos (qrcode-generator, MIT). Vendorizado:
+     el CSP solo permite scripts propios, y img-src 'self' impide un QR como
+     imagen incrustada -- por eso se dibuja como SVG inline. -->
+<script src="../lib/qrcode.js"></script>
+<!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
+     igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
+     (importado por todas las páginas), no acá. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E1B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GEALMI">
+<link rel="apple-touch-icon" href="/assets/logo-icon.png">
+<style>
+  .seg-aviso{
+    padding:12px 14px; border-radius:8px; font-size:13px; line-height:1.5; margin:14px 0;
+    background:#FFF4E0; border:1px solid #F0C36B; color:#7A4E00;
+  }
+  .seg-aviso.ok{ background:var(--teal-soft); border-color:#9BE3D6; color:#0B5F58; }
+  .seg-texto{ font-size:13.5px; color:var(--muted); line-height:1.6; margin:0 0 6px; }
+  .seg-sub{ margin:22px 0 4px; font-size:14px; }
+  .seg-lista{ font-size:13px; color:var(--muted); line-height:1.6; padding-left:18px; margin:6px 0 0; }
+  .qr-caja{
+    width:210px; height:210px; margin:10px auto 14px; background:#fff; border-radius:10px;
+    border:1px solid var(--paper-line); overflow:hidden;
+  }
+  .qr-caja svg{ width:100%; height:100%; display:block; }
+  .clave-manual{
+    padding:10px 12px; border-radius:8px; background:var(--ink); color:#E8F0FF; margin:8px 0 14px;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:13px;
+    letter-spacing:.06em; word-break:break-all; user-select:all;
+  }
+  .codigos-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0;
+    padding:14px; border-radius:8px; background:var(--ink);
+  }
+  .codigos-grid code{
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:13px;
+    color:#E8F0FF; letter-spacing:.05em; user-select:all;
+  }
+  .btn-peligro{ color:var(--coral); border-color:var(--coral); }
+  .panel-lateral-body details{ font-size:13px; color:var(--muted); margin-bottom:10px; }
+  .panel-lateral-body summary{ cursor:pointer; margin-bottom:6px; }
+</style>
+</head>
+<body data-modulo="seguridad">
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1 id="topbarTitle">Seguridad</h1>
+        <div class="topbar-subtitle" id="topbarSubtitle">PROTEGE TU CUENTA</div>
+      </div>
+      <div class="topbar-search" id="topbarSearch"></div>
+      <div id="sesionWidget" class="sesion-widget"></div>
+    </header>
+
+    <main>
+      <div class="inicio-columnas">
+        <div class="inicio-col">
+          <section class="panel captura-panel" id="capturaSection">
+            <div class="captura-header">
+              <h3>Verificación en dos pasos</h3>
+              <div class="captura-header-acciones" id="badge2FA"></div>
+            </div>
+            <div id="contenido2FA">Cargando…</div>
+          </section>
+        </div>
+        <div class="inicio-col inicio-col-angosta">
+          <div class="panel" style="padding:20px;">
+            <h3 style="margin-bottom:4px;">¿Cómo funciona?</h3>
+            <div style="font-size:12px; color:var(--muted);">Se pide solo al iniciar sesión.</div>
+            <ul class="seg-lista" style="margin-top:12px;">
+              <li>Instalas una app autenticadora en tu celular (Google Authenticator, Authy, Microsoft Authenticator…).</li>
+              <li>Escaneas un código QR una sola vez.</li>
+              <li>Al iniciar sesión, además de tu contraseña, escribes el código de 6 dígitos que muestra la app (cambia cada 30 segundos).</li>
+              <li>Guardas 10 códigos de recuperación por si pierdes el celular. Cada uno sirve una sola vez.</li>
+            </ul>
+            <p class="seg-texto" style="margin-top:14px;">Si alguien averigua tu contraseña, sin tu celular no podrá entrar.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer></footer>
+  </div>
+</div>
+
+<script type="module">
+import { cargarConfigEmpresa } from '../js/config.js';
+import { renderSidebar } from '../components/sidebar.js';
+import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
+import { renderTopbar } from '../components/topbar.js';
+import { renderFooter } from '../components/footer.js';
+import { haySesionActiva, obtenerSesion } from '../js/sesion.js';
+import { listarRegistros, crearRegistro, ultimoErrorAPI } from '../js/api.js';
+import { abrirPanelLateral, cerrarPanelLateral } from '../components/panelLateral.js';
+
+if (!haySesionActiva()) location.replace('login.html');
+
+let config;
+let estado = null;
+
+// listarRegistros/crearRegistro arman `${baseUrl}/${modulo}` -- acá "modulo" es
+// la ruta de /api/2fa. Devuelven null ante cualquier error y dejan el motivo en
+// ultimoErrorAPI() (por eso el backend responde 403 y no 401 a una contraseña
+// o código incorrectos: un 401 cerraría la sesión).
+const leer = (ruta) => listarRegistros(config.apiBaseUrl, `2fa/${ruta}`);
+const enviar = (ruta, datos = {}) => crearRegistro(config.apiBaseUrl, `2fa/${ruta}`, datos);
+
+function pintarEstado(el, texto, tipo) {
+  el.textContent = texto;
+  el.style.color = tipo === 'error' ? 'var(--coral)' : (tipo === 'ok' ? 'var(--teal)' : 'var(--muted)');
+}
+
+function badge(activada) {
+  return activada
+    ? '<span class="role-badge role-numerico">Activada</span>'
+    : '<span class="role-badge role-fecha">Desactivada</span>';
+}
+
+function htmlDesactivada() {
+  if (!estado.servidorConfigurado) {
+    return `<div class="seg-aviso"><strong>Todavía no está disponible en este servidor.</strong> Avisa a soporte de GEALMI para que la habiliten.</div>`;
+  }
+  if (!estado.planIncluye) {
+    return `<div class="seg-aviso"><strong>No está incluida en tu plan actual.</strong> La verificación en dos pasos es parte del plan Empresarial. Contáctanos para actualizar tu plan.</div>`;
+  }
+  return `
+    <p class="seg-texto">Suma una capa extra de seguridad: además de tu contraseña, al iniciar sesión te pedimos un código de 6 dígitos que genera una app en tu celular. Si alguien averigua tu contraseña, igual no podrá entrar.</p>
+    <button type="button" class="btn btn-ochre" id="btnActivar" style="margin-top:12px;">Activar verificación en dos pasos</button>
+    <span class="form-status" id="activarStatus" style="margin-left:10px;"></span>`;
+}
+
+function htmlActivada() {
+  const restantes = estado.codigosRestantes;
+  const pocos = restantes <= 2;
+  return `
+    <div class="seg-aviso ok"><strong>Tu cuenta está protegida.</strong> Al iniciar sesión te pedimos un código de tu app además de tu contraseña.</div>
+    ${!estado.planIncluye ? '<p class="seg-texto">Tu plan actual ya no incluye esta función, pero tu cuenta sigue protegida hasta que la desactives.</p>' : ''}
+    <p class="seg-texto">Códigos de recuperación disponibles: <strong>${restantes}</strong> de 10.</p>
+    ${pocos ? '<div class="seg-aviso">Te quedan pocos códigos de recuperación. Desactiva la verificación y vuelve a activarla para generar 10 nuevos.</div>' : ''}
+
+    <h4 class="seg-sub">Desactivar</h4>
+    <p class="seg-texto">Por seguridad te pedimos tu contraseña y un código: el de tu app o uno de recuperación.</p>
+    <form class="form-registro" style="grid-template-columns:1fr; max-width:380px;" id="formDesactivar">
+      <div class="campo"><label for="desPassword">Contraseña</label><input type="password" id="desPassword" autocomplete="current-password" required></div>
+      <div class="campo"><label for="desCodigo">Código</label><input type="text" id="desCodigo" autocomplete="one-time-code" placeholder="123 456 o XXXXX-XXXXX" maxlength="11" required></div>
+      <div class="campo campo-accion">
+        <button type="submit" class="btn btn-ghost btn-peligro">Desactivar verificación en dos pasos</button>
+        <span class="form-status" id="desStatus"></span>
+      </div>
+    </form>`;
+}
+
+async function cargar() {
+  const cont = document.getElementById('contenido2FA');
+  estado = await leer('estado');
+  if (!estado) { cont.innerHTML = '<p class="tabla-vacia">No se pudo conectar con el backend.</p>'; return; }
+
+  document.getElementById('badge2FA').innerHTML = badge(estado.activado);
+  cont.innerHTML = estado.activado ? htmlActivada() : htmlDesactivada();
+
+  const btnActivar = document.getElementById('btnActivar');
+  if (btnActivar) btnActivar.addEventListener('click', abrirActivacion);
+
+  const formDesactivar = document.getElementById('formDesactivar');
+  if (formDesactivar) formDesactivar.addEventListener('submit', desactivar);
+}
+
+async function desactivar(e) {
+  e.preventDefault();
+  const statusEl = document.getElementById('desStatus');
+  const password = document.getElementById('desPassword').value;
+  const codigo = document.getElementById('desCodigo').value.trim();
+  if (!password || !codigo) { pintarEstado(statusEl, 'Completa la contraseña y el código.', 'error'); return; }
+  if (!confirm('¿Desactivar la verificación en dos pasos?\n\nTu cuenta quedará protegida solo por la contraseña.')) return;
+
+  // 6 dígitos = código de la app; cualquier otra cosa = de recuperación.
+  const esDeLaApp = /^\d{3}\s?\d{3}$/.test(codigo);
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  const res = await enviar('desactivar', esDeLaApp ? { password, codigo } : { password, codigoRecuperacion: codigo });
+  btn.disabled = false;
+  if (!res) { pintarEstado(statusEl, ultimoErrorAPI() || 'No se pudo desactivar.', 'error'); return; }
+  cargar();
+}
+
+// --- Activación (panel lateral, dos pasos) ----------------------------------
+
+async function abrirActivacion() {
+  const statusEl = document.getElementById('activarStatus');
+  pintarEstado(statusEl, 'Preparando…', 'info');
+  const ini = await enviar('iniciar');
+  if (!ini) { pintarEstado(statusEl, ultimoErrorAPI() || 'No se pudo iniciar la activación.', 'error'); return; }
+  statusEl.textContent = '';
+
+  abrirPanelLateral({
+    titulo: 'Activar verificación en dos pasos',
+    icono: '🔐',
+    // cerrarPanelLateral() solo oculta el panel: sin esto, el QR, la clave y los
+    // códigos de recuperación seguirían en el DOM (fuera de pantalla). Cubre
+    // todas las vías de cierre (botón, X, Esc, clic afuera).
+    onCerrar: () => {
+      for (const id of ['qrCaja', 'claveManual', 'listaCodigos']) document.getElementById(id)?.replaceChildren();
+      cargar();
+    },
+    montar: (body) => mostrarPasoEscaneo(body, ini)
+  });
+}
+
+function mostrarPasoEscaneo(body, ini) {
+  body.innerHTML = `
+    <ol class="seg-lista" style="margin:0 0 6px;">
+      <li>Instala una app autenticadora en tu celular (Google Authenticator, Authy, Microsoft Authenticator…).</li>
+      <li>Escanea este código QR con la app:</li>
+    </ol>
+    <div class="qr-caja" id="qrCaja" role="img" aria-label="Código QR para tu app autenticadora"></div>
+    <details>
+      <summary>¿No puedes escanear? Ingresa esta clave a mano</summary>
+      <div class="clave-manual" id="claveManual"></div>
+    </details>
+    <form class="form-registro" style="grid-template-columns:1fr;" id="formActivar">
+      <div class="campo">
+        <label for="codigoActivar">Escribe el código de 6 dígitos que muestra la app</label>
+        <input type="text" id="codigoActivar" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="123 456" required>
+      </div>
+      <div class="campo campo-accion">
+        <button type="submit" class="btn btn-ochre" style="width:100%; justify-content:center;">Activar</button>
+        <span class="form-status" id="activarPasoStatus"></span>
+      </div>
+    </form>`;
+
+  const qr = qrcode(0, 'M');
+  qr.addData(ini.otpauthUrl);
+  qr.make();
+  document.getElementById('qrCaja').innerHTML = qr.createSvgTag({ scalable: true, cellSize: 4, margin: 2 });
+  document.getElementById('claveManual').textContent = ini.secreto.match(/.{1,4}/g).join(' ');
+
+  const input = document.getElementById('codigoActivar');
+  const form = document.getElementById('formActivar');
+  input.focus();
+  // Se envía solo al completar los 6 dígitos.
+  input.addEventListener('input', () => {
+    if (input.value.replace(/\D/g, '').length === 6) form.requestSubmit();
+  });
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById('activarPasoStatus');
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const res = await enviar('activar', { codigo: input.value.trim() });
+    btn.disabled = false;
+    if (!res) { pintarEstado(statusEl, ultimoErrorAPI() || 'No se pudo activar.', 'error'); input.select(); return; }
+    mostrarPasoCodigos(body, res.codigosRecuperacion);
+  });
+}
+
+function textoDescarga(codigos) {
+  const sesion = obtenerSesion();
+  return [
+    'GEALMI — Códigos de recuperación (verificación en dos pasos)',
+    `Cuenta: ${sesion?.usuario?.email || ''}`,
+    `Generados: ${new Date().toLocaleString('es-PE')}`,
+    '',
+    'Cada código sirve una sola vez. Guárdalos en un lugar seguro, aparte de tu celular.',
+    '',
+    ...codigos
+  ].join('\r\n');
+}
+
+function descargar(nombre, texto) {
+  const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// Los códigos en claro solo existen en esta respuesta: el backend guarda un
+// hash de cada uno. Esta es la única oportunidad de guardarlos.
+function mostrarPasoCodigos(body, codigos) {
+  body.innerHTML = `
+    <div class="seg-aviso ok"><strong>¡Verificación en dos pasos activada!</strong></div>
+    <div class="seg-aviso"><strong>Guarda estos códigos de recuperación ahora.</strong> Si pierdes tu celular, son la única forma de entrar sin tu app. Cada uno sirve una sola vez y no volveremos a mostrarlos.</div>
+    <div class="codigos-grid" id="listaCodigos"></div>
+    <button type="button" class="btn btn-ochre" id="btnCopiarCodigos" style="width:100%; justify-content:center; margin-bottom:8px;">📋 Copiar códigos</button>
+    <button type="button" class="btn btn-ghost" id="btnDescargarCodigos" style="width:100%; justify-content:center; margin-bottom:14px;">⬇️ Descargar como archivo</button>
+    <label style="display:flex; gap:8px; align-items:center; font-size:13px; margin-bottom:12px; cursor:pointer;">
+      <input type="checkbox" id="chkGuarde" style="width:auto;"> Ya guardé mis códigos en un lugar seguro
+    </label>
+    <button type="button" class="btn" id="btnListoCodigos" disabled style="width:100%; justify-content:center;">Listo</button>
+    <span class="form-status" id="copiaCodigosStatus" style="display:block; margin-top:8px;"></span>`;
+
+  const lista = document.getElementById('listaCodigos');
+  for (const c of codigos) {
+    const el = document.createElement('code');
+    el.textContent = c;
+    lista.appendChild(el);
+  }
+
+  document.getElementById('btnCopiarCodigos').addEventListener('click', async () => {
+    const statusEl = document.getElementById('copiaCodigosStatus');
+    try {
+      await navigator.clipboard.writeText(codigos.join('\n'));
+      pintarEstado(statusEl, 'Copiados al portapapeles.', 'ok');
+    } catch {
+      pintarEstado(statusEl, 'No se pudo copiar automáticamente. Selecciónalos y cópialos con Ctrl+C.', 'error');
+    }
+  });
+  document.getElementById('btnDescargarCodigos').addEventListener('click', () => {
+    descargar('gealmi-codigos-recuperacion.txt', textoDescarga(codigos));
+  });
+  const chk = document.getElementById('chkGuarde');
+  const btnListo = document.getElementById('btnListoCodigos');
+  chk.addEventListener('change', () => { btnListo.disabled = !chk.checked; });
+  btnListo.addEventListener('click', cerrarPanelLateral);
+}
+
+(async function iniciar() {
+  config = await cargarConfigEmpresa();
+  renderSidebar(config, 'seguridad');
+  renderGealmiAiWidget(config);
+  await renderTopbar(config);
+  renderFooter();
+  cargar();
+})();
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ import { enviarCorreoRecuperacion } from '../mailer.js';
 import { permitir } from '../rateLimiter.js';
 import { passwordCumplePolitica, MENSAJE_POLITICA_PASSWORD } from '../passwordPolicy.js';
 import { logger } from '../logger.js';
+import { verificarSegundoFactor } from '../segundoFactor.js';
 
 const router = Router();
 const DURACION_TOKEN = '8h';
@@ -21,6 +22,10 @@ const DURACION_TOKEN = '8h';
 // día hace falta revocar al instante, la alternativa es una tabla de
 // tokens invalidados o acortar este valor.
 const DURACION_PREAUTH = '5m';
+// Prueba de que la contraseña ya se validó y falta el código de 2FA. Igual
+// que el preAuthToken: no lleva empresa_id, así que requireEmpresa() la
+// rechaza en todo router de datos (ver middleware/auth.js).
+const DURACION_DESAFIO_2FA = '5m';
 
 // Junta el rol, la lista de permisos y la sucursal (si la tiene asignada)
 // que tiene un usuario DENTRO de una empresa concreta (join usuario_empresa
@@ -71,6 +76,52 @@ async function firmarSesion(usuario, empresaId, empresaNombre) {
   return { token, usuario: payload };
 }
 
+// Último paso del login, una vez que la persona ya probó quién es (contraseña
+// y, si lo tiene activado, 2FA): resuelve a qué empresa entra. Lo comparten
+// POST /login y POST /login/2fa.
+//
+// "Login inteligente": la identidad (usuarios) es global, la empresa activa
+// sale de a qué empresas pertenece ese usuario (usuario_empresa).
+async function completarLogin(res, usuario, { segundoFactorVerificado = false } = {}) {
+  const { rows: membresias } = await pool.query(
+    `SELECT ue.empresa_id, e.nombre AS empresa_nombre
+     FROM usuario_empresa ue
+     JOIN empresas e ON e.id = ue.empresa_id
+     WHERE ue.usuario_id = $1 AND ue.activo = true AND e.activo = true
+     ORDER BY e.nombre`,
+    [usuario.id]
+  );
+
+  if (!membresias.length) {
+    return res.status(401).json({ error: 'Tu usuario no está asociado a ninguna empresa activa.' });
+  }
+
+  if (membresias.length === 1) {
+    const sesion = await firmarSesion(usuario, membresias[0].empresa_id, membresias[0].empresa_nombre);
+    return res.json(sesion);
+  }
+
+  // Más de una empresa: no se firma el token completo todavía. Se manda
+  // un preAuthToken de corta duración (prueba de que el password ya se
+  // validó, sin repetir el login) + la lista para que el frontend
+  // muestre el selector.
+  //
+  // `mfa: true` = esta persona ya pasó el código de 2FA en ESTE login. Sin
+  // esa marca, un preAuthToken pedido cuando el 2FA estaba apagado (dura 5
+  // min) serviría para saltarse el código si la persona lo activa justo
+  // después -- POST /login/empresa lo exige mientras el 2FA esté activo.
+  const preAuthToken = jwt.sign(
+    { id: usuario.id, tipo: 'preauth', ...(segundoFactorVerificado ? { mfa: true } : {}) },
+    process.env.JWT_SECRET,
+    { expiresIn: DURACION_PREAUTH }
+  );
+  res.json({
+    requiereSeleccionEmpresa: true,
+    preAuthToken,
+    empresas: membresias.map(m => ({ id: m.empresa_id, nombre: m.empresa_nombre }))
+  });
+}
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) return res.status(400).json({ error: 'Email y contraseña son requeridos.' });
@@ -111,39 +162,81 @@ router.post('/login', async (req, res) => {
       return res.json({ token, usuario: payload });
     }
 
-    // "Login inteligente": la identidad (usuarios) es global, la empresa
-    // activa sale de a qué empresas pertenece ese usuario (usuario_empresa).
-    const { rows: membresias } = await pool.query(
-      `SELECT ue.empresa_id, e.nombre AS empresa_nombre
-       FROM usuario_empresa ue
-       JOIN empresas e ON e.id = ue.empresa_id
-       WHERE ue.usuario_id = $1 AND ue.activo = true AND e.activo = true
-       ORDER BY e.nombre`,
-      [usuario.id]
-    );
-
-    if (!membresias.length) {
-      return res.status(401).json({ error: 'Tu usuario no está asociado a ninguna empresa activa.' });
+    // Segundo factor (2FA), solo si esta persona lo activó. Va ANTES de mirar
+    // sus empresas: quien solo conoce la contraseña no debe enterarse de a
+    // cuáles pertenece. La cuenta de super admin queda fuera en esta versión
+    // (el 2FA es una función del plan Empresarial, ver planes.acceso_2fa).
+    if (usuario.totp_activado_el) {
+      const desafioToken = jwt.sign({ id: usuario.id, tipo: 'desafio2fa' }, process.env.JWT_SECRET, { expiresIn: DURACION_DESAFIO_2FA });
+      return res.json({ requiere2FA: true, desafioToken });
     }
 
-    if (membresias.length === 1) {
-      const sesion = await firmarSesion(usuario, membresias[0].empresa_id, membresias[0].empresa_nombre);
-      return res.json(sesion);
-    }
-
-    // Más de una empresa: no se firma el token completo todavía. Se manda
-    // un preAuthToken de corta duración (prueba de que el password ya se
-    // validó, sin repetir el login) + la lista para que el frontend
-    // muestre el selector.
-    const preAuthToken = jwt.sign({ id: usuario.id, tipo: 'preauth' }, process.env.JWT_SECRET, { expiresIn: DURACION_PREAUTH });
-    res.json({
-      requiereSeleccionEmpresa: true,
-      preAuthToken,
-      empresas: membresias.map(m => ({ id: m.empresa_id, nombre: m.empresa_nombre }))
-    });
+    return await completarLogin(res, usuario);
   } catch (err) {
     logger.error({ requestId: req.requestId, method: req.method, url: req.originalUrl, statusCode: 500, body: req.body, err }, 'No se pudo iniciar sesión.');
     res.status(500).json({ error: 'No se pudo iniciar sesión.' });
+  }
+});
+
+// Segundo paso del login para quien tiene 2FA activado. El desafioToken (lo
+// entrega POST /login solo cuando la contraseña era correcta) demuestra que
+// falta únicamente el código. Acepta el código de la app (`codigo`) o uno de
+// recuperación (`codigoRecuperacion`, de un solo uso, para quien perdió el
+// celular). Si la persona tiene varias empresas, sigue el mismo selector de
+// siempre (preAuthToken) -- el 2FA es de la identidad, se pide una sola vez.
+router.post('/login/2fa', async (req, res) => {
+  const { desafioToken, codigo, codigoRecuperacion } = req.body || {};
+  if (!desafioToken || (!codigo && !codigoRecuperacion)) {
+    return res.status(400).json({ error: 'desafioToken y un código son requeridos.' });
+  }
+
+  let payload;
+  try {
+    payload = jwt.verify(desafioToken, process.env.JWT_SECRET);
+    if (payload.tipo !== 'desafio2fa') throw new Error('tipo inválido');
+  } catch (err) {
+    return res.status(401).json({ error: 'La verificación venció. Inicia sesión de nuevo.' });
+  }
+
+  // Sin este freno, quien ya conoce la contraseña podría probar los
+  // 1.000.000 de códigos posibles. El límite es por CUENTA (no por IP): un
+  // atacante rota IPs, pero la cuenta atacada es siempre la misma.
+  if (!permitir(`2fa:${payload.id}`, { maxIntentos: 5, ventanaMs: 15 * 60 * 1000 })) {
+    return res.status(429).json({ error: 'Demasiados intentos. Espera unos minutos antes de volver a intentar.' });
+  }
+
+  try {
+    const { rows } = await pool.query('SELECT id, nombre, email FROM usuarios WHERE id = $1 AND activo = true', [payload.id]);
+    const usuario = rows[0];
+    if (!usuario) return res.status(401).json({ error: 'La verificación venció. Inicia sesión de nuevo.' });
+
+    const resultado = await verificarSegundoFactor(usuario.id, { codigo, codigoRecuperacion });
+    // Sin 2FA activo (se lo restablecieron entre los dos pasos): el desafío ya no aplica.
+    if (resultado.motivo === 'sin_2fa') return res.status(401).json({ error: 'La verificación venció. Inicia sesión de nuevo.' });
+
+    const empresaIdAuditoria = await empresaIdParaAuditoria(usuario.id);
+    const auditar = (accion) => empresaIdAuditoria && registrarAuditoria(pool, {
+      usuario: { id: usuario.id, nombre: usuario.nombre, empresa_id: empresaIdAuditoria },
+      accion, modulo: 'auth', registroId: usuario.id, detalle: null
+    });
+
+    if (!resultado.ok) {
+      await auditar('login_2fa_fallo');
+      return res.status(401).json({
+        error: resultado.motivo === 'reutilizado'
+          ? 'Ese código ya se usó. Espera a que tu app genere uno nuevo.'
+          : 'Código incorrecto.'
+      });
+    }
+
+    // Entrar con un código de recuperación es un evento que la empresa debe
+    // poder ver: significa que esa persona no tenía a mano su app.
+    if (resultado.medio === 'recuperacion') await auditar('usar_cod_recup');
+
+    return await completarLogin(res, usuario, { segundoFactorVerificado: true });
+  } catch (err) {
+    logger.error({ requestId: req.requestId, method: req.method, url: req.originalUrl, statusCode: 500, err }, 'No se pudo verificar el segundo factor.');
+    res.status(500).json({ error: 'No se pudo verificar el código.' });
   }
 });
 
@@ -165,8 +258,11 @@ router.post('/login/empresa', async (req, res) => {
   }
 
   try {
+    // u.* (y no una lista de columnas) para que leer totp_activado_el no
+    // dependa de que la migración 043 ya esté aplicada: el login no debe
+    // caerse en la ventana entre desplegar el código y migrar.
     const { rows } = await pool.query(
-      `SELECT u.id, u.nombre, u.email, e.id AS empresa_id, e.nombre AS empresa_nombre
+      `SELECT u.*, e.id AS empresa_id, e.nombre AS empresa_nombre
        FROM usuario_empresa ue
        JOIN usuarios u ON u.id = ue.usuario_id
        JOIN empresas e ON e.id = ue.empresa_id
@@ -176,6 +272,12 @@ router.post('/login/empresa', async (req, res) => {
     if (!rows.length) return res.status(403).json({ error: 'No perteneces a esa empresa.' });
 
     const fila = rows[0];
+    // Si tiene 2FA activo, este preAuthToken tiene que venir de un login que
+    // SÍ pasó el código (mfa:true, ver completarLogin). Uno pedido antes de
+    // que lo activara no vale: se vuelve a iniciar sesión.
+    if (fila.totp_activado_el && payload.mfa !== true) {
+      return res.status(401).json({ error: 'Selección de empresa vencida. Inicia sesión de nuevo.' });
+    }
     const sesion = await firmarSesion(fila, fila.empresa_id, fila.empresa_nombre);
     res.json(sesion);
   } catch (err) {

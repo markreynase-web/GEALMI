@@ -14,6 +14,7 @@ import { pool } from '../db.js';
 import { auth, requireEmpresa } from '../middleware/auth.js';
 import { verificarPermiso } from '../middleware/permisos.js';
 import { passwordCumplePolitica, MENSAJE_POLITICA_PASSWORD } from '../passwordPolicy.js';
+import { registrarAuditoria } from '../registroAuditoria.js';
 
 const router = Router();
 router.use(auth, requireEmpresa);
@@ -48,7 +49,8 @@ router.get('/', verificarPermiso('usuarios.ver'), async (req, res) => {
     // "todas" si es null) -- LEFT JOIN porque la mayoría va a seguir sin
     // restricción, no tiene por qué tener fila de sucursal.
     const { rows } = await pool.query(
-      `SELECT u.id, u.nombre, u.email, r.nombre AS rol, ue.activo, ue.sucursal_id, s.nombre AS sucursal_nombre, u.creado_el
+      `SELECT u.id, u.nombre, u.email, r.nombre AS rol, ue.activo, ue.sucursal_id, s.nombre AS sucursal_nombre, u.creado_el,
+              (u.totp_activado_el IS NOT NULL) AS tiene_2fa
        FROM usuario_empresa ue
        JOIN usuarios u ON u.id = ue.usuario_id
        JOIN roles r ON r.id = ue.rol_id
@@ -244,6 +246,66 @@ router.put('/:id', verificarPermiso('usuarios.editar'), async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'No se pudo actualizar el usuario.' });
+  }
+});
+
+// POST /api/usuarios/:id/reset-2fa
+// Para quien perdió el celular Y sus códigos de recuperación: apaga el 2FA de
+// esa persona (podrá volver a activarlo desde Seguridad). Es una decisión de
+// quien administra la empresa, así que va con usuarios.editar y queda en
+// Auditoría. Como el 2FA es de la identidad (global), esto también lo apaga en
+// otras empresas donde participe -- mismo trade-off que ya documenta el PUT de
+// arriba para `nombre`; la persona sigue necesitando su contraseña para entrar.
+router.post('/:id/reset-2fa', verificarPermiso('usuarios.editar'), async (req, res) => {
+  const idObjetivo = Number(req.params.id);
+  if (!Number.isInteger(idObjetivo)) return res.status(400).json({ error: 'id inválido.' });
+  // Nadie se restablece a sí mismo: para eso está "Desactivar" en Seguridad,
+  // que pide contraseña y un código (esto, en cambio, no pide nada de la persona).
+  if (idObjetivo === req.usuario.id) {
+    return res.status(400).json({ error: 'Para desactivar tu propia verificación en dos pasos usa la pantalla de Seguridad.' });
+  }
+
+  try {
+    const { rows: membresia } = await pool.query(
+      `SELECT r.nombre AS rol
+       FROM usuario_empresa ue JOIN roles r ON r.id = ue.rol_id
+       WHERE ue.usuario_id = $1 AND ue.empresa_id = $2`,
+      [idObjetivo, req.usuario.empresa_id]
+    );
+    if (!membresia.length) return res.status(404).json({ error: 'Usuario no encontrado en esta empresa.' });
+    // Mismo candado que asignar el rol: a un administrador solo lo toca otro administrador.
+    if (membresia[0].rol === 'administrador' && req.usuario.rol !== 'administrador') {
+      return res.status(403).json({ error: 'Solo un administrador puede restablecer el 2FA de otro administrador.' });
+    }
+
+    const cliente = await pool.connect();
+    let teniaActivo;
+    try {
+      await cliente.query('BEGIN');
+      const { rows } = await cliente.query(
+        `UPDATE usuarios u SET totp_secreto_cifrado = NULL, totp_activado_el = NULL, totp_ultimo_paso = NULL
+         FROM (SELECT id, totp_activado_el IS NOT NULL AS activo FROM usuarios WHERE id = $1 FOR UPDATE) previo
+         WHERE u.id = previo.id
+         RETURNING previo.activo`,
+        [idObjetivo]
+      );
+      teniaActivo = rows[0]?.activo === true;
+      await cliente.query('DELETE FROM codigos_recuperacion_2fa WHERE usuario_id = $1', [idObjetivo]);
+      await cliente.query('COMMIT');
+    } catch (err) {
+      await cliente.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      cliente.release();
+    }
+
+    res.json({ ok: true, teniaActivo });
+    if (teniaActivo) {
+      registrarAuditoria(pool, { usuario: req.usuario, accion: 'reset_2fa', modulo: 'usuarios', registroId: idObjetivo, detalle: null });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'No se pudo restablecer el 2FA.' });
   }
 });
 

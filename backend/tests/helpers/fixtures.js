@@ -179,6 +179,10 @@ export async function limpiarContexto(ctx) {
     await pool.query(`DELETE FROM atenciones_veterinarias WHERE empresa_id = ANY($1::int[])`, [ctx.empresaIds]);
     await pool.query(`DELETE FROM mascotas WHERE empresa_id = ANY($1::int[])`, [ctx.empresaIds]);
     await pool.query(`DELETE FROM flota WHERE empresa_id = ANY($1::int[])`, [ctx.empresaIds]);
+    // empleados.empresa_id no tiene ON DELETE CASCADE (022): sin esto, borrar la
+    // empresa falla. Borrar los empleados arrastra su asistencia, ausencias,
+    // remuneraciones, documentos, evaluaciones y participaciones (RRHH, 046-052).
+    await pool.query(`DELETE FROM empleados WHERE empresa_id = ANY($1::int[])`, [ctx.empresaIds]);
   }
   if (ctx.atencionIds.length) {
     await pool.query(`DELETE FROM atenciones_veterinarias WHERE id = ANY($1::int[])`, [ctx.atencionIds]);

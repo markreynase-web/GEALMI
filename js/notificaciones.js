@@ -20,7 +20,8 @@ export const TIPOS = {
   stock_bajo: { icono: '📦', clase: 'stock', etiqueta: 'Inventario' },
   arqueo_diferencia: { icono: '🧾', clase: 'caja', etiqueta: 'Caja' },
   caja_abierta: { icono: '⏰', clase: 'caja', etiqueta: 'Caja' },
-  vencimientos: { icono: '📅', clase: 'vence', etiqueta: 'Vencimientos' }
+  vencimientos: { icono: '📅', clase: 'vence', etiqueta: 'Vencimientos' },
+  rrhh: { icono: '👥', clase: 'rrhh', etiqueta: 'RRHH' }
 };
 export const tipoDe = (tipo) => TIPOS[tipo] || { icono: '🔔', clase: 'otro', etiqueta: 'Aviso' };
 

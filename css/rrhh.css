@@ -1,0 +1,138 @@
+/* css/rrhh.css -- pantallas de RRHH (paso 8): pestañas, secciones, tablas,
+   avisos, tablero de reclutamiento y "Mi asistencia". Reutiliza las variables
+   de base.css y las clases de tablas/formularios de tables.css y forms.css. */
+
+/* ---------- Pestañas ---------- */
+.rrhh-barra-pestanas{ display:flex; align-items:center; gap:12px; padding:0 32px; margin-bottom:6px; border-bottom:1px solid var(--paper-line); }
+.rrhh-tabs{ display:flex; align-items:center; gap:2px; flex:1; min-width:0; overflow-x:auto; scrollbar-width:thin; }
+.rrhh-nueva-ficha{ flex:none; padding:7px 14px; font-size:13px; white-space:nowrap; margin:6px 0; }
+.rrhh-tab{
+  font-family:'Inter', sans-serif; font-size:13px; font-weight:600; color:var(--muted); white-space:nowrap;
+  background:transparent; border:none; border-bottom:2px solid transparent; padding:11px 14px; cursor:pointer;
+}
+.rrhh-tab:hover{ color:var(--ink); }
+.rrhh-tab.activo{ color:var(--ink); border-bottom-color:var(--ochre-deep); }
+.rrhh-tab:focus-visible{ outline:2px solid var(--ochre-deep); outline-offset:-2px; border-radius:6px; }
+
+/* Con una sección de RRHH abierta se oculta lo de "Equipo" (lo pinta app.js). */
+body.rrhh-seccion-activa .toolbar,
+body.rrhh-seccion-activa #uploadStatus,
+body.rrhh-seccion-activa #capturaSection,
+body.rrhh-seccion-activa main{ display:none !important; }
+
+.rrhh-seccion{ padding:18px 32px 36px; }
+.rrhh-seccion[hidden]{ display:none; }
+
+/* ---------- Cabecera y filtros ---------- */
+.rrhh-cabecera{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px 20px; margin-bottom:16px; }
+.rrhh-cabecera h2{ margin:0; font-family:var(--font-display); font-size:18px; color:var(--ink); }
+.rrhh-cabecera p{ margin:4px 0 0; font-size:12.5px; color:var(--muted); max-width:640px; line-height:1.45; }
+.rrhh-filtros{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px; }
+.rrhh-filtros label{ display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+.rrhh-filtros input, .rrhh-filtros select{
+  font-family:'Inter', sans-serif; font-size:13px; padding:7px 10px; border:1px solid var(--paper-line); border-radius:9px; background:#fff; color:var(--ink);
+}
+.rrhh-filtros input:focus, .rrhh-filtros select:focus{ outline:none; border-color:var(--ochre-deep); }
+.rrhh-subtabs{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+.rrhh-pildora{
+  font-family:'Inter', sans-serif; font-size:12.5px; font-weight:600; color:var(--ink); background:#fff; border:1px solid var(--paper-line);
+  border-radius:20px; padding:7px 14px; cursor:pointer;
+}
+.rrhh-pildora.activo{ background:var(--ink); color:#fff; border-color:var(--ink); }
+
+.rrhh-panel{ background:#fff; border:1px solid var(--paper-line); border-radius:14px; padding:16px 18px; margin-bottom:16px; }
+.rrhh-panel h3{ margin:0 0 10px; font-family:var(--font-display); font-size:14px; color:var(--ink); }
+.rrhh-kpis{ margin-bottom:16px; }
+
+/* ---------- Avisos ---------- */
+.rrhh-aviso{ padding:10px 14px; border-radius:10px; font-size:13px; font-weight:600; margin-bottom:14px; line-height:1.45; }
+.rrhh-aviso.ok{ background:#E1F5EE; color:var(--teal-strong); }
+.rrhh-aviso.error{ background:#FBEAF0; color:var(--coral-deep); }
+.rrhh-aviso.info{ background:var(--blue-soft); color:var(--ink); font-weight:500; }
+#rrhhAlertas{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+#rrhhAlertas:empty{ display:none; }
+#rrhhAlertas .rrhh-aviso{ margin:0; flex:1 1 320px; }
+#rrhhAlertas button.rrhh-aviso{ width:auto; }
+button.rrhh-aviso{ display:block; width:100%; text-align:left; border:none; cursor:pointer; font-family:inherit; }
+button.rrhh-aviso:hover{ filter:brightness(0.97); }
+.rrhh-fila-click{ cursor:pointer; }
+.rrhh-fila-click:hover{ background:var(--paper); }
+.rrhh-fila-click:focus-visible{ outline:2px solid var(--ochre-deep); outline-offset:-2px; border-radius:8px; }
+.rrhh-legal{
+  padding:11px 14px; margin-bottom:14px; border-radius:10px; background:#FFF8EC; border-left:3px solid var(--ochre-deep);
+  font-size:12.5px; color:var(--ink); line-height:1.5;
+}
+.rrhh-vacio{ padding:22px; text-align:center; color:var(--muted); font-size:13.5px; line-height:1.55; }
+.form-status.error{ color:var(--coral-deep); font-weight:600; }
+
+/* ---------- Tablas y botones chicos ---------- */
+.rrhh-acciones{ display:inline-flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+.rrhh-btn-mini{
+  font-family:'Inter', sans-serif; font-size:12px; font-weight:600; color:var(--ink); background:#fff; border:1px solid var(--paper-line);
+  border-radius:8px; padding:4px 10px; cursor:pointer; white-space:nowrap;
+}
+.rrhh-btn-mini:hover{ border-color:var(--ink); }
+.rrhh-btn-mini.peligro{ color:var(--coral-deep); }
+.rrhh-btn-mini.peligro:hover{ background:#FBEAF0; border-color:var(--coral-deep); }
+.rrhh-btn-mini.confirmar{ color:var(--teal-strong); }
+.rrhh-btn-mini.confirmar:hover{ background:#E1F5EE; border-color:var(--teal-strong); }
+.rrhh-seccion .tabla-registros td{ vertical-align:middle; }
+.rrhh-seccion .tabla-registros td.num, .rrhh-seccion .tabla-registros th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+.rrhh-seccion .tabla-registros td.acc{ text-align:right; }
+.rrhh-seccion .evento-badge{ display:inline-block; white-space:nowrap; }
+.rrhh-sub{ display:block; font-size:11.5px; color:var(--muted); }
+.rrhh-alerta-texto{ color:var(--coral-deep); font-weight:600; }
+.rrhh-enlace{ color:var(--blue); font-weight:600; text-decoration:none; }
+.rrhh-enlace:hover{ text-decoration:underline; }
+.rrhh-check{ flex-direction:row !important; align-items:center; justify-content:flex-start !important; gap:8px !important; text-transform:none !important; letter-spacing:normal !important; font-size:13px !important; color:var(--ink) !important; font-weight:500 !important; }
+.rrhh-check input{ width:auto; }
+.rrhh-dias{ display:flex; gap:10px; flex-wrap:wrap; }
+.rrhh-dias label{ flex-direction:row; align-items:center; gap:5px; text-transform:none; letter-spacing:normal; font-size:13px; color:var(--ink); font-weight:500; }
+.rrhh-dias input{ width:auto; }
+.rrhh-form textarea{ font-family:'Inter', sans-serif; font-size:13px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:9px; background:var(--paper); color:var(--ink); resize:vertical; }
+.rrhh-form textarea:focus{ outline:none; border-color:var(--ochre-deep); }
+.rrhh-form .campo-ancho-4{ grid-column:1 / -1; }
+.rrhh-form h4{ grid-column:1 / -1; margin:8px 0 0; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ochre-deep); border-bottom:1px solid var(--paper-line); padding-bottom:4px; }
+.rrhh-bloque{ margin-top:18px; padding-top:14px; border-top:1px solid var(--paper-line); }
+.rrhh-bloque h4{ margin:0 0 8px; font-size:13px; color:var(--ink); }
+.rrhh-datos{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:10px; }
+.rrhh-dato{ background:var(--paper); border-radius:10px; padding:9px 12px; }
+.rrhh-dato b{ display:block; font-size:18px; color:var(--ink); font-variant-numeric:tabular-nums; }
+.rrhh-dato span{ font-size:11.5px; color:var(--muted); }
+
+/* ---------- Calificación (evaluaciones) ---------- */
+.rrhh-barra{ display:inline-block; width:80px; height:8px; border-radius:6px; background:var(--paper-line); overflow:hidden; vertical-align:middle; margin-right:6px; }
+.rrhh-barra > i{ display:block; height:100%; background:var(--teal-strong); }
+
+/* ---------- Tablero de reclutamiento ---------- */
+.rrhh-tablero{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(230px, 1fr); gap:12px; overflow-x:auto; padding-bottom:10px; }
+.rrhh-col{ background:var(--paper); border:1px solid var(--paper-line); border-radius:12px; padding:10px; min-height:120px; }
+.rrhh-col > h4{ margin:0 0 4px; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); display:flex; justify-content:space-between; }
+.rrhh-cand{ background:#fff; border:1px solid var(--paper-line); border-radius:10px; padding:10px 12px; margin-top:8px; font-size:13px; }
+.rrhh-cand b{ display:block; color:var(--ink); }
+.rrhh-cand .rrhh-acciones{ margin-top:8px; justify-content:flex-start; }
+.rrhh-cand select{ font-size:12px; padding:3px 6px; border:1px solid var(--paper-line); border-radius:7px; background:#fff; }
+
+/* ---------- Mi asistencia ---------- */
+.mi-grid{ display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); gap:18px; align-items:start; }
+.mi-reloj{ text-align:center; padding:26px 18px; }
+.mi-hora{ font-family:var(--font-display); font-size:52px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1.1; }
+.mi-fecha{ margin:4px 0 16px; font-size:13.5px; color:var(--muted); }
+.mi-fecha::first-letter{ text-transform:uppercase; }
+.mi-acciones{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:16px 0 4px; }
+.mi-acciones .btn{ padding:13px 24px; font-size:15px; min-width:170px; }
+.mi-marcas{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; margin-top:18px; }
+.mi-marca{ background:var(--paper); border-radius:10px; padding:9px 6px; }
+.mi-marca b{ display:block; font-size:17px; font-variant-numeric:tabular-nums; color:var(--ink); }
+.mi-marca span{ font-size:11px; color:var(--muted); }
+.mi-servidor{ font-size:11.5px; color:var(--muted); margin-top:12px; }
+
+@media (max-width:900px){
+  .rrhh-barra-pestanas{ padding:0 16px; }
+  .rrhh-ocultable{ display:none; }
+  .rrhh-seccion{ padding:16px 16px 32px; }
+  .mi-grid{ grid-template-columns:1fr; }
+  .mi-hora{ font-size:42px; }
+  .mi-marcas{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .rrhh-form .campo-ancho-4, .rrhh-form .campo-ancho-3{ grid-column:1 / -1; }
+}

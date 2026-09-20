@@ -16,9 +16,13 @@
 // cajas siguen funcionando; solo faltan los avisos.
 
 import { pool } from './db.js';
+import { fechaEnLima, claveSemana } from './rrhh/calculos.js';
 
 export const HORAS_CAJA_ABIERTA = 12;
 export const DIAS_AVISO_VENCIMIENTO = 7;
+// Contratos y documentos de RRHH se avisan con más margen: renovar un contrato
+// o un examen médico no se resuelve en una semana.
+export const DIAS_AVISO_RRHH = 30;
 const DIAS_RETENCION = 90;
 const MAX_LINEAS_RESUMEN = 6;
 
@@ -151,6 +155,7 @@ export async function revisarAlertasProgramadas(empresaId) {
 
   await avisarCajasAbiertas(empresaId);
   await avisarVencimientos(empresaId);
+  await avisarVencimientosRrhh(empresaId);
   await limpiarAntiguas(empresaId);
 }
 
@@ -218,6 +223,69 @@ async function avisarVencimientos(empresaId) {
     }
   } catch (err) {
     console.error('No se pudo revisar los vencimientos:', err.message);
+  }
+}
+
+// RRHH (paso 8): contratos a plazo fijo y documentos del legajo que vencen
+// pronto (o ya vencieron). UN resumen por semana y por grupo de destinatarios,
+// no un aviso por cada papel: con una planilla grande sería ruido. Los
+// exámenes médicos son dato de salud y van aparte, solo a quienes tienen
+// rrhh.salud -- el resumen general nunca los nombra.
+async function avisarVencimientosRrhh(empresaId) {
+  try {
+    const { rows: modulo } = await pool.query(`SELECT 1 FROM empresa_modulos WHERE empresa_id = $1 AND modulo_id = 'rrhh'`, [empresaId]);
+    if (!modulo.length) return;
+
+    const hoy = fechaEnLima(Date.now());
+    const semana = claveSemana(hoy);
+    const { rows: contratos } = await pool.query(
+      `SELECT nombre, fecha_fin_contrato::text AS vence FROM empleados
+       WHERE empresa_id = $1 AND fecha_fin_contrato BETWEEN $2::date AND $2::date + $3::int
+         AND (fecha_cese IS NULL OR fecha_cese > $2::date)
+       ORDER BY fecha_fin_contrato, nombre LIMIT 100`,
+      [empresaId, hoy, DIAS_AVISO_RRHH]
+    );
+    const { rows: documentos } = await pool.query(
+      `SELECT d.tipo, d.nombre, e.nombre AS empleado, d.fecha_vencimiento::text AS vence
+       FROM documentos_empleado d JOIN empleados e ON e.id = d.empleado_id
+       WHERE d.empresa_id = $1 AND d.fecha_vencimiento IS NOT NULL AND d.fecha_vencimiento <= $2::date + $3::int
+         AND (e.fecha_cese IS NULL OR e.fecha_cese > $2::date)
+       ORDER BY d.fecha_vencimiento, e.nombre LIMIT 300`,
+      [empresaId, hoy, DIAS_AVISO_RRHH]
+    );
+
+    const linea = (texto, vence) => `• ${texto} — ${vence < hoy ? 'venció' : 'vence'} el ${vence}`;
+    const comunes = documentos.filter(d => d.tipo !== 'examen_medico');
+    const lineas = [
+      ...contratos.map(c => linea(`Contrato de ${c.nombre}`, c.vence)),
+      ...comunes.map(d => linea(`${d.nombre} (${d.empleado})`, d.vence))
+    ];
+    if (lineas.length) {
+      const mostradas = lineas.slice(0, MAX_LINEAS_RESUMEN);
+      if (lineas.length > MAX_LINEAS_RESUMEN) mostradas.push(`… y ${lineas.length - MAX_LINEAS_RESUMEN} más`);
+      const vencidos = comunes.filter(d => d.vence < hoy).length;
+      await insertarNotificaciones(pool, {
+        empresaId, usuarioIds: await usuariosConPermiso(pool, empresaId, 'rrhh.editar'), tipo: 'rrhh', enlace: 'rrhh',
+        prioridad: vencidos ? 'alta' : 'normal',
+        titulo: lineas.length === 1 ? 'RRHH: 1 contrato o documento por vencer' : `RRHH: ${lineas.length} contratos o documentos por vencer`,
+        cuerpo: mostradas.join('\n'),
+        clave: `rrhh_vencimientos:${semana}`
+      });
+    }
+
+    const medicos = documentos.filter(d => d.tipo === 'examen_medico');
+    if (medicos.length) {
+      const mostradas = medicos.slice(0, MAX_LINEAS_RESUMEN).map(d => linea(`Examen médico de ${d.empleado}`, d.vence));
+      if (medicos.length > MAX_LINEAS_RESUMEN) mostradas.push(`… y ${medicos.length - MAX_LINEAS_RESUMEN} más`);
+      await insertarNotificaciones(pool, {
+        empresaId, usuarioIds: await usuariosConPermiso(pool, empresaId, 'rrhh.salud'), tipo: 'rrhh', enlace: 'rrhh',
+        titulo: medicos.length === 1 ? 'RRHH: 1 examen médico por vencer' : `RRHH: ${medicos.length} exámenes médicos por vencer`,
+        cuerpo: mostradas.join('\n'),
+        clave: `rrhh_vencimientos_salud:${semana}`
+      });
+    }
+  } catch (err) {
+    console.error('No se pudo revisar los vencimientos de RRHH:', err.message);
   }
 }
 

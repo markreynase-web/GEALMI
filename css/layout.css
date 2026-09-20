@@ -295,6 +295,7 @@
 .topbar-notif-icono.tipo-stock, .notif-icono.tipo-stock{ background:var(--orange-soft); color:var(--orange); }
 .topbar-notif-icono.tipo-caja, .notif-icono.tipo-caja{ background:#FBEAF0; color:var(--coral); }
 .topbar-notif-icono.tipo-vence, .notif-icono.tipo-vence{ background:var(--purple-soft); color:var(--purple); }
+.topbar-notif-icono.tipo-rrhh, .notif-icono.tipo-rrhh{ background:var(--teal-soft); color:var(--teal-strong); }
 .topbar-notif-icono.tipo-otro, .notif-icono.tipo-otro{ background:var(--paper); color:var(--muted); }
 
 .topbar-usuario-menu{ position:relative; }

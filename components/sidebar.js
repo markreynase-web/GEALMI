@@ -53,6 +53,10 @@ export function renderSidebar(config, paginaActualId) {
   if (!cont) return;
 
   const sinSesion = !haySesionActiva();
+  // "Mi asistencia" (paso 8): cualquier persona de una empresa con RRHH contratado
+  // puede marcar su asistencia, sin permiso rrhh.* -- solo hace falta que su
+  // usuario esté vinculado a una ficha (la pantalla lo explica si no).
+  const conRrhh = !sinSesion && modulosHabilitados(config).some(m => m.id === 'rrhh');
 
   const modulosPrincipales = modulosHabilitados(config).filter(m => {
     // GEALMI AI tiene su propia entrada fija al pie del menú (ver
@@ -127,6 +131,7 @@ export function renderSidebar(config, paginaActualId) {
             <div class="sidebar-group-label">Principal</div>
             ${itemHtml({ id: 'inicio', label: 'Inicio', icon: '🏠', href: 'inicio' }, paginaActualId === 'inicio')}
             ${itemHtml({ id: 'notificaciones', label: 'Notificaciones', icon: '🔔', href: 'notificaciones', badgeId: 'badgeMenuNotif' }, paginaActualId === 'notificaciones')}
+            ${conRrhh ? itemHtml({ id: 'mi-asistencia', label: 'Mi asistencia', icon: '⏱️', href: 'mi-asistencia' }, paginaActualId === 'mi-asistencia') : ''}
           </div>` : ''}
         ${gruposHtml}
         ${seccionAdmin.length ? `

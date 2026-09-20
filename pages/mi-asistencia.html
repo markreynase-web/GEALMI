@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEALMI — Mi asistencia</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/cards.css">
+<link rel="stylesheet" href="../css/tables.css">
+<link rel="stylesheet" href="../css/forms.css">
+<link rel="stylesheet" href="../css/panel-lateral.css">
+<link rel="stylesheet" href="../css/rrhh.css">
+<!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
+     igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
+     (importado por todas las páginas), no acá. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E1B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GEALMI">
+<link rel="apple-touch-icon" href="/assets/logo-icon.png">
+</head>
+<body data-modulo="mi-asistencia">
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1 id="topbarTitle">Mi asistencia</h1>
+        <div class="topbar-subtitle" id="topbarSubtitle">MARCA TU ENTRADA Y SALIDA</div>
+      </div>
+      <div class="topbar-search" id="topbarSearch"></div>
+      <div id="sesionWidget" class="sesion-widget"></div>
+    </header>
+
+    <main>
+      <div id="miContenido"><p class="rrhh-vacio">Cargando…</p></div>
+    </main>
+
+    <footer></footer>
+  </div>
+</div>
+
+<script type="module">
+import { cargarConfigEmpresa, buscarModulo } from '../js/config.js';
+import { renderSidebar } from '../components/sidebar.js';
+import { renderTopbar } from '../components/topbar.js';
+import { renderFooter } from '../components/footer.js';
+import { haySesionActiva } from '../js/sesion.js';
+
+if (!haySesionActiva()) location.replace('login');
+
+(async function iniciar() {
+  const config = await cargarConfigEmpresa();
+  renderSidebar(config, 'mi-asistencia');
+  await renderTopbar(config);
+  renderFooter();
+
+  const cont = document.getElementById('miContenido');
+  if (!buscarModulo(config, 'rrhh')) {
+    cont.innerHTML = '<div class="panel" style="padding:28px;text-align:center;"><h3 style="margin:0 0 6px;">Mi asistencia no está disponible</h3><p style="margin:0;color:var(--muted);font-size:13px;">Tu empresa no tiene el módulo de RRHH habilitado.</p></div>';
+    return;
+  }
+  const { montar } = await import('../js/rrhh/miAsistencia.js');
+  await montar(cont);
+})();
+</script>
+</body>
+</html>

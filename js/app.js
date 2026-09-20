@@ -343,6 +343,11 @@ async function activarCapturaSiCorresponde(config) {
   if (!backend || !seccion) return;
 
   backendActivo = backend;
+  // Pantallas propias de un módulo (p. ej. la ficha de RRHH) avisan con este evento
+  // cuando guardan algo, para que la lista y la tabla de arriba se vuelvan a leer.
+  document.addEventListener('gealmi:datos-cambiaron', (e) => {
+    if (!e.detail?.modulo || e.detail.modulo === NAMESPACE) refrescar();
+  });
   document.getElementById('uploadBtn').style.display = 'none';
   document.getElementById('clearStorageBtn').style.display = 'none';
   mostrarEstado('', 'info');

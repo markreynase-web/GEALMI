@@ -14,6 +14,7 @@ import { pool } from '../db.js';
 import { auth, requireEmpresa, requireModulo } from '../middleware/auth.js';
 import { verificarPermiso } from '../middleware/permisos.js';
 import { registrarAuditoria } from '../registroAuditoria.js';
+import { alertarStockBajo } from '../notificaciones.js';
 
 const router = Router();
 router.use(auth, requireEmpresa, requireModulo('combo_ventas'));
@@ -85,6 +86,7 @@ router.post('/', verificarPermiso('combo_ventas.crear'), async (req, res) => {
   if (cant <= 0) return res.status(400).json({ error: 'La cantidad debe ser mayor a 0.' });
   const estadoFinal = ESTADOS_VALIDOS.includes(estado) ? estado : 'pendiente';
 
+  let productosParaAlertar = []; // aviso de stock bajo: tras el COMMIT y con la conexión liberada (ver src/notificaciones.js)
   const cliente = await pool.connect();
   try {
     await cliente.query('BEGIN');
@@ -119,6 +121,7 @@ router.post('/', verificarPermiso('combo_ventas.crear'), async (req, res) => {
       detalle: { ...venta, items_descontados: combo.items }
     });
     await cliente.query('COMMIT');
+    productosParaAlertar = (combo.items || []).map(item => item.producto_id);
     res.status(201).json(venta);
   } catch (err) {
     await cliente.query('ROLLBACK');
@@ -127,6 +130,7 @@ router.post('/', verificarPermiso('combo_ventas.crear'), async (req, res) => {
   } finally {
     cliente.release();
   }
+  if (productosParaAlertar.length) await alertarStockBajo(empresaId, productosParaAlertar);
 });
 
 // combo_id/mesa_id son INMUTABLES después de creada (mismo criterio que

@@ -44,6 +44,7 @@ function itemHtml(m, activo) {
     <a class="sidebar-item${activo ? ' active' : ''}" href="${m.href}" title="${escapeHtml(m.label)}">
       <span class="sidebar-icon">${m.icon || '•'}</span>
       <span>${m.label}</span>
+      ${m.badgeId ? `<span class="sidebar-badge" id="${m.badgeId}" hidden></span>` : ''}
     </a>`;
 }
 
@@ -128,6 +129,7 @@ export function renderSidebar(config, paginaActualId) {
           <div class="sidebar-group">
             <div class="sidebar-group-label">Principal</div>
             ${itemHtml({ id: 'inicio', label: 'Inicio', icon: '🏠', href: 'inicio' }, paginaActualId === 'inicio')}
+            ${itemHtml({ id: 'notificaciones', label: 'Notificaciones', icon: '🔔', href: 'notificaciones', badgeId: 'badgeMenuNotif' }, paginaActualId === 'notificaciones')}
           </div>` : ''}
         ${gruposHtml}
         ${seccionAdmin.length ? `

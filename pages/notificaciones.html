@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEALMI — Notificaciones</title>
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/cards.css">
+<link rel="stylesheet" href="../css/forms.css">
+<link rel="stylesheet" href="../css/tables.css">
+<link rel="stylesheet" href="../css/panel-lateral.css">
+<link rel="stylesheet" href="../css/notificaciones.css">
+<!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
+     igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
+     (importado por todas las páginas), no acá. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E1B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GEALMI">
+<link rel="apple-touch-icon" href="/assets/logo-icon.png">
+</head>
+<body data-modulo="notificaciones">
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1 id="topbarTitle">Notificaciones</h1>
+        <div class="topbar-subtitle" id="topbarSubtitle">AVISOS Y MENSAJES</div>
+      </div>
+      <div class="topbar-search" id="topbarSearch"></div>
+      <div id="sesionWidget" class="sesion-widget"></div>
+    </header>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="vista-tabs" id="vistaTabs">
+          <button type="button" class="vista-tab activo" data-vista="recibidas">📥 Recibidas</button>
+          <button type="button" class="vista-tab" data-vista="enviadas" id="tabEnviadas" style="display:none;">📤 Enviadas</button>
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <button type="button" class="btn btn-ghost" id="btnMarcarTodas">Marcar todas como leídas</button>
+        <button type="button" class="btn btn-ochre" id="btnNuevoMensaje" style="display:none;">✉️ Nuevo mensaje</button>
+      </div>
+    </div>
+    <div id="estadoPagina" class="form-status" style="padding:0 32px;" role="status" aria-live="polite"></div>
+
+    <main>
+      <div class="kpis" id="notifKpis"></div>
+
+      <section class="panel" id="panelRecibidas" style="padding:20px;">
+        <div class="captura-header">
+          <h3>Recibidas</h3>
+          <div class="periodo-tabs" id="filtroTabs">
+            <button type="button" class="periodo-tab activo" data-filtro="todas">Todas</button>
+            <button type="button" class="periodo-tab" data-filtro="sin_leer">Sin leer</button>
+            <button type="button" class="periodo-tab" data-filtro="importantes">Por confirmar</button>
+          </div>
+        </div>
+        <div class="notif-lista" id="listaRecibidas">Cargando…</div>
+        <div class="notif-mas"><button type="button" class="btn btn-ghost" id="btnMas" style="display:none;">Cargar más</button></div>
+      </section>
+
+      <section class="panel" id="panelEnviadas" style="padding:20px; display:none;">
+        <div class="captura-header">
+          <h3>Mensajes enviados</h3>
+          <span class="tag">Toca uno para ver quién lo recibió</span>
+        </div>
+        <div id="tablaEnviadas">Cargando…</div>
+      </section>
+    </main>
+
+    <footer></footer>
+  </div>
+</div>
+
+<script type="module">
+import { cargarConfigEmpresa, modulosHabilitados } from '../js/config.js';
+import { renderSidebar } from '../components/sidebar.js';
+import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
+import { renderTopbar } from '../components/topbar.js';
+import { renderFooter } from '../components/footer.js';
+import { tienePermiso, haySesionActiva } from '../js/sesion.js';
+import { abrirPanelLateral, cerrarPanelLateral } from '../components/panelLateral.js';
+import { escapeHtml, fmtNum, urlLimpia } from '../js/utils.js';
+import { kpiCard } from '../js/kpiCard.js';
+import {
+  suscribir, consultar, listar, marcarLeidas, marcarTodasLeidas, confirmarEnterado,
+  listarDestinatarios, enviarMensaje, listarEnviados, detalleEnviado, tipoDe, tiempoRelativo, fechaCorta
+} from '../js/notificaciones.js';
+
+if (!haySesionActiva()) location.replace('login');
+
+const POR_PAGINA = 20;
+let config;
+let puedeEnviar = false;
+let vista = 'recibidas';
+let filtro = 'todas';
+let pagina = 1;
+let totalRecibidas = 0;
+let enviados = null;
+let firmaResumen = null;
+
+const $ = (id) => document.getElementById(id);
+
+function estadoPagina(texto, tipo = 'ok') {
+  const el = $('estadoPagina');
+  el.textContent = texto;
+  el.style.color = tipo === 'error' ? 'var(--coral)' : 'var(--teal-strong)';
+}
+
+// ---------- KPIs ----------
+
+function dibujarKpis(estado) {
+  const tarjetas = [
+    kpiCard({ acento: 'blue', icono: '📥', label: 'Sin leer', value: fmtNum(estado.no_leidas), sub: estado.no_leidas ? 'esperan tu atención' : 'estás al día' }),
+    kpiCard({ acento: estado.pendientes_enterado ? 'red' : 'green', icono: '⚠️', label: 'Por confirmar', value: fmtNum(estado.pendientes_enterado), sub: estado.pendientes_enterado ? 'avisos importantes sin «Enterado»' : 'nada pendiente' })
+  ];
+  if (puedeEnviar && enviados) {
+    tarjetas.push(kpiCard({ acento: 'teal', icono: '📤', label: 'Enviados', value: fmtNum(enviados.length), sub: 'tus últimos mensajes' }));
+  }
+  $('notifKpis').innerHTML = tarjetas.join('');
+}
+
+// ---------- Recibidas ----------
+
+function tarjeta(n) {
+  const t = tipoDe(n.tipo);
+  const origen = n.remitente_nombre ? `De ${escapeHtml(n.remitente_nombre)}` : 'Aviso automático';
+  return `
+    <article class="notif-item${n.leida ? '' : ' sin-leer'}${n.requiere_enterado ? ' por-confirmar' : ''}" data-id="${n.id}">
+      <div class="notif-icono tipo-${t.clase}" aria-hidden="true">${t.icono}</div>
+      <div class="notif-cuerpo">
+        <div class="notif-titulo">
+          ${n.requiere_enterado ? '<span class="notif-pill importante">Importante</span>' : ''}
+          <span>${escapeHtml(n.titulo)}</span>
+        </div>
+        ${n.cuerpo ? `<div class="notif-texto">${escapeHtml(n.cuerpo)}</div>` : ''}
+        <div class="notif-meta">
+          <span class="notif-pill tipo">${t.etiqueta}</span>
+          <span>${origen} · ${tiempoRelativo(n.creada_el)}</span>
+          ${n.prioridad === 'alta' && n.enterado_el ? '<span class="notif-ok">✓ Enterado</span>' : ''}
+        </div>
+      </div>
+      <div class="notif-acciones">
+        ${n.enlace ? `<a class="btn btn-ghost" href="${escapeHtml(n.enlace)}" data-accion="abrir">Abrir</a>` : ''}
+        ${!n.leida ? '<button type="button" class="btn btn-ghost" data-accion="leer">Marcar leída</button>' : ''}
+        ${n.requiere_enterado ? '<button type="button" class="btn btn-ochre" data-accion="enterado">Enterado</button>' : ''}
+      </div>
+    </article>`;
+}
+
+async function cargarRecibidas({ reiniciar = true } = {}) {
+  const lista = $('listaRecibidas');
+  if (reiniciar) { pagina = 1; }
+  const res = await listar({ estado: filtro, pagina, limite: POR_PAGINA });
+  if (!res) {
+    if (reiniciar) lista.innerHTML = '<div class="notif-vacia">No se pudieron cargar las notificaciones. Se reintentará en unos segundos.</div>';
+    return;
+  }
+  totalRecibidas = res.total;
+  const html = res.datos.map(tarjeta).join('');
+  if (reiniciar) {
+    lista.innerHTML = html || `<div class="notif-vacia">${filtro === 'todas' ? 'Todavía no recibiste notificaciones.' : filtro === 'sin_leer' ? 'No tienes notificaciones sin leer.' : 'No tienes avisos importantes por confirmar.'}</div>`;
+  } else {
+    lista.insertAdjacentHTML('beforeend', html);
+  }
+  $('btnMas').style.display = pagina * POR_PAGINA < totalRecibidas ? 'inline-flex' : 'none';
+}
+
+$('listaRecibidas').addEventListener('click', async (e) => {
+  const boton = e.target.closest('[data-accion]');
+  if (!boton) return;
+  const id = Number(boton.closest('.notif-item').dataset.id);
+  if (boton.dataset.accion === 'abrir') {
+    marcarLeidas([id]); // el enlace navega solo; el pedido sigue aunque cambie la página
+    return;
+  }
+  boton.disabled = true;
+  if (boton.dataset.accion === 'leer') await marcarLeidas([id]);
+  if (boton.dataset.accion === 'enterado') await confirmarEnterado(id);
+  await cargarRecibidas();
+});
+
+$('btnMas').addEventListener('click', async () => {
+  pagina += 1;
+  await cargarRecibidas({ reiniciar: false });
+});
+
+$('filtroTabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.periodo-tab');
+  if (!tab) return;
+  $('filtroTabs').querySelectorAll('.periodo-tab').forEach(b => b.classList.remove('activo'));
+  tab.classList.add('activo');
+  filtro = tab.dataset.filtro;
+  cargarRecibidas();
+});
+
+$('btnMarcarTodas').addEventListener('click', async () => {
+  await marcarTodasLeidas();
+  estadoPagina('Marcaste todas como leídas.');
+  await cargarRecibidas();
+});
+
+// ---------- Enviadas ----------
+
+function cifra(n, total) {
+  return `<span class="env-cifra${total > 0 && n === total ? ' completa' : ''}">${n} / ${total}</span>`;
+}
+
+async function cargarEnviadas() {
+  const cont = $('tablaEnviadas');
+  enviados = await listarEnviados();
+  if (!enviados) { cont.innerHTML = '<p class="tabla-vacia">No se pudieron cargar los mensajes enviados.</p>'; return; }
+  dibujarKpis(estadoLocal);
+  if (!enviados.length) { cont.innerHTML = '<p class="tabla-vacia">Todavía no enviaste mensajes. Usa «Nuevo mensaje» para escribirle a una persona, un rol, una sucursal o a todos.</p>'; return; }
+  cont.innerHTML = `
+    <div class="tabla-registros-wrap" style="margin-top:0;">
+      <table class="tabla-registros">
+        <thead><tr><th>Mensaje</th><th>Enviado</th><th>Para</th><th>Entregados</th><th>Leídos</th><th>Enterados</th></tr></thead>
+        <tbody>
+          ${enviados.map(m => `
+            <tr class="fila-clicable" data-lote="${escapeHtml(m.lote)}" tabindex="0">
+              <td>
+                <div class="env-titulo">${m.prioridad === 'alta' ? '<span class="notif-pill importante">Importante</span> ' : ''}${escapeHtml(m.titulo)}</div>
+                ${m.cuerpo ? `<div class="env-sub">${escapeHtml(m.cuerpo)}</div>` : ''}
+              </td>
+              <td>${fechaCorta(m.creada_el)}</td>
+              <td>${m.destinatarios} persona${m.destinatarios === 1 ? '' : 's'}</td>
+              <td>${cifra(m.entregadas, m.destinatarios)}</td>
+              <td>${cifra(m.leidas, m.destinatarios)}</td>
+              <td>${m.prioridad === 'alta' ? cifra(m.enteradas, m.destinatarios) : '<span class="estado-no">—</span>'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+const marca = (iso) => iso ? `<span class="estado-si">✓ ${fechaCorta(iso)}</span>` : '<span class="estado-no">—</span>';
+
+async function abrirDetalle(lote) {
+  const d = await detalleEnviado(lote);
+  if (!d) { estadoPagina('No se pudo abrir el detalle de ese mensaje.', 'error'); return; }
+  abrirPanelLateral({
+    titulo: 'Detalle del mensaje', icono: '📤', ancho: 'amplio',
+    montar: (body) => {
+      body.innerHTML = `
+        <div class="detalle-mensaje">
+          <h4>${escapeHtml(d.titulo)}</h4>
+          <div class="meta">Enviado el ${fechaCorta(d.creada_el)}${d.prioridad === 'alta' ? ' · Importante (pide «Enterado»)' : ''}</div>
+          ${d.cuerpo ? `<div class="cuerpo">${escapeHtml(d.cuerpo)}</div>` : ''}
+          <div class="tabla-registros-wrap" style="margin-top:0;">
+            <table class="tabla-registros">
+              <thead><tr><th>Persona</th><th>Entregado</th><th>Leído</th>${d.prioridad === 'alta' ? '<th>Enterado</th>' : ''}</tr></thead>
+              <tbody>
+                ${d.destinatarios.map(p => `
+                  <tr>
+                    <td>${escapeHtml(p.destinatario)}</td>
+                    <td>${marca(p.entregada_el)}</td>
+                    <td>${marca(p.leida_el)}</td>
+                    ${d.prioridad === 'alta' ? `<td>${marca(p.enterado_el)}</td>` : ''}
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+    }
+  });
+}
+
+$('tablaEnviadas').addEventListener('click', (e) => {
+  const fila = e.target.closest('tr[data-lote]');
+  if (fila) abrirDetalle(fila.dataset.lote);
+});
+$('tablaEnviadas').addEventListener('keydown', (e) => {
+  const fila = e.target.closest('tr[data-lote]');
+  if (fila && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); abrirDetalle(fila.dataset.lote); }
+});
+
+// ---------- Nuevo mensaje ----------
+
+// Páginas a las que se puede apuntar el enlace del mensaje (solo el nombre de la página: la API no acepta otra cosa).
+function opcionesEnlace() {
+  const vistos = new Set(['']);
+  const filas = [{ valor: '', texto: 'Sin enlace' }];
+  const agregar = (valor, texto) => { if (valor && !vistos.has(valor)) { vistos.add(valor); filas.push({ valor, texto }); } };
+  agregar('inicio', 'Inicio');
+  modulosHabilitados(config).filter(m => m.id !== 'gealmi_ai').forEach(m => agregar(urlLimpia(m.page), m.label));
+  agregar('cajas', 'Cajas');
+  agregar('sucursales', 'Sucursales');
+  return filas;
+}
+
+async function abrirNuevoMensaje() {
+  const destinatarios = await listarDestinatarios();
+  if (!destinatarios) { estadoPagina('No se pudo cargar la lista de personas. Intenta de nuevo.', 'error'); return; }
+  const { usuarios, roles, sucursales } = destinatarios;
+
+  abrirPanelLateral({
+    titulo: 'Nuevo mensaje', icono: '✉️',
+    montar: (body) => {
+      body.innerHTML = `
+        <form class="form-registro" style="grid-template-columns:1fr;" id="formMensaje">
+          <div class="campo">
+            <label for="msgTipo">Para</label>
+            <select id="msgTipo">
+              <option value="usuarios">Personas específicas</option>
+              <option value="rol">Todas las personas de un rol</option>
+              ${sucursales.length ? '<option value="sucursal">Quienes trabajan en una sucursal</option>' : ''}
+              <option value="todos">Todos</option>
+            </select>
+          </div>
+
+          <div class="campo" id="campoPersonas">
+            <div class="msg-buscar-fila">
+              <input type="search" id="msgBuscar" placeholder="Buscar por nombre o rol…" aria-label="Buscar personas">
+              <button type="button" class="campo-accion-extra" id="msgTodasVisibles">Marcar visibles</button>
+            </div>
+            <div class="msg-personas" id="msgPersonas">
+              ${usuarios.length ? usuarios.map(u => `
+                <label class="msg-persona" data-texto="${escapeHtml((u.nombre + ' ' + (u.rol || '')).toLowerCase())}">
+                  <input type="checkbox" value="${u.id}"> ${escapeHtml(u.nombre)} <small>${escapeHtml(u.rol || '')}</small>
+                </label>`).join('') : '<div class="msg-ayuda" style="padding:8px;">No hay otras personas activas en tu empresa.</div>'}
+            </div>
+          </div>
+
+          <div class="campo" id="campoRol" hidden>
+            <label for="msgRol">Rol</label>
+            <select id="msgRol">
+              ${roles.map(r => `<option value="${escapeHtml(r.nombre)}">${escapeHtml(r.nombre)} (${r.cantidad} persona${r.cantidad === 1 ? '' : 's'})</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="campo" id="campoSucursal" hidden>
+            <label for="msgSucursal">Sucursal</label>
+            <select id="msgSucursal">
+              ${sucursales.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('')}
+            </select>
+            <div class="msg-ayuda">Llega a quienes están asignados a esa sucursal (no a quienes ven todas).</div>
+          </div>
+
+          <div class="campo" id="campoTodos" hidden>
+            <div class="msg-ayuda">Llegará a ${usuarios.length} persona${usuarios.length === 1 ? '' : 's'} de tu empresa (sin contarte a ti).</div>
+          </div>
+
+          <div class="campo">
+            <label for="msgTitulo">Título</label>
+            <input type="text" id="msgTitulo" maxlength="120" required placeholder="Ej. Revisa tu caja antes de irte">
+          </div>
+          <div class="campo">
+            <label for="msgCuerpo">Mensaje (opcional)</label>
+            <textarea id="msgCuerpo" maxlength="2000" rows="4" placeholder="Escribe los detalles…"></textarea>
+          </div>
+          <div class="campo">
+            <label for="msgEnlace">Enlace a una pantalla (opcional)</label>
+            <select id="msgEnlace">
+              ${opcionesEnlace().map(o => `<option value="${escapeHtml(o.valor)}">${escapeHtml(o.texto)}</option>`).join('')}
+            </select>
+          </div>
+          <label class="msg-marca">
+            <input type="checkbox" id="msgAlta">
+            <span>Importante: queda como aviso fijo hasta que cada persona toque «Enterado», y podrás ver quién lo hizo.</span>
+          </label>
+
+          <div class="campo campo-accion">
+            <button type="submit" class="btn btn-ochre" id="btnEnviarMensaje" style="width:100%; justify-content:center;">Enviar mensaje</button>
+          </div>
+          <span class="form-status" id="msgStatus" role="status" aria-live="polite"></span>
+        </form>`;
+
+      const tipo = $('msgTipo');
+      const mostrarSegunTipo = () => {
+        $('campoPersonas').hidden = tipo.value !== 'usuarios';
+        $('campoRol').hidden = tipo.value !== 'rol';
+        $('campoSucursal').hidden = tipo.value !== 'sucursal';
+        $('campoTodos').hidden = tipo.value !== 'todos';
+      };
+      tipo.addEventListener('change', mostrarSegunTipo);
+      mostrarSegunTipo();
+
+      $('msgBuscar').addEventListener('input', () => {
+        const t = $('msgBuscar').value.trim().toLowerCase();
+        $('msgPersonas').querySelectorAll('.msg-persona').forEach(l => { l.style.display = !t || l.dataset.texto.includes(t) ? '' : 'none'; });
+      });
+      $('msgTodasVisibles').addEventListener('click', () => {
+        $('msgPersonas').querySelectorAll('.msg-persona').forEach(l => { if (l.style.display !== 'none') l.querySelector('input').checked = true; });
+      });
+
+      $('formMensaje').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const estado = $('msgStatus');
+        let destino;
+        if (tipo.value === 'usuarios') {
+          const ids = [...$('msgPersonas').querySelectorAll('input:checked')].map(i => Number(i.value));
+          if (!ids.length) { estado.textContent = 'Elige al menos una persona.'; estado.style.color = 'var(--coral)'; return; }
+          destino = { tipo: 'usuarios', ids };
+        } else if (tipo.value === 'rol') destino = { tipo: 'rol', rol: $('msgRol').value };
+        else if (tipo.value === 'sucursal') destino = { tipo: 'sucursal', sucursal_id: Number($('msgSucursal').value) };
+        else destino = { tipo: 'todos' };
+
+        const boton = $('btnEnviarMensaje');
+        boton.disabled = true;
+        estado.textContent = 'Enviando…';
+        estado.style.color = 'var(--muted)';
+        const r = await enviarMensaje({
+          destino, titulo: $('msgTitulo').value.trim(), cuerpo: $('msgCuerpo').value.trim() || undefined,
+          enlace: $('msgEnlace').value || undefined, prioridad: $('msgAlta').checked ? 'alta' : 'normal'
+        });
+        if (!r.ok) { estado.textContent = r.error; estado.style.color = 'var(--coral)'; boton.disabled = false; return; }
+        cerrarPanelLateral();
+        estadoPagina(`Mensaje enviado a ${r.datos.destinatarios} persona${r.datos.destinatarios === 1 ? '' : 's'}.`);
+        cambiarVista('enviadas');
+      });
+    }
+  });
+}
+
+// ---------- Vistas ----------
+
+function cambiarVista(nueva) {
+  vista = nueva;
+  $('vistaTabs').querySelectorAll('.vista-tab').forEach(b => b.classList.toggle('activo', b.dataset.vista === nueva));
+  $('panelRecibidas').style.display = nueva === 'recibidas' ? '' : 'none';
+  $('panelEnviadas').style.display = nueva === 'enviadas' ? '' : 'none';
+  $('btnMarcarTodas').style.display = nueva === 'recibidas' ? '' : 'none';
+  if (nueva === 'enviadas') cargarEnviadas(); else cargarRecibidas();
+}
+
+$('vistaTabs').addEventListener('click', (e) => {
+  const boton = e.target.closest('.vista-tab');
+  if (boton) cambiarVista(boton.dataset.vista);
+});
+
+// La campana consulta cada ~30 s: si llegó algo nuevo o cambió lo pendiente, esta pantalla se refresca sola.
+let estadoLocal = { no_leidas: 0, pendientes_enterado: 0, importantes: [], recientes: [] };
+suscribir((estado) => {
+  estadoLocal = estado;
+  dibujarKpis(estado);
+  const firma = `${estado.recientes[0]?.id ?? 0}:${estado.no_leidas}:${estado.pendientes_enterado}`;
+  if (firmaResumen !== null && firma !== firmaResumen && vista === 'recibidas') cargarRecibidas();
+  firmaResumen = firma;
+});
+
+(async function iniciar() {
+  config = await cargarConfigEmpresa();
+  renderSidebar(config, 'notificaciones');
+  renderGealmiAiWidget(config);
+  await renderTopbar(config);
+  renderFooter();
+
+  puedeEnviar = tienePermiso('mensajes.enviar');
+  if (puedeEnviar) {
+    $('tabEnviadas').style.display = '';
+    const btn = $('btnNuevoMensaje');
+    btn.style.display = 'inline-flex';
+    btn.addEventListener('click', abrirNuevoMensaje);
+    listarEnviados().then(lista => { enviados = lista; dibujarKpis(estadoLocal); });
+  }
+  consultar();
+  cargarRecibidas();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+/* css/notificaciones.css -- pantalla "Notificaciones" (pages/notificaciones.html).
+   La campana, el aviso fijo y el contador del menú viven en css/layout.css
+   porque están en todas las páginas; acá solo lo de esta pantalla. */
+
+/* ---------- Recibidas ---------- */
+.notif-lista{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+.notif-item{
+  display:flex; align-items:flex-start; gap:14px; padding:14px 16px;
+  border:1px solid var(--paper-line); border-radius:12px; background:#fff;
+}
+.notif-item.sin-leer{ background:#F1F8FB; border-color:#CFE6EF; }
+.notif-item.por-confirmar{ background:#FFF8EE; border-color:#E0A458; }
+.notif-icono{
+  width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
+}
+.notif-cuerpo{ flex:1; min-width:0; }
+.notif-titulo{ font-size:14px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.notif-texto{ font-size:13px; color:var(--ink); line-height:1.5; margin-top:4px; white-space:pre-line; overflow-wrap:anywhere; }
+.notif-meta{ font-size:11.5px; color:var(--muted); margin-top:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.notif-pill{
+  display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+  padding:2px 8px; border-radius:20px;
+}
+.notif-pill.importante{ background:#FBEAF0; color:var(--coral-deep); }
+.notif-pill.tipo{ background:var(--paper); color:var(--muted); }
+.notif-ok{ color:var(--green); font-weight:600; }
+.notif-acciones{ display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end; }
+.notif-acciones .btn{ padding:6px 12px; font-size:12px; text-decoration:none; }
+.notif-mas{ text-align:center; margin-top:14px; }
+.notif-vacia{ text-align:center; padding:36px 12px; color:var(--muted); font-size:13px; }
+@media (max-width:700px){
+  .notif-item{ flex-wrap:wrap; }
+  .notif-acciones{ width:100%; justify-content:flex-start; }
+}
+
+/* ---------- Enviadas ---------- */
+.env-titulo{ font-weight:600; color:var(--ink); }
+.env-sub{ font-size:11.5px; color:var(--muted); margin-top:2px; max-width:420px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.env-cifra{ font-variant-numeric:tabular-nums; white-space:nowrap; }
+.env-cifra.completa{ color:var(--green); font-weight:600; }
+.tabla-registros tbody tr.fila-clicable{ cursor:pointer; }
+.tabla-registros tbody tr.fila-clicable:hover{ background:var(--paper); }
+
+.detalle-mensaje h4{ font-family:var(--font-display); font-size:16px; margin:0 0 6px; color:var(--ink); }
+.detalle-mensaje .cuerpo{ font-size:13px; color:var(--ink); line-height:1.5; white-space:pre-line; overflow-wrap:anywhere; margin-bottom:14px; }
+.detalle-mensaje .meta{ font-size:11.5px; color:var(--muted); margin-bottom:12px; }
+.estado-si{ color:var(--green); font-weight:600; white-space:nowrap; }
+.estado-no{ color:var(--muted); white-space:nowrap; }
+
+/* ---------- Formulario "Nuevo mensaje" ---------- */
+/* .form-registro .campo{ display:flex } le gana al [hidden] del navegador: sin esto los campos de un destino
+   que no se eligió (rol, sucursal, "todos") se verían siempre. */
+.form-registro [hidden]{ display:none !important; }
+.form-registro textarea{
+  font-family:'Inter', sans-serif; font-size:13px; padding:8px 10px; border:1px solid var(--paper-line);
+  border-radius:9px; background:var(--paper); color:var(--ink); resize:vertical; min-height:88px;
+}
+.form-registro textarea:focus{ outline:none; border-color:var(--ochre-deep); }
+.msg-personas{ border:1px solid var(--paper-line); border-radius:9px; background:#fff; max-height:210px; overflow-y:auto; padding:6px; }
+.form-registro .msg-persona{
+  display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:7px; cursor:pointer;
+  font-size:13px; font-weight:500; color:var(--ink); text-transform:none; letter-spacing:normal; justify-content:flex-start;
+}
+.msg-persona:hover{ background:var(--paper); }
+.form-registro .msg-persona input{ width:auto; padding:0; }
+.msg-persona small{ color:var(--muted); margin-left:auto; font-size:11.5px; }
+.msg-buscar-fila{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+.msg-buscar-fila input{ flex:1; }
+.form-registro .msg-marca{
+  display:flex; flex-direction:row; align-items:flex-start; gap:8px; text-transform:none; letter-spacing:normal;
+  font-size:13px; font-weight:500; color:var(--ink); justify-content:flex-start;
+}
+.form-registro .msg-marca input{ width:auto; margin-top:2px; }
+.msg-ayuda{ font-size:11.5px; color:var(--muted); line-height:1.4; }

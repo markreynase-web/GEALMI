@@ -30,6 +30,7 @@ import { auth, requireEmpresa } from '../middleware/auth.js';
 import { resolverRestriccionSucursal } from '../middleware/sucursal.js';
 import { verificarPermiso } from '../middleware/permisos.js';
 import { registrarAuditoria } from '../registroAuditoria.js';
+import { alertarArqueo } from '../notificaciones.js';
 
 const router = Router();
 router.use(auth, requireEmpresa, resolverRestriccionSucursal);
@@ -233,6 +234,9 @@ router.put('/turnos/:id/cerrar', verificarPermiso('cajas.editar'), async (req, r
   const montoDeclarado = numeroOCero(montoDeclaradoCrudo);
   if (montoDeclarado < 0) return res.status(400).json({ error: 'monto_cierre_declarado no puede ser negativo.' });
 
+  // Aviso de arqueo con diferencia: tras el COMMIT y con la conexión liberada
+  // (ver src/notificaciones.js) -- nunca dentro de la transacción.
+  let avisoArqueo = null;
   const cliente = await pool.connect();
   try {
     await cliente.query('BEGIN');
@@ -242,7 +246,7 @@ router.put('/turnos/:id/cerrar', verificarPermiso('cajas.editar'), async (req, r
       ? [req.params.id, req.usuario.empresa_id, req.sucursalRestringida]
       : [req.params.id, req.usuario.empresa_id];
     const { rows: turnoRows } = await cliente.query(
-      `SELECT t.* FROM turnos_caja t JOIN cajas c ON c.id = t.caja_id
+      `SELECT t.*, c.nombre AS caja_nombre, c.sucursal_id AS caja_sucursal_id FROM turnos_caja t JOIN cajas c ON c.id = t.caja_id
        WHERE t.id = $1 AND t.empresa_id = $2${condSucursal} FOR UPDATE OF t`,
       valores
     );
@@ -283,6 +287,10 @@ router.put('/turnos/:id/cerrar', verificarPermiso('cajas.editar'), async (req, r
       }
     });
     await cliente.query('COMMIT');
+    avisoArqueo = {
+      turnoId: turno.id, cajaNombre: turno.caja_nombre, sucursalId: turno.caja_sucursal_id,
+      diferencia, montoDeclarado, montoSistema
+    };
     res.json(actualizado[0]);
   } catch (err) {
     await cliente.query('ROLLBACK');
@@ -291,6 +299,7 @@ router.put('/turnos/:id/cerrar', verificarPermiso('cajas.editar'), async (req, r
   } finally {
     cliente.release();
   }
+  if (avisoArqueo) await alertarArqueo(req.usuario.empresa_id, avisoArqueo, req.usuario);
 });
 
 // PUT /api/cajas/:id -- { nombre?, activa? }

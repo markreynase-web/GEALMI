@@ -13,6 +13,7 @@ import ventasRouter from './routes/ventas.js';
 import inventarioRouter from './routes/inventario.js';
 import sucursalesRouter from './routes/sucursales.js';
 import cajasRouter from './routes/cajas.js';
+import notificacionesRouter from './routes/notificaciones.js';
 import apiKeysRouter from './routes/apiKeys.js';
 import twoFactorRouter from './routes/twoFactor.js';
 import publicApiRouter from './routes/publicApi.js';
@@ -191,6 +192,7 @@ app.use('/api/ventas', ventasRouter);
 app.use('/api/inventario', inventarioRouter);
 app.use('/api/sucursales', sucursalesRouter);
 app.use('/api/cajas', cajasRouter);
+app.use('/api/notificaciones', notificacionesRouter);
 app.use('/api/api-keys', apiKeysRouter);
 app.use('/api/2fa', twoFactorRouter);
 // /api/v1: API PÚBLICA para integraciones de terceros -- autenticada con

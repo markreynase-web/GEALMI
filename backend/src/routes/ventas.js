@@ -18,6 +18,7 @@ import { auth, requireEmpresa, requireModulo } from '../middleware/auth.js';
 import { resolverRestriccionSucursal } from '../middleware/sucursal.js';
 import { verificarPermiso } from '../middleware/permisos.js';
 import { registrarAuditoria } from '../registroAuditoria.js';
+import { alertarStockBajo } from '../notificaciones.js';
 
 const router = Router();
 router.use(auth, requireEmpresa, resolverRestriccionSucursal, requireModulo('ventas'));
@@ -141,6 +142,9 @@ router.post('/', verificarPermiso('ventas.crear'), async (req, res) => {
     return res.status(400).json({ error: 'turno_caja_id debe ser un número entero.' });
   }
 
+  // Aviso de stock bajo: se decide DESPUÉS del COMMIT y con la conexión ya
+  // liberada (ver src/notificaciones.js) -- nunca dentro de la transacción.
+  let alertarProductoId = null;
   const cliente = await pool.connect();
   try {
     await cliente.query('BEGIN');
@@ -253,6 +257,7 @@ router.post('/', verificarPermiso('ventas.crear'), async (req, res) => {
       }
     });
     await cliente.query('COMMIT');
+    alertarProductoId = producto.id;
     res.status(201).json(venta);
   } catch (err) {
     await cliente.query('ROLLBACK');
@@ -261,6 +266,7 @@ router.post('/', verificarPermiso('ventas.crear'), async (req, res) => {
   } finally {
     cliente.release();
   }
+  if (alertarProductoId) await alertarStockBajo(empresaId, [alertarProductoId]);
 });
 
 // PUT /:id -- permite corregir fecha/notas/cantidad. Si cambia la cantidad,
@@ -277,6 +283,7 @@ router.put('/:id', verificarPermiso('ventas.editar'), async (req, res) => {
   if (nuevaCant !== null && nuevaCant <= 0) return res.status(400).json({ error: 'La cantidad debe ser mayor a 0.' });
   if (nuevoPrecio !== null && nuevoPrecio <= 0) return res.status(400).json({ error: 'El precio unitario debe ser mayor a 0.' });
 
+  let alertarProductoId = null; // ver el mismo patrón en el POST
   const cliente = await pool.connect();
   try {
     await cliente.query('BEGIN');
@@ -360,6 +367,7 @@ router.put('/:id', verificarPermiso('ventas.editar'), async (req, res) => {
       detalle: Object.keys(cambios).length ? cambios : 'Sin cambios en los valores (se guardó igual).'
     });
     await cliente.query('COMMIT');
+    if (cantidadCambio) alertarProductoId = producto.id;
     res.json(actualizada[0]);
   } catch (err) {
     await cliente.query('ROLLBACK');
@@ -368,6 +376,7 @@ router.put('/:id', verificarPermiso('ventas.editar'), async (req, res) => {
   } finally {
     cliente.release();
   }
+  if (alertarProductoId) await alertarStockBajo(empresaId, [alertarProductoId]);
 });
 
 // DELETE /:id -- anular una venta devuelve el stock y borra su movimiento en finanzas.

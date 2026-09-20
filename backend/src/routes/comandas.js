@@ -13,6 +13,7 @@ import { pool } from '../db.js';
 import { auth, requireEmpresa, requireModulo } from '../middleware/auth.js';
 import { verificarPermiso } from '../middleware/permisos.js';
 import { registrarAuditoria } from '../registroAuditoria.js';
+import { alertarStockBajo } from '../notificaciones.js';
 
 const router = Router();
 router.use(auth, requireEmpresa, requireModulo('comandas'));
@@ -50,6 +51,7 @@ router.post('/', verificarPermiso('comandas.crear'), async (req, res) => {
   if (cant <= 0) return res.status(400).json({ error: 'La cantidad debe ser mayor a 0.' });
   const estadoFinal = ESTADOS_VALIDOS.includes(estado) ? estado : 'pendiente';
 
+  let alertarProductoId = null; // aviso de stock bajo: tras el COMMIT y con la conexión liberada (ver src/notificaciones.js)
   const cliente = await pool.connect();
   try {
     await cliente.query('BEGIN');
@@ -85,6 +87,7 @@ router.post('/', verificarPermiso('comandas.crear'), async (req, res) => {
 
     await registrarAuditoria(cliente, { usuario: req.usuario, accion: 'crear', modulo: 'comandas', registroId: comanda.id, detalle: comanda });
     await cliente.query('COMMIT');
+    alertarProductoId = producto.id;
     res.status(201).json(comanda);
   } catch (err) {
     await cliente.query('ROLLBACK');
@@ -93,6 +96,7 @@ router.post('/', verificarPermiso('comandas.crear'), async (req, res) => {
   } finally {
     cliente.release();
   }
+  if (alertarProductoId) await alertarStockBajo(empresaId, [alertarProductoId]);
 });
 
 // mesa_id/producto_id son INMUTABLES después de creada (mismo criterio que

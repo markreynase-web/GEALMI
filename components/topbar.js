@@ -8,14 +8,14 @@
 //     módulo (Promise.all de listarRegistros ya existente en js/api.js);
 //     cada tecla después de eso filtra en cliente, sin volver a pedir nada
 //     al backend. Click en un resultado navega a "<modulo>.html?q=<termino>".
-//   - #sesionWidget: campana de notificaciones (real: stock bajo,
-//     vencimientos próximos, actividad reciente de auditoría -- sin tabla
-//     nueva en la base de datos, se arma al vuelo desde endpoints que ya
-//     existen) + el chip de usuario con dropdown (nombre/rol/cerrar sesión).
+//   - #sesionWidget: campana de notificaciones (paso 6: leídas desde la base
+//     de datos, con "Enterado" para las importantes -- ver js/notificaciones.js)
+//     + el chip de usuario con dropdown (nombre/rol/cerrar sesión).
 
 import { obtenerSesion, tienePermiso, haySesionActiva, cerrarSesion, estaImpersonando, restaurarSesionSuperAdmin } from '../js/sesion.js';
 import { listarRegistros } from '../js/api.js';
 import { escapeHtml, fmtNum } from '../js/utils.js';
+import { iniciarSondeo, suscribir, marcarLeidas, marcarTodasLeidas, confirmarEnterado, tipoDe, tiempoRelativo } from '../js/notificaciones.js';
 
 const MODULOS_BUSCABLES = [
   { id: 'ventas', label: 'Ventas', icon: '💰', campos: ['producto', 'cliente', 'categoria', 'notas'],
@@ -117,60 +117,97 @@ function renderBusqueda(config) {
   });
 }
 
-const ETIQUETA_ACCION = { crear: 'Creó', editar: 'Editó', eliminar: 'Eliminó' };
+// ---------------------------------------------------------------------------
+// Campana de notificaciones (paso 6): lee de la base de datos vía
+// js/notificaciones.js -- ya no se arma al vuelo bajando el inventario entero
+// en cada página. Se pinta una vez el armazón y después solo se actualiza su
+// contenido cuando llega un resumen nuevo (cada ~30 s o al volver a la pestaña),
+// así el desplegable no se cierra solo mientras alguien lo está leyendo.
+// ---------------------------------------------------------------------------
 
-function diasHasta(fechaStr) {
-  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-  const f = new Date(fechaStr); f.setHours(0, 0, 0, 0);
-  return Math.round((f - hoy) / 86400000);
+function itemCampana(n) {
+  const tipo = tipoDe(n.tipo);
+  return `
+    <div class="topbar-notif-item${n.leida ? '' : ' sin-leer'}" role="button" tabindex="0" data-id="${n.id}" data-enlace="${escapeHtml(n.enlace || '')}">
+      <div class="topbar-notif-icono tipo-${tipo.clase}" aria-hidden="true">${tipo.icono}</div>
+      <div class="topbar-notif-contenido">
+        <div class="topbar-notif-texto">${n.requiere_enterado ? '<span class="topbar-notif-tag">Importante</span> ' : ''}<b>${escapeHtml(n.titulo)}</b></div>
+        ${n.cuerpo ? `<div class="topbar-notif-detalle">${escapeHtml(n.cuerpo)}</div>` : ''}
+        <div class="topbar-notif-hora">${n.remitente_nombre ? `${escapeHtml(n.remitente_nombre)} · ` : ''}${tiempoRelativo(n.creada_el)}</div>
+      </div>
+    </div>`;
 }
 
-function tiempoRelativo(iso) {
-  const min = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (min < 1) return 'Justo ahora';
-  if (min < 60) return `Hace ${min} minuto${min === 1 ? '' : 's'}`;
-  const horas = Math.floor(min / 60);
-  if (horas < 24) return `Hace ${horas} hora${horas === 1 ? '' : 's'}`;
-  const dias = Math.floor(horas / 24);
-  return `Hace ${dias} día${dias === 1 ? '' : 's'}`;
+function pintarCampana(estado) {
+  const badge = document.getElementById('badgeNotif');
+  if (badge) {
+    badge.textContent = estado.no_leidas > 9 ? '9+' : String(estado.no_leidas);
+    badge.style.display = estado.no_leidas ? 'flex' : 'none';
+  }
+  const boton = document.getElementById('btnNotif');
+  if (boton) boton.setAttribute('aria-label', estado.no_leidas ? `Notificaciones: ${estado.no_leidas} sin leer` : 'Notificaciones');
+
+  const lista = document.getElementById('listaNotif');
+  if (lista) {
+    lista.innerHTML = estado.recientes.length
+      ? estado.recientes.map(itemCampana).join('')
+      : '<div class="topbar-notif-vacio">Sin novedades por ahora.</div>';
+  }
+  const marcar = document.getElementById('btnMarcarTodasNotif');
+  if (marcar) marcar.style.display = estado.no_leidas ? '' : 'none';
+
+  // El menú lateral muestra el mismo contador junto a "Notificaciones".
+  const badgeMenu = document.getElementById('badgeMenuNotif');
+  if (badgeMenu) {
+    badgeMenu.textContent = estado.no_leidas > 99 ? '99+' : String(estado.no_leidas);
+    badgeMenu.hidden = !estado.no_leidas;
+  }
+  pintarAvisoFijo(estado);
 }
 
-// Sin tabla de "notificaciones" en la base de datos: se arman al vuelo a
-// partir de datos que ya existen (alertas de stock/vencimiento de
-// Inventario + los últimos movimientos de Auditoría), igual que el resumen
-// de pages/inicio.html.
-async function construirNotificaciones(config) {
-  const notifs = [];
+// Las importantes (prioridad alta) quedan como una franja fija arriba de la
+// página hasta que la persona da "Enterado": leerlas no alcanza. Solo se vuelve
+// a dibujar cuando cambia cuál toca mostrar, para que el lector de pantalla no
+// la repita en cada consulta.
+let avisoMostrado = null; // "id:total"
 
-  if (tienePermiso('inventario.ver')) {
-    const productos = (await listarRegistros(config.apiBaseUrl, 'inventario')) || [];
-    productos.filter(p => Number(p.stock) <= Number(p.stock_minimo)).slice(0, 5).forEach(p => {
-      notifs.push({ icono: '📦', bg: 'var(--orange-soft)', color: 'var(--orange)', orden: 2,
-        texto: `Stock bajo: <b>${escapeHtml(p.nombre)}</b> (${fmtNum(Number(p.stock))} unidad(es))` });
-    });
-    productos.filter(p => p.fecha_vencimiento && diasHasta(p.fecha_vencimiento) >= 0 && diasHasta(p.fecha_vencimiento) <= 7).slice(0, 5).forEach(p => {
-      notifs.push({ icono: '⏰', bg: '#FBEAF0', color: 'var(--coral)', orden: 3,
-        texto: `Vence pronto: <b>${escapeHtml(p.nombre)}</b>` });
-    });
-  }
+function pintarAvisoFijo(estado) {
+  const mainArea = document.querySelector('.main-area');
+  if (!mainArea) return;
+  const actual = document.getElementById('bannerAvisos');
+  const n = estado.importantes[0];
+  if (!n) { actual?.remove(); avisoMostrado = null; return; }
+  const marca = `${n.id}:${estado.pendientes_enterado}`;
+  if (actual && avisoMostrado === marca) return;
+  avisoMostrado = marca;
 
-  if (tienePermiso('auditoria.ver')) {
-    try {
-      const sesion = obtenerSesion();
-      const res = await fetch(`${config.apiBaseUrl}/auditoria?limite=6`, { headers: { Authorization: `Bearer ${sesion.token}` } });
-      if (res.ok) {
-        const acts = await res.json();
-        acts.forEach(a => notifs.push({
-          icono: a.accion === 'crear' ? '➕' : (a.accion === 'eliminar' ? '🗑️' : '✏️'),
-          bg: 'var(--blue-soft)', color: 'var(--blue)',
-          texto: `<b>${escapeHtml(a.usuario_nombre || '—')}</b> ${ETIQUETA_ACCION[a.accion] || a.accion} en ${escapeHtml(a.modulo)}`,
-          hora: tiempoRelativo(a.creado_el), orden: new Date(a.creado_el).getTime()
-        }));
-      }
-    } catch { /* sin conexión: se omite, el resto de notificaciones sigue funcionando */ }
-  }
+  const resto = estado.pendientes_enterado - 1;
+  const banner = actual || document.createElement('div');
+  banner.id = 'bannerAvisos';
+  banner.className = 'banner-avisos';
+  banner.setAttribute('role', 'alert');
+  banner.innerHTML = `
+    <span class="banner-avisos-icono" aria-hidden="true">${tipoDe(n.tipo).icono}</span>
+    <div class="banner-avisos-texto">
+      <b>${escapeHtml(n.titulo)}</b>
+      ${n.cuerpo ? `<span>${escapeHtml(n.cuerpo)}</span>` : ''}
+      ${resto > 0 ? `<em>+ ${resto} aviso${resto === 1 ? '' : 's'} importante${resto === 1 ? '' : 's'} más</em>` : ''}
+    </div>
+    <div class="banner-avisos-acciones">
+      ${n.enlace ? `<a class="banner-avisos-ver" href="${escapeHtml(n.enlace)}">Ver</a>` : ''}
+      <button type="button" id="btnEnterado" data-id="${n.id}">Enterado</button>
+    </div>`;
+  if (!actual) mainArea.prepend(banner);
+  document.getElementById('btnEnterado').addEventListener('click', async (e) => {
+    e.currentTarget.disabled = true;
+    await confirmarEnterado(n.id);
+  });
+}
 
-  return notifs.sort((a, b) => (b.orden || 0) - (a.orden || 0)).slice(0, 10);
+async function alHacerClicEnNotificacion(item) {
+  const { id, enlace } = item.dataset;
+  await marcarLeidas([Number(id)]);
+  if (enlace) location.href = enlace;
 }
 
 async function renderUsuarioYNotificaciones(config) {
@@ -179,25 +216,21 @@ async function renderUsuarioYNotificaciones(config) {
   const sesion = obtenerSesion();
   if (!sesion?.usuario) { cont.innerHTML = `<a href="login" class="topbar-login-link">Iniciar sesión</a>`; return; }
 
-  const notifs = await construirNotificaciones(config);
   const inicial = (sesion.usuario.nombre || '?').trim().charAt(0).toUpperCase();
 
   cont.innerHTML = `
     <div class="topbar-user">
       <div class="topbar-notif">
-        <button type="button" class="topbar-notif-btn" id="btnNotif" title="Notificaciones">
-          🔔${notifs.length ? `<span class="topbar-notif-badge">${notifs.length > 9 ? '9+' : notifs.length}</span>` : ''}
+        <button type="button" class="topbar-notif-btn" id="btnNotif" title="Notificaciones" aria-label="Notificaciones">
+          🔔<span class="topbar-notif-badge" id="badgeNotif" style="display:none;"></span>
         </button>
         <div class="topbar-notif-panel" id="panelNotif">
-          <div class="topbar-notif-titulo">Notificaciones</div>
-          ${notifs.length ? notifs.map(n => `
-            <div class="topbar-notif-item">
-              <div class="topbar-notif-icono" style="background:${n.bg}; color:${n.color};">${n.icono}</div>
-              <div>
-                <div class="topbar-notif-texto">${n.texto}</div>
-                ${n.hora ? `<div class="topbar-notif-hora">${n.hora}</div>` : ''}
-              </div>
-            </div>`).join('') : '<div class="topbar-notif-vacio">Sin novedades por ahora.</div>'}
+          <div class="topbar-notif-cabecera">
+            <div class="topbar-notif-titulo">Notificaciones</div>
+            <button type="button" class="topbar-notif-marcar" id="btnMarcarTodasNotif" style="display:none;">Marcar todas como leídas</button>
+          </div>
+          <div class="topbar-notif-lista" id="listaNotif"><div class="topbar-notif-vacio">Sin novedades por ahora.</div></div>
+          <a class="topbar-notif-ver-todas" href="notificaciones">Ver todas las notificaciones</a>
         </div>
       </div>
       <div class="topbar-usuario-menu">
@@ -224,6 +257,18 @@ async function renderUsuarioYNotificaciones(config) {
     panelUsuario.classList.remove('abierto');
     panelNotif.classList.toggle('abierto');
   });
+  // Un clic dentro del desplegable no lo cierra (el clic global de abajo lo haría antes de tiempo).
+  panelNotif.addEventListener('click', (e) => e.stopPropagation());
+  document.getElementById('listaNotif').addEventListener('click', (e) => {
+    const item = e.target.closest('.topbar-notif-item');
+    if (item) alHacerClicEnNotificacion(item);
+  });
+  document.getElementById('listaNotif').addEventListener('keydown', (e) => {
+    const item = e.target.closest('.topbar-notif-item');
+    if (item && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); alHacerClicEnNotificacion(item); }
+  });
+  document.getElementById('btnMarcarTodasNotif').addEventListener('click', () => marcarTodasLeidas());
+
   document.getElementById('btnUsuario').addEventListener('click', (e) => {
     e.stopPropagation();
     panelNotif.classList.remove('abierto');
@@ -238,6 +283,10 @@ async function renderUsuarioYNotificaciones(config) {
     panelNotif.classList.remove('abierto');
     panelUsuario.classList.remove('abierto');
   });
+
+  // No se espera a la red: la página aparece ya y la campana se llena cuando llega el resumen.
+  suscribir(pintarCampana);
+  iniciarSondeo(config.apiBaseUrl);
 }
 
 // Banner mientras el super admin está impersonando una empresa (ver POST

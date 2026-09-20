@@ -14,7 +14,7 @@
 import { modulosHabilitados, buscarModulo } from '../js/config.js';
 import { tienePermiso, tieneAlgunPermiso, haySesionActiva, obtenerSesion, cerrarSesion } from '../js/sesion.js';
 import { escapeHtml, urlLimpia } from '../js/utils.js';
-import { ICONO_SPARK } from './gealmiAiWidget.js';
+import { ICONO_SPARK } from '../js/iconos.js';
 
 // Grupo de sidebar por id de módulo (Rediseño v3). Client-side a propósito:
 // la tabla `modulos` no tiene columna de categoría y no vale la pena una
@@ -55,13 +55,10 @@ export function renderSidebar(config, paginaActualId) {
   const sinSesion = !haySesionActiva();
 
   const modulosPrincipales = modulosHabilitados(config).filter(m => {
-    // GEALMI AI no es una página navegable (no tiene captura/Vista Ejecutiva
-    // ni un .html real detrás) -- es solo un flag de catálogo para que el
-    // panel de super admin pueda habilitarlo/deshabilitarlo por empresa. Sin
-    // este filtro caía en la rama de abajo (baseDeDatos:false = "módulo
-    // libre, mostrar siempre", pensada para Compras/RRHH) y aparecía como
-    // pestaña rota -> 404 al hacer clic (ver components/gealmiAiWidget.js
-    // para el botón flotante, que es la única UI real de este módulo).
+    // GEALMI AI tiene su propia entrada fija al pie del menú (ver
+    // gealmiAiEntradaHtml): sin este filtro caería también en la rama de abajo
+    // (baseDeDatos:false = "módulo libre, mostrar siempre") y aparecería dos
+    // veces, y sin respetar el permiso gealmi_ai.ver.
     if (m.id === 'gealmi_ai') return false;
     if (!m.baseDeDatos) return true;
     if (sinSesion) return true; // el guard de app.js ya redirige a login antes si el módulo lo exige
@@ -139,40 +136,31 @@ export function renderSidebar(config, paginaActualId) {
           </div>` : ''}
       </nav>
       <div class="sidebar-footer" id="sidebarFooter"></div>
-      ${gealmiAiEntradaHtml(config)}
+      ${gealmiAiEntradaHtml(config, paginaActualId)}
     </div>
   `;
 
   renderSidebarFooter();
   asegurarControlesMovil();
   aplicarEstadoColapsado();
-  wireGealmiAiEntrada();
 }
 
-// Entrada fija de GEALMI AI al pie del sidebar (Rediseño v3): mismo gate que
-// el botón flotante (components/gealmiAiWidget.js) -- módulo habilitado por
-// la empresa Y permiso del usuario -- para que no aparezca una entrada que
-// lleva a algo que ese usuario/empresa no tiene. Al hacer clic dispara un
-// evento global (ver gealmiAiWidget.js) en vez de abrir su propia ventana:
-// es un segundo punto de entrada al MISMO chat, no un chat aparte.
-function gealmiAiEntradaHtml(config) {
+// Entrada fija de GEALMI AI al pie del sidebar (Rediseño v3): módulo habilitado
+// por la empresa Y permiso del usuario, para que no aparezca una entrada que
+// lleva a algo que ese usuario/empresa no tiene. Desde el paso 7 es un enlace a
+// pages/gealmi-ai.html (antes abría un chat flotante en la misma página).
+function gealmiAiEntradaHtml(config, paginaActualId) {
   const habilitado = !!buscarModulo(config, 'gealmi_ai') && tienePermiso('gealmi_ai.ver');
   if (!habilitado) return '';
   return `
-    <button type="button" class="sidebar-gealmi-ai" id="sidebarGealmiAiTrigger" title="Abrir GEALMI AI">
+    <a class="sidebar-gealmi-ai${paginaActualId === 'gealmi_ai' ? ' active' : ''}" href="gealmi-ai" title="Abrir GEALMI AI">
       <div class="sidebar-gealmi-ai-icon">${ICONO_SPARK}</div>
       <div class="sidebar-footer-info">
         <div class="sidebar-footer-nombre">GEALMI AI</div>
         <div class="sidebar-footer-rol">Asistente empresarial</div>
       </div>
       <span class="sidebar-gealmi-ai-chevron">›</span>
-    </button>`;
-}
-
-function wireGealmiAiEntrada() {
-  document.getElementById('sidebarGealmiAiTrigger')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('gealmi-ai:abrir'));
-  });
+    </a>`;
 }
 
 // Colapsar/expandir el sidebar en desktop (v3): estado persistido en

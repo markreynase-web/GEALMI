@@ -87,7 +87,6 @@
   import { renderSidebar } from '../components/sidebar.js';
   import { renderTopbar } from '../components/topbar.js';
   import { renderFooter } from '../components/footer.js';
-  import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
   import { abrirPanelLateral, cerrarPanelLateral } from '../components/panelLateral.js';
   import { escapeHtml } from '../js/utils.js';
 
@@ -118,7 +117,6 @@
   renderSidebar(config, 'membresias');
   await renderTopbar(config);
   renderFooter();
-  renderGealmiAiWidget(config);
 
   let clientesDisponibles = [];
   let planesDisponibles = [];

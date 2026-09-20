@@ -68,7 +68,6 @@
 <script type="module">
 import { cargarConfigEmpresa } from '../js/config.js';
 import { renderSidebar } from '../components/sidebar.js';
-import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
 import { renderTopbar } from '../components/topbar.js';
 import { renderFooter } from '../components/footer.js';
 import { obtenerSesion, tienePermiso, haySesionActiva } from '../js/sesion.js';
@@ -254,7 +253,6 @@ async function cargarGanancia() {
 (async function iniciar() {
   config = await cargarConfigEmpresa();
   renderSidebar(config, 'sucursales');
-  renderGealmiAiWidget(config);
   await renderTopbar(config);
   renderFooter();
 

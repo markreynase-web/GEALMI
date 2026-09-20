@@ -68,7 +68,7 @@ async function tendenciaVentasMensual({ pool, empresaId }, input = {}) {
   return { meses_solicitados: meses, serie_mensual: rows };
 }
 
-async function alertasStock({ pool, empresaId, modulosHabilitados }) {
+async function alertasStock({ pool, empresaId, modulosHabilitados, puede }) {
   const inventario = await pool.query(
     `SELECT nombre, categoria, stock, stock_minimo
      FROM inventario WHERE empresa_id = $1 AND stock <= stock_minimo
@@ -76,7 +76,7 @@ async function alertasStock({ pool, empresaId, modulosHabilitados }) {
     [empresaId]
   );
   const resultado = { inventario: inventario.rows };
-  if (modulosHabilitados.has('repuestos')) {
+  if (modulosHabilitados.has('repuestos') && puede('repuestos.ver')) {
     const repuestos = await pool.query(
       `SELECT nombre, codigo_oem, stock, stock_minimo
        FROM repuestos WHERE empresa_id = $1 AND stock <= stock_minimo
@@ -105,7 +105,7 @@ async function productosBajaRotacion({ pool, empresaId }, input = {}) {
   return { dias_sin_venta: dias, productos: rows };
 }
 
-async function velocidadDeVentaDeProducto({ pool, empresaId, modulosHabilitados }, input = {}) {
+async function velocidadDeVentaDeProducto({ pool, empresaId, modulosHabilitados, puede }, input = {}) {
   const nombre = (input.nombre || '').trim();
   if (!nombre) return { error: 'Falta el nombre (o parte del nombre) del producto o repuesto a buscar.' };
 
@@ -135,7 +135,7 @@ async function velocidadDeVentaDeProducto({ pool, empresaId, modulosHabilitados 
     });
   }
 
-  if (modulosHabilitados.has('repuestos')) {
+  if (modulosHabilitados.has('repuestos') && puede('repuestos.ver')) {
     const rep = await pool.query(
       `SELECT id, nombre, stock, stock_minimo FROM repuestos
        WHERE empresa_id = $1 AND nombre ILIKE '%' || $2 || '%' ORDER BY nombre LIMIT 5`,
@@ -239,6 +239,7 @@ const CATALOGO = [
         hasta: { type: 'string', description: 'Fecha de fin, formato YYYY-MM-DD (opcional).' }
       }
     },
+    permisos: ['ventas.ver'],
     ejecutar: resumenVentas
   },
   {
@@ -248,12 +249,14 @@ const CATALOGO = [
       type: 'object',
       properties: { meses: { type: 'integer', description: 'Cuántos meses hacia atrás (1-24). Por defecto 6.' } }
     },
+    permisos: ['ventas.ver'],
     ejecutar: tendenciaVentasMensual
   },
   {
     name: 'alertas_stock',
     description: 'Productos (y repuestos, si ese módulo está habilitado) cuyo stock actual está en o por debajo de su stock mínimo -- candidatos a reponer ya.',
     input_schema: { type: 'object', properties: {} },
+    permisos: ['inventario.ver'],
     ejecutar: alertasStock
   },
   {
@@ -263,6 +266,7 @@ const CATALOGO = [
       type: 'object',
       properties: { dias: { type: 'integer', description: 'Días sin venta para considerarlo de baja rotación (7-365). Por defecto 60.' } }
     },
+    permisos: ['inventario.ver'],
     ejecutar: productosBajaRotacion
   },
   {
@@ -273,6 +277,7 @@ const CATALOGO = [
       properties: { nombre: { type: 'string', description: 'Nombre o parte del nombre del producto/repuesto a buscar.' } },
       required: ['nombre']
     },
+    permisos: ['inventario.ver'],
     ejecutar: velocidadDeVentaDeProducto
   },
   {
@@ -285,6 +290,7 @@ const CATALOGO = [
         hasta: { type: 'string', description: 'Fecha de fin, formato YYYY-MM-DD (opcional).' }
       }
     },
+    permisos: ['finanzas.ver'],
     ejecutar: resumenFinanzas
   },
   {
@@ -298,6 +304,7 @@ const CATALOGO = [
         hasta: { type: 'string', description: 'Fecha de fin, formato YYYY-MM-DD (opcional).' }
       }
     },
+    permisos: ['ventas.ver', 'clientes.ver'],
     ejecutar: topClientes
   },
   {
@@ -307,16 +314,24 @@ const CATALOGO = [
       type: 'object',
       properties: { dias: { type: 'integer', description: 'Cuántos días hacia atrás analizar (7-180). Por defecto 30.' } }
     },
+    permisos: ['ventas.ver'],
     ejecutar: detectarAnomaliasVentas
   }
 ];
 
-export function construirHerramientas({ pool, empresaId, modulosHabilitados }) {
-  const ctx = { pool, empresaId, modulosHabilitados };
-  return CATALOGO.map(({ name, description, input_schema, ejecutar }) => ({
-    name,
-    description,
-    input_schema,
-    ejecutar: (input) => ejecutar(ctx, input)
-  }));
+// permisos: los del usuario que pregunta (los del JWT). La IA nunca debe darle a
+// alguien datos que su rol no puede ver en la app: cada herramienta declara los
+// permisos que exige y las que no se cumplen ni se le OFRECEN al modelo (así ni
+// sabe que existen). Sin `permisos` (llamada interna sin usuario) no se filtra.
+export function construirHerramientas({ pool, empresaId, modulosHabilitados, permisos }) {
+  const puede = (permiso) => !Array.isArray(permisos) || permisos.includes(permiso);
+  const ctx = { pool, empresaId, modulosHabilitados, puede };
+  return CATALOGO
+    .filter(({ permisos: exigidos }) => exigidos.every(puede))
+    .map(({ name, description, input_schema, ejecutar }) => ({
+      name,
+      description,
+      input_schema,
+      ejecutar: (input) => ejecutar(ctx, input)
+    }));
 }

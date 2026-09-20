@@ -104,7 +104,6 @@
 <script type="module">
 import { cargarConfigEmpresa } from '../js/config.js';
 import { renderSidebar } from '../components/sidebar.js';
-import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
 import { renderTopbar } from '../components/topbar.js';
 import { renderFooter } from '../components/footer.js';
 import { haySesionActiva, obtenerSesion } from '../js/sesion.js';
@@ -340,7 +339,6 @@ function mostrarPasoCodigos(body, codigos) {
 (async function iniciar() {
   config = await cargarConfigEmpresa();
   renderSidebar(config, 'seguridad');
-  renderGealmiAiWidget(config);
   await renderTopbar(config);
   renderFooter();
   cargar();

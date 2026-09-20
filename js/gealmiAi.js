@@ -1,29 +1,41 @@
 // js/gealmiAi.js
-// Fase D: cliente delgado para el endpoint de GEALMI AI. Mismo patrón de
-// fetch que js/config.js (Authorization: Bearer <token de sesión>).
+// Cliente delgado de /api/gealmi-ai (paso 7: GEALMI AI es un módulo con página
+// propia -- pages/gealmi-ai.html -- y las conversaciones se guardan en el
+// servidor). Mismo patrón de fetch que js/config.js (Authorization: Bearer
+// <token de sesión>). Cada función lanza un Error con el mensaje exacto del
+// servidor, para que la pantalla lo muestre tal cual.
 
 import { API_BASE_URL } from './apiConfig.js';
 import { obtenerSesion } from './sesion.js';
 
-// historial: [{ rol:'user'|'assistant', texto:'...' }, ...] -- lo arma y
-// mantiene components/gealmiAiWidget.js, en memoria del navegador (no se
-// persiste, ver decisión de "generación en vivo" en el plan de Fase D).
-export async function preguntarGealmiAi(pregunta, historial = []) {
+async function llamar(ruta, { metodo = 'GET', cuerpo } = {}) {
   const token = obtenerSesion()?.token;
-  const res = await fetch(`${API_BASE_URL}/gealmi-ai/preguntar`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    },
-    body: JSON.stringify({ pregunta, historial })
-  });
-
+  let res;
+  try {
+    res = await fetch(`${API_BASE_URL}/gealmi-ai${ruta}`, {
+      method: metodo,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo)
+    });
+  } catch {
+    throw new Error('No se pudo conectar con el servidor. Revisa tu conexión e intenta de nuevo.');
+  }
   let json = null;
   try { json = await res.json(); } catch { /* respuesta sin cuerpo JSON */ }
-
   if (!res.ok) {
-    throw new Error(json?.error || `No se pudo consultar a GEALMI AI (HTTP ${res.status}).`);
+    const error = new Error(json?.error || `No se pudo consultar a GEALMI AI (HTTP ${res.status}).`);
+    error.status = res.status;
+    throw error;
   }
-  return json; // { respuesta, herramientas_usadas }
+  return json;
 }
+
+export const listarConversaciones = () => llamar('/conversaciones');
+export const obtenerConversacion = (id) => llamar(`/conversaciones/${id}`);
+export const renombrarConversacion = (id, titulo) => llamar(`/conversaciones/${id}`, { metodo: 'PUT', cuerpo: { titulo } });
+export const eliminarConversacion = (id) => llamar(`/conversaciones/${id}`, { metodo: 'DELETE' });
+
+// conversacionId null = abre una conversación nueva. Devuelve
+// { conversacion_id, titulo, respuesta, herramientas_usadas }.
+export const preguntarGealmiAi = (pregunta, conversacionId = null) =>
+  llamar('/preguntar', { metodo: 'POST', cuerpo: { pregunta, ...(conversacionId ? { conversacion_id: conversacionId } : {}) } });

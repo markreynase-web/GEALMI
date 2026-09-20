@@ -82,7 +82,6 @@
 <script type="module">
 import { cargarConfigEmpresa, modulosHabilitados } from '../js/config.js';
 import { renderSidebar } from '../components/sidebar.js';
-import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
 import { renderTopbar } from '../components/topbar.js';
 import { renderFooter } from '../components/footer.js';
 import { tienePermiso, haySesionActiva } from '../js/sesion.js';
@@ -449,7 +448,6 @@ suscribir((estado) => {
 (async function iniciar() {
   config = await cargarConfigEmpresa();
   renderSidebar(config, 'notificaciones');
-  renderGealmiAiWidget(config);
   await renderTopbar(config);
   renderFooter();
 

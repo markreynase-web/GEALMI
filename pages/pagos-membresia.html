@@ -67,7 +67,6 @@
   import { renderSidebar } from '../components/sidebar.js';
   import { renderTopbar } from '../components/topbar.js';
   import { renderFooter } from '../components/footer.js';
-  import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
   import { escapeHtml } from '../js/utils.js';
 
   if (!haySesionActiva()) location.replace('login');
@@ -96,7 +95,6 @@
   renderSidebar(config, 'pagos_membresia');
   await renderTopbar(config);
   renderFooter();
-  renderGealmiAiWidget(config);
 
   const METODO_LABEL = { efectivo: 'Efectivo', yape: 'Yape', plin: 'Plin', transferencia: 'Transferencia', tarjeta: 'Tarjeta' };
   const puedeBorrar = tienePermiso('pagos_membresia.eliminar');

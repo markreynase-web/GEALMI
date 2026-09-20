@@ -128,10 +128,15 @@ router.get('/', verificarPermiso('ventas.ver'), async (req, res) => {
 // la MISMA sucursal que el producto vendido -- no tendría sentido vender
 // algo de la Sucursal Principal contra un turno abierto en la Sede B.
 router.post('/', verificarPermiso('ventas.crear'), async (req, res) => {
-  const { fecha, cliente_id, producto_id, categoria, cantidad, precio_unitario, notas, turno_caja_id } = req.body;
+  const { fecha, cliente_id, producto_id, categoria, cantidad, precio_unitario, notas, turno_caja_id, campana_id } = req.body;
   const cant = numeroOCero(cantidad);
   const precio = numeroOCero(precio_unitario);
   const empresaId = req.usuario.empresa_id;
+  // Marketing (paso 9): la venta puede atribuirse a una campaña. Vacío = sin campaña.
+  const quiereCampana = campana_id !== undefined && campana_id !== null && campana_id !== '';
+  if (quiereCampana && !(Number.isInteger(Number(campana_id)) && Number(campana_id) > 0)) {
+    return res.status(400).json({ error: 'campana_id debe ser un número entero.' });
+  }
 
   if (!fecha) return res.status(400).json({ error: 'fecha es requerido' });
   if (!producto_id) return res.status(400).json({ error: 'Selecciona un producto del inventario.' });
@@ -213,6 +218,22 @@ router.post('/', verificarPermiso('ventas.crear'), async (req, res) => {
       turnoCajaIdFinal = turnoRows[0].id;
     }
 
+    // La campaña tiene que ser de ESTA empresa y no estar finalizada. Solo se consulta
+    // cuando la venta trae campaña: una venta normal no toca las tablas de marketing.
+    let campanaIdFinal = null;
+    if (quiereCampana) {
+      const { rows: campRows } = await cliente.query(`SELECT id, estado FROM campanas WHERE id = $1 AND empresa_id = $2`, [Number(campana_id), empresaId]);
+      if (!campRows.length) {
+        await cliente.query('ROLLBACK');
+        return res.status(404).json({ error: 'La campaña seleccionada ya no existe.' });
+      }
+      if (campRows[0].estado === 'finalizada') {
+        await cliente.query('ROLLBACK');
+        return res.status(400).json({ error: 'Esa campaña ya está finalizada: elige una activa o registra la venta sin campaña.' });
+      }
+      campanaIdFinal = campRows[0].id;
+    }
+
     const categoriaFinal = categoria || producto.categoria_catalogo || null;
     const monto = +(cant * precio).toFixed(2);
 
@@ -228,6 +249,22 @@ router.post('/', verificarPermiso('ventas.crear'), async (req, res) => {
       [fecha, clienteRow.nombre, clienteRow.id, producto.nombre, producto.id, categoriaFinal, cant, precio, monto, notas || null, empresaId, producto.sucursal_id, turnoCajaIdFinal]
     );
     const venta = ventaRows[0];
+
+    // Atribución a la campaña: la venta cuenta como resultado, y el cliente figura como
+    // convertido en su lista (se agrega si no estaba: alguien que compró por la campaña
+    // sin haber sido contactado por la lista sigue siendo un resultado de la campaña).
+    if (campanaIdFinal) {
+      await cliente.query(`UPDATE ventas SET campana_id = $1 WHERE id = $2 AND empresa_id = $3`, [campanaIdFinal, venta.id, empresaId]);
+      venta.campana_id = campanaIdFinal;
+      await cliente.query(
+        `INSERT INTO campana_clientes (campana_id, cliente_id, empresa_id, estado, etiqueta, contactado_el, respondio_el, convirtio_el)
+         VALUES ($1, $2, $3, 'convirtio', 'Venta directa', now(), now(), now())
+         ON CONFLICT (campana_id, cliente_id) DO UPDATE SET estado = 'convirtio',
+           contactado_el = COALESCE(campana_clientes.contactado_el, now()), respondio_el = COALESCE(campana_clientes.respondio_el, now()),
+           convirtio_el = COALESCE(campana_clientes.convirtio_el, now())`,
+        [campanaIdFinal, clienteRow.id, empresaId]
+      );
+    }
 
     await cliente.query(`UPDATE inventario SET stock = stock - $1, actualizado_el = now() WHERE id = $2 AND empresa_id = $3`, [cant, producto.id, empresaId]);
 
@@ -253,7 +290,8 @@ router.post('/', verificarPermiso('ventas.crear'), async (req, res) => {
       usuario: req.usuario, accion: 'crear', modulo: 'ventas', registroId: venta.id,
       detalle: {
         producto: producto.nombre, cliente: clienteRow.nombre, cantidad: cant, precio_unitario: precio, monto,
-        ...(desviacion ? { desviacion_precio: desviacion } : {})
+        ...(desviacion ? { desviacion_precio: desviacion } : {}),
+        ...(campanaIdFinal ? { campana_id: campanaIdFinal } : {})
       }
     });
     await cliente.query('COMMIT');

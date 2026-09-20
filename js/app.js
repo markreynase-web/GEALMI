@@ -415,7 +415,9 @@ async function activarCapturaSiCorresponde(config) {
     rutas: r => ({ value: r.id, label: r.nombre }),
     mesas: m => ({ value: m.id, label: `Mesa ${m.numero}${m.zona ? ' · ' + m.zona : ''}` }),
     combos: c => ({ value: c.id, label: `${c.nombre} - S/ ${Number(c.precio).toFixed(2)}` }),
-    planes_membresia: p => ({ value: p.id, label: `${p.nombre} · ${p.duracion_meses} mes(es) · S/ ${Number(p.precio).toFixed(2)}` })
+    planes_membresia: p => ({ value: p.id, label: `${p.nombre} · ${p.duracion_meses} mes(es) · S/ ${Number(p.precio).toFixed(2)}` }),
+    // Marketing (paso 9): campañas activas, para atribuirles la venta que se registra.
+    'marketing/campanas-activas': c => ({ value: c.id, label: c.nombre })
   };
 
   async function esquemaConOpcionesFrescas() {
@@ -426,20 +428,23 @@ async function activarCapturaSiCorresponde(config) {
     // formularioRegistro.js) pida resultados en vivo, reusando el mismo
     // CONSTRUCTORES_OPCION de siempre -- ni el combobox ni formularioRegistro.js
     // necesitan saber qué forma tiene una fila de "inventario".
+    // Un campo con requiereModulo (p. ej. la campaña de una venta) solo existe si la
+    // empresa tiene ese módulo contratado: sin él, ni se pide la lista ni se muestra.
+    const camposDisponibles = backend.esquema.campos.filter(c => !c.requiereModulo || buscarModulo(config, c.requiereModulo));
     const fuentes = [...new Set(
-      backend.esquema.campos.filter(c => !c.buscar).map(c => c.fuente).filter(f => f && CONSTRUCTORES_OPCION[f])
+      camposDisponibles.filter(c => !c.buscar).map(c => c.fuente).filter(f => f && CONSTRUCTORES_OPCION[f])
     )];
     const listas = Object.fromEntries(await Promise.all(
       fuentes.map(async f => [f, await backend.listarDeModulo(f)])
     ));
 
     let categoriasUnicas = null;
-    if (backend.esquema.campos.some(c => c.fuente === 'categoriasInventario')) {
+    if (camposDisponibles.some(c => c.fuente === 'categoriasInventario')) {
       const productos = listas.inventario || await backend.listarDeModulo('inventario');
       categoriasUnicas = [...new Set((productos || []).map(p => p.categoria).filter(Boolean))];
     }
 
-    const campos = backend.esquema.campos.map(c => {
+    const campos = camposDisponibles.map(c => {
       if (c.fuente === 'categoriasInventario') {
         return { ...c, opcionesResueltas: (categoriasUnicas || []).map(cat => ({ value: cat, label: cat })) };
       }

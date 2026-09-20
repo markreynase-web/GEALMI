@@ -35,6 +35,9 @@ export const ESQUEMAS = {
       { id: 'categoria', label: 'Categoría', type: 'select', fuente: 'categoriasInventario', vacio: 'Selecciona una categoría…' },
       { id: 'cantidad', label: 'Cantidad', type: 'number', required: true, defecto: 1, min: 0.01, step: '0.01' },
       { id: 'precio_unitario', label: 'Precio unitario', type: 'number', required: true, min: 0.01, step: '0.01' },
+      // Marketing (paso 9): atribuye la venta a una campaña activa. Solo aparece si la
+      // empresa tiene el módulo (requiereModulo, ver esquemaConOpcionesFrescas en app.js).
+      { id: 'campana_id', label: 'Campaña', type: 'select', fuente: 'marketing/campanas-activas', vacio: 'Sin campaña', requiereModulo: 'marketing' },
       { id: 'notas', label: 'Notas', type: 'text', ancho: 2, placeholder: 'Opcional' }
     ],
     columnasTabla: [

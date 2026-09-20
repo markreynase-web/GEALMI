@@ -3,19 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GEALMI — Plantilla Adaptable</title>
-
+<title>GEALMI — Marketing</title>
 <link rel="stylesheet" href="../css/base.css">
 <link rel="stylesheet" href="../css/layout.css">
 <link rel="stylesheet" href="../css/cards.css">
 <link rel="stylesheet" href="../css/tables.css">
 <link rel="stylesheet" href="../css/forms.css">
 <link rel="stylesheet" href="../css/panel-lateral.css">
-
-<!-- Librerías de terceros: se cargan como globales (Chart, Papa, JSZip) -->
-<script src="../lib/chart.js"></script>
-<script src="../lib/papaparse.min.js"></script>
-<script src="../lib/jszip.min.js"></script>
+<link rel="stylesheet" href="../css/rrhh.css">
+<link rel="stylesheet" href="../css/marketing.css">
 <!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
      igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
      (importado por todas las páginas), no acá. -->
@@ -35,129 +31,43 @@
     <header class="topbar">
       <div class="topbar-title">
         <h1 id="topbarTitle">Marketing</h1>
-        <div class="topbar-subtitle" id="topbarSubtitle"></div>
+        <div class="topbar-subtitle" id="topbarSubtitle">CAMPAÑAS Y RESULTADOS</div>
       </div>
       <div class="topbar-search" id="topbarSearch"></div>
       <div id="sesionWidget" class="sesion-widget"></div>
     </header>
 
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <div class="vista-tabs" id="vistaTabs" style="display:none;">
-          <button type="button" class="vista-tab activo" data-vista="ejecutiva">📊 Vista Ejecutiva</button>
-          <button type="button" class="vista-tab" data-vista="operativa">🗂️ Vista Operativa</button>
-        </div>
-      </div>
-      <div class="toolbar-right">
-        <div class="date-range" id="dateRangeWrap" style="display:none;">
-          <input type="date" class="period" id="fechaDesde" title="Desde">
-          <span>→</span>
-          <input type="date" class="period" id="fechaHasta" title="Hasta">
-          <button class="btn btn-ghost" id="resetRangoBtn" title="Ver todo el periodo">Todo</button>
-        </div>
-        <button class="btn btn-ghost" id="exportPdfBtn">Exportar PDF</button>
-        <button class="btn btn-ochre" id="uploadBtn">Cargar CSV o ZIP</button>
-        <button class="btn btn-ghost" id="clearStorageBtn" style="display:none;" title="Borra los datos guardados en este navegador">Borrar datos guardados</button>
-        <input type="file" id="fileInput" accept=".csv,.zip" />
-      </div>
-    </div>
-    <div id="uploadStatus" style="font-size:12px; color:var(--muted); padding:0 32px;"></div>
-
-    <div class="print-only" id="printHeader">
-      <h1 id="printBizName"></h1>
-      <div id="printMeta"></div>
-    </div>
-
-    <section class="panel captura-panel" id="capturaSection" style="display:none; margin:0 32px 20px;">
-      <div class="captura-header">
-        <h3>Registros</h3>
-        <div class="captura-header-acciones">
-          <button type="button" class="btn btn-ochre" id="btnNuevoRegistro">+ Nuevo</button>
-          <button type="button" class="btn btn-ghost" id="btnImportarCSVDB">Importar CSV</button>
-          <input type="file" id="fileInputImportDB" accept=".csv" style="display:none;">
-        </div>
-      </div>
-      <span id="importDBStatus" class="form-status"></span>
-      <div id="tablaCaptura"></div>
-    </section>
-
     <main>
-      <div class="hero">
-        <div class="hero-figure">
-          <div class="label" id="heroLabel">Total</div>
-          <div class="value num" id="heroTotal">—</div>
-          <div class="stamp neutral" id="heroDelta">Sube un archivo para empezar</div>
-        </div>
-        <div class="hero-meta" id="heroMeta">Esperando datos…</div>
-      </div>
-
-      <div class="kpis">
-        <div class="kpi-card">
-          <div class="label" id="kpi1Label">Métrica 1</div>
-          <div class="value num" id="kpi1Value">—</div>
-          <div class="sub" id="kpi1Sub"></div>
-        </div>
-        <div class="kpi-card">
-          <div class="label">N° de registros</div>
-          <div class="value num" id="kpiCount">0</div>
-          <div class="sub" id="kpiCountSub">filas cargadas</div>
-        </div>
-        <div class="kpi-card">
-          <div class="label" id="kpi3Label">Métrica 3</div>
-          <div class="value num" id="kpi3Value" style="font-size:20px;">—</div>
-          <div class="sub" id="kpi3Sub"></div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="panel">
-          <h3 id="chartTitle">Vista principal <span class="tag" id="chartTag">—</span></h3>
-          <div class="chart-wrap" id="mainChartWrap"><canvas id="mainChart"></canvas></div>
-        </div>
-        <div class="panel">
-          <h3 id="rankTitle">Top valores</h3>
-          <div id="rankList"></div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="panel">
-          <h3 id="catTitle">Distribución</h3>
-          <div class="chart-wrap" id="catChartWrap"><canvas id="catChart"></canvas></div>
-        </div>
-        <div class="panel">
-          <h3 id="secTitle">Otra dimensión</h3>
-          <div id="secList"></div>
-        </div>
-      </div>
-
-      <div class="panel" id="secundariosSection" style="display:none; margin-bottom:20px;">
-        <h3 style="font-family:'Inter', sans-serif; font-size:15px; font-weight:700; margin:0 0 4px 0;">Otras métricas numéricas</h3>
-        <div style="font-size:12px; color:var(--muted); margin-bottom:14px;">Columnas numéricas adicionales detectadas en tu archivo, graficadas por separado.</div>
-        <div class="secundarios-grid" id="secundariosGrid"></div>
-      </div>
-
-      <div class="panel" id="otrasCategoriasSection" style="display:none; margin-bottom:20px;">
-        <h3 style="font-family:'Inter', sans-serif; font-size:15px; font-weight:700; margin:0 0 4px 0;">Otras categorías</h3>
-        <div style="font-size:12px; color:var(--muted); margin-bottom:14px;">Columnas de categoría adicionales detectadas en tu archivo, desglosadas por separado.</div>
-        <div class="secundarios-grid" id="otrasCategoriasGrid"></div>
-      </div>
-
-      <div class="debug-panel">
-        <h3 style="font-family:'Inter', sans-serif; font-size:15px; font-weight:700; margin:0 0 14px 0;">Columnas detectadas</h3>
-        <table id="debugTable"><thead><tr><th>Columna en tu archivo</th><th>Rol asignado</th><th>Datos válidos</th></tr></thead><tbody></tbody></table>
-        <div style="font-size:12px; color:var(--muted); margin-top:10px;" id="debugNote"></div>
-      </div>
+      <div id="mkContenido"><p class="rrhh-vacio">Cargando…</p></div>
     </main>
 
-    <footer>
-      Plantilla de <b>GEALMI</b> · detecta automáticamente fechas, valores numéricos y categorías en tu archivo · hecho a la medida por Mark
-    </footer>
+    <footer></footer>
   </div>
 </div>
 
-<!-- app.js es un módulo ES: importa utils/parsing/storage/filters/charts/dashboard.
-     Requiere servidor local (no funciona con doble clic / file://). -->
-<script type="module" src="../js/app.js"></script>
+<script type="module">
+import { cargarConfigEmpresa, buscarModulo } from '../js/config.js';
+import { renderSidebar } from '../components/sidebar.js';
+import { renderTopbar } from '../components/topbar.js';
+import { renderFooter } from '../components/footer.js';
+import { haySesionActiva, tienePermiso } from '../js/sesion.js';
+
+if (!haySesionActiva()) location.replace('login');
+
+(async function iniciar() {
+  const config = await cargarConfigEmpresa();
+  renderSidebar(config, 'marketing');
+  await renderTopbar(config);
+  renderFooter();
+
+  const cont = document.getElementById('mkContenido');
+  if (!buscarModulo(config, 'marketing') || !tienePermiso('marketing.ver')) {
+    cont.innerHTML = '<div class="panel" style="padding:28px;text-align:center;"><h3 style="margin:0 0 6px;">Marketing no está disponible</h3><p style="margin:0;color:var(--muted);font-size:13px;">Tu empresa no tiene el módulo habilitado o tu rol no incluye este acceso. Pídele al administrador que lo active.</p></div>';
+    return;
+  }
+  const { montar } = await import('../js/marketing/panel.js');
+  await montar(cont);
+})();
+</script>
 </body>
 </html>

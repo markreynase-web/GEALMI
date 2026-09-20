@@ -19,8 +19,10 @@ function headerAuth() {
 // cualquier llamada que use pedirJSON() o importarCSV()).
 function manejarSesionVencida() {
   cerrarSesion();
-  if (!location.pathname.endsWith('login.html')) {
-    location.replace('login.html?expirado=true');
+  // Con o sin extensión: el sitio se sirve como /pages/login (cleanUrls), pero
+  // un marcador viejo o un servidor sin URLs limpias aún llega a login.html.
+  if (!/\/login(\.html)?$/.test(location.pathname)) {
+    location.replace('login?expirado=true');
   }
 }
 

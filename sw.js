@@ -9,9 +9,13 @@
 // se sirve "cache-first para siempre" -- nunca queremos que alguien quede
 // atrapado en una versión vieja del código sin darse cuenta.
 //
-//   - Navegación (los .html):        network-first -- si hay red, SIEMPRE
+//   - Navegación (las páginas):      network-first -- si hay red, SIEMPRE
 //                                     la versión nueva; el cache es solo
 //                                     el salvavidas para cuando no hay red.
+//                                     Las páginas se sirven sin extensión
+//                                     (/pages/ventas, "cleanUrls" en
+//                                     vercel.json); /pages/ventas.html redirige
+//                                     ahí y la redirección NO se guarda.
 //   - JS/CSS/fuentes/imágenes propias: stale-while-revalidate -- responde
 //                                     al toque desde cache (rápido), pero
 //                                     SIEMPRE pide la versión fresca en
@@ -26,7 +30,17 @@
 // skipWaiting()/clients.claim(): la versión nueva del service worker toma
 // control apenas se instala, no espera a que se cierren todas las pestañas.
 
-const CACHE = 'gealmi-shell-v1';
+// v2: las páginas pasaron de /pages/x.html a /pages/x; el activate borra el
+// caché v1 con las entradas de las URLs viejas.
+const CACHE = 'gealmi-shell-v2';
+
+// Solo se guarda una respuesta buena y directa. Una redirección (la 308 de
+// /pages/login.html a /pages/login) o un 404/500 no sirven de salvavidas sin
+// red: el navegador se niega a mostrar a una navegación una respuesta que pasó
+// por una redirección, y un error guardado seguiría apareciendo offline.
+function guardar(cache, req, resp) {
+  if (resp.ok && !resp.redirected) cache.put(req, resp.clone()).catch(() => {});
+}
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -67,8 +81,7 @@ self.addEventListener('fetch', (event) => {
 async function networkFirst(req) {
   try {
     const fresca = await fetch(req);
-    const cache = await caches.open(CACHE);
-    cache.put(req, fresca.clone());
+    guardar(await caches.open(CACHE), req, fresca);
     return fresca;
   } catch {
     const cacheada = await caches.match(req);
@@ -80,7 +93,7 @@ async function staleWhileRevalidate(req) {
   const cache = await caches.open(CACHE);
   const cacheada = await cache.match(req);
   const actualizando = fetch(req)
-    .then(fresca => { cache.put(req, fresca.clone()); return fresca; })
+    .then(fresca => { guardar(cache, req, fresca); return fresca; })
     .catch(() => null);
   // Si hay algo en caché, se responde ya mismo (rápido) -- la versión
   // fresca queda guardada para la próxima vez, en segundo plano. Sin nada

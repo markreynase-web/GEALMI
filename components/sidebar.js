@@ -13,7 +13,7 @@
 
 import { modulosHabilitados, buscarModulo } from '../js/config.js';
 import { tienePermiso, tieneAlgunPermiso, haySesionActiva, obtenerSesion, cerrarSesion } from '../js/sesion.js';
-import { escapeHtml } from '../js/utils.js';
+import { escapeHtml, urlLimpia } from '../js/utils.js';
 import { ICONO_SPARK } from './gealmiAiWidget.js';
 
 // Grupo de sidebar por id de módulo (Rediseño v3). Client-side a propósito:
@@ -69,31 +69,31 @@ export function renderSidebar(config, paginaActualId) {
 
   const seccionAdmin = [];
   if (sinSesion || tieneAlgunPermiso('usuarios')) {
-    seccionAdmin.push({ id: 'usuarios', label: 'Usuarios', icon: '👤', href: 'usuarios.html' });
+    seccionAdmin.push({ id: 'usuarios', label: 'Usuarios', icon: '👤', href: 'usuarios' });
   }
   // Sub-fase F: Sucursales y Cajas, mismo criterio que Usuarios/Auditoría --
   // no dependen de un módulo contratado (empresa_modulos), son transversales
   // y se gatean solo por permiso (ver backend/src/routes/sucursales.js y
   // cajas.js, que a propósito no usan requireModulo()).
   if (sinSesion || tieneAlgunPermiso('sucursales')) {
-    seccionAdmin.push({ id: 'sucursales', label: 'Sucursales', icon: '🏢', href: 'sucursales.html' });
+    seccionAdmin.push({ id: 'sucursales', label: 'Sucursales', icon: '🏢', href: 'sucursales' });
   }
   if (sinSesion || tieneAlgunPermiso('cajas')) {
-    seccionAdmin.push({ id: 'cajas', label: 'Cajas', icon: '🧾', href: 'cajas.html' });
+    seccionAdmin.push({ id: 'cajas', label: 'Cajas', icon: '🧾', href: 'cajas' });
   }
   // API pública (Nivel 3): también transversal, gateada por permiso -- el
   // acceso real lo decide el plan de la empresa (planes.acceso_api), que el
   // backend revalida en cada request (ver backend/src/routes/apiKeys.js).
   if (sinSesion || tieneAlgunPermiso('api_keys')) {
-    seccionAdmin.push({ id: 'api-keys', label: 'API pública', icon: '🔑', href: 'api-keys.html' });
+    seccionAdmin.push({ id: 'api-keys', label: 'API pública', icon: '🔑', href: 'api-keys' });
   }
   if (sinSesion || tieneAlgunPermiso('auditoria')) {
-    seccionAdmin.push({ id: 'auditoria', label: 'Auditoría', icon: '🛡️', href: 'auditoria.html' });
+    seccionAdmin.push({ id: 'auditoria', label: 'Auditoría', icon: '🛡️', href: 'auditoria' });
   }
   // Seguridad de la PROPIA cuenta (verificación en dos pasos): para cualquier
   // persona con sesión, sin permiso de rol -- la pantalla misma explica si su
   // plan lo incluye.
-  seccionAdmin.push({ id: 'seguridad', label: 'Seguridad', icon: '🔐', href: 'seguridad.html' });
+  seccionAdmin.push({ id: 'seguridad', label: 'Seguridad', icon: '🔐', href: 'seguridad' });
 
   // Agrupa los módulos habilitados según GRUPO_POR_MODULO, preservando el
   // orden de GRUPOS_ORDEN -- un grupo sin módulos simplemente no se pinta.
@@ -107,7 +107,7 @@ export function renderSidebar(config, paginaActualId) {
     .map(g => `
       <div class="sidebar-group">
         <div class="sidebar-group-label">${g.label}</div>
-        ${modulosPorGrupo.get(g.id).map(m => itemHtml({ ...m, href: m.page }, m.id === paginaActualId)).join('')}
+        ${modulosPorGrupo.get(g.id).map(m => itemHtml({ ...m, href: urlLimpia(m.page) }, m.id === paginaActualId)).join('')}
       </div>`)
     .join('');
 
@@ -116,7 +116,7 @@ export function renderSidebar(config, paginaActualId) {
   cont.innerHTML = `
     <div class="sidebar-inner">
       <div class="sidebar-brand">
-        <a href="../index.html" title="Ir a la página principal"><img class="mark" src="../assets/logo-icon.png" alt="GEALMI"></a>
+        <a href="../" title="Ir a la página principal"><img class="mark" src="../assets/logo-icon.png" alt="GEALMI"></a>
         <div class="sidebar-brand-text">
           <input class="biz-name" id="bizName" value="${escapeHtml(config.bizName || 'Gestor de Datos Empresariales')}" />
           <div class="sidebar-subtitle" id="sidebarSubtitle"></div>
@@ -127,7 +127,7 @@ export function renderSidebar(config, paginaActualId) {
         ${!sinSesion ? `
           <div class="sidebar-group">
             <div class="sidebar-group-label">Principal</div>
-            ${itemHtml({ id: 'inicio', label: 'Inicio', icon: '🏠', href: 'inicio.html' }, paginaActualId === 'inicio')}
+            ${itemHtml({ id: 'inicio', label: 'Inicio', icon: '🏠', href: 'inicio' }, paginaActualId === 'inicio')}
           </div>` : ''}
         ${gruposHtml}
         ${seccionAdmin.length ? `
@@ -251,7 +251,7 @@ function renderSidebarFooter() {
   const sesion = obtenerSesion();
 
   if (!sesion || !sesion.usuario) {
-    cont.innerHTML = `<a class="sidebar-login-link" href="login.html">Iniciar sesión</a>`;
+    cont.innerHTML = `<a class="sidebar-login-link" href="login">Iniciar sesión</a>`;
     return;
   }
 

@@ -612,7 +612,7 @@ async function iniciar() {
     // el mensaje correcto en login.html (sub-bloque B1, Fase 3 Eje B).
     const habiaSesionGuardada = !!obtenerSesion()?.token;
     if (!haySesionActiva()) {
-      location.replace(habiaSesionGuardada ? 'login.html?expirado=true' : 'login.html');
+      location.replace(habiaSesionGuardada ? 'login?expirado=true' : 'login');
       return;
     }
   }

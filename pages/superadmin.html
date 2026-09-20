@@ -46,7 +46,7 @@
 
 <div class="sa-shell">
   <div class="sa-header">
-    <a class="sa-brand" href="../index.html" title="Ir a la página principal">
+    <a class="sa-brand" href="../" title="Ir a la página principal">
       <img src="../assets/logo-icon.png" alt="GEALMI">
       <div class="sa-brand-text">GEALMI <span class="sa-brand-tag">Super Admin</span></div>
     </a>
@@ -116,12 +116,12 @@
     }
   };
 
-  if (!haySesionActiva()) location.replace('login.html');
+  if (!haySesionActiva()) location.replace('login');
 
   const contenido = document.getElementById('contenido');
   document.getElementById('btnCerrarSesion').addEventListener('click', () => {
     cerrarSesion();
-    location.replace('login.html');
+    location.replace('login');
   });
 
   if (!esSuperAdmin()) {
@@ -588,7 +588,7 @@
           if (res) {
             respaldarSesionSuperAdmin();
             guardarSesion(res);
-            location.href = '../index.html';
+            location.href = '../';
           } else {
             statusEl.textContent = 'No se pudo entrar.';
             statusEl.style.color = 'var(--coral)';

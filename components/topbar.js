@@ -81,7 +81,7 @@ function pintarResultados(panel, grupos, termino) {
   panel.querySelectorAll('.topbar-search-item').forEach(item => {
     item.addEventListener('click', () => {
       sessionStorage.setItem('pd_busqueda_pendiente', termino);
-      location.href = `${item.dataset.modulo}.html`;
+      location.href = item.dataset.modulo;
     });
   });
   panel.classList.add('abierto');
@@ -177,7 +177,7 @@ async function renderUsuarioYNotificaciones(config) {
   const cont = document.getElementById('sesionWidget');
   if (!cont) return;
   const sesion = obtenerSesion();
-  if (!sesion?.usuario) { cont.innerHTML = `<a href="login.html" class="topbar-login-link">Iniciar sesión</a>`; return; }
+  if (!sesion?.usuario) { cont.innerHTML = `<a href="login" class="topbar-login-link">Iniciar sesión</a>`; return; }
 
   const notifs = await construirNotificaciones(config);
   const inicial = (sesion.usuario.nombre || '?').trim().charAt(0).toUpperCase();
@@ -270,7 +270,7 @@ function renderBannerImpersonacion() {
   mainArea.prepend(banner);
   document.getElementById('btnSalirImpersonacion').addEventListener('click', () => {
     const restaurada = restaurarSesionSuperAdmin();
-    location.href = restaurada ? 'superadmin.html' : 'login.html';
+    location.href = restaurada ? 'superadmin' : 'login';
   });
 }
 

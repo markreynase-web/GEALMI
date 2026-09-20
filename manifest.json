@@ -3,7 +3,7 @@
   "short_name": "GEALMI",
   "description": "Gestión empresarial en un solo lugar: ventas, inventario, clientes, finanzas y más.",
   "id": "/pages/inicio.html",
-  "start_url": "/pages/inicio.html",
+  "start_url": "/pages/inicio",
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],

@@ -18,6 +18,14 @@ export function normalizarTexto(s) {
   return String(s).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
+// URL "limpia" de una página interna: quita el ".html" final (antes de un
+// ?query o #hash, si lo hay). El sitio se sirve sin extensión ("cleanUrls" en
+// vercel.json) pero el catálogo de módulos (modulos.page) sigue guardando
+// "ventas.html", y una página nueva del super admin puede llegar con o sin él.
+export function urlLimpia(ruta) {
+  return String(ruta ?? '').replace(/\.html(?=$|[?#])/, '');
+}
+
 // Escapa cualquier texto que venga del archivo del usuario (nombres de columna,
 // valores de celdas) antes de insertarlo con innerHTML/insertAdjacentHTML.
 // Nunca insertes datos del CSV sin pasar por aquí si usas innerHTML.

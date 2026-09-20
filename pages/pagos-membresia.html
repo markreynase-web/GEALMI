@@ -70,7 +70,7 @@
   import { renderGealmiAiWidget } from '../components/gealmiAiWidget.js';
   import { escapeHtml } from '../js/utils.js';
 
-  if (!haySesionActiva()) location.replace('login.html');
+  if (!haySesionActiva()) location.replace('login');
 
   function headerAuth() {
     const token = obtenerSesion()?.token;

@@ -328,7 +328,7 @@
       <li><a href="#planes">Planes</a></li>
     </ul>
     <div class="nav-actions">
-      <a class="link-nav-login" href="pages/login.html">Iniciar sesión</a>
+      <a class="link-nav-login" href="pages/login">Iniciar sesión</a>
       <a class="btn btn-on-dark btn-sm" href="#contacto">Solicitar demostración</a>
       <button class="nav-burger" id="burgerBtn" aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menú">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 4.5H16M2 9H16M2 13.5H16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -340,7 +340,7 @@
     <a href="#origen">Nosotros</a>
     <a href="#gealmi-ai">GEALMI AI</a>
     <a href="#planes">Planes</a>
-    <a href="pages/login.html">Iniciar sesión</a>
+    <a href="pages/login">Iniciar sesión</a>
     <a href="#contacto" class="btn btn-on-dark btn-sm" style="margin-top:8px; justify-content:center;">Solicitar demostración</a>
   </nav>
 </header>
@@ -692,7 +692,7 @@
       <div class="cta-row">
         <a class="btn btn-on-dark" href="https://wa.me/51934568353" target="_blank" rel="noopener">WhatsApp</a>
         <a class="btn btn-ghost-dark" href="mailto:markreynase@gmail.com">markreynase@gmail.com</a>
-        <a class="btn btn-ghost-dark" href="pages/login.html">Ya soy cliente</a>
+        <a class="btn btn-ghost-dark" href="pages/login">Ya soy cliente</a>
       </div>
     </div>
   </section>
@@ -728,7 +728,7 @@
         <div>
           <h4>Legal</h4>
           <ul>
-            <li><a href="pages/privacidad.html">Privacidad</a></li>
+            <li><a href="pages/privacidad">Privacidad</a></li>
           </ul>
         </div>
       </div>
@@ -747,7 +747,7 @@
   // js/sesion.js), así que su "dashboard" es el panel de super
   // administrador, no pages/inicio.html.
   if (haySesionActiva()) {
-    location.replace(esSuperAdmin() ? 'pages/superadmin.html' : 'pages/inicio.html');
+    location.replace(esSuperAdmin() ? 'pages/superadmin' : 'pages/inicio');
   }
 
   document.getElementById('year').textContent = new Date().getFullYear();

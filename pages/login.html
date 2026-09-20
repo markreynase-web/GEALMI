@@ -326,7 +326,7 @@
               <span class="chk-box" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l2.7 2.7L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
               Recordarme
             </label>
-            <a href="recuperar-password.html" class="login-forgot">¿Olvidaste tu contraseña?</a>
+            <a href="recuperar-password" class="login-forgot">¿Olvidaste tu contraseña?</a>
           </div>
 
           <div class="login-error" id="loginError" role="alert" aria-live="assertive"></div>
@@ -400,7 +400,7 @@
 
   renderFooter();
 
-  if (haySesionActiva()) location.replace('../index.html');
+  if (haySesionActiva()) location.replace('../');
 
   const form = document.getElementById('formLogin');
   const errorEl = document.getElementById('loginError');
@@ -565,7 +565,7 @@
         return;
       }
       guardarSesion(cuerpo);
-      location.replace('../index.html');
+      location.replace('../');
     } catch (err) {
       campoCodigo.classList.add('has-error');
       error2FA.textContent = err.message.includes('fetch') || err.message.includes('Failed')
@@ -594,7 +594,7 @@
       if (!res.ok) throw new Error(cuerpo.error || 'No se pudo completar el inicio de sesión.');
       borrarPreAuth();
       guardarSesion(cuerpo);
-      location.replace('../index.html');
+      location.replace('../');
     } catch (err) {
       empresaErrorEl.textContent = err.message;
     }
@@ -635,7 +635,7 @@
       }
 
       guardarSesion(cuerpo);
-      location.replace('../index.html');
+      location.replace('../');
     } catch (err) {
       marcarError(campoEmail);
       marcarError(campoPassword);

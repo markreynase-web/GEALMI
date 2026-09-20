@@ -118,7 +118,7 @@ import { crearGraficoLineasComparativo } from '../js/charts.js';
 import { kpiCard, calcularDeltaMensual } from '../js/kpiCard.js';
 import { nivelRiesgoStock } from '../js/stockRisk.js';
 
-if (!haySesionActiva()) location.replace('login.html');
+if (!haySesionActiva()) location.replace('login');
 
 let config;
 let chartInstance = null;
@@ -270,13 +270,13 @@ async function seccionInventario(kpis) {
     return `<div class="rank-row"><span class="rank-name">${escapeHtml(p.nombre)}</span>${badge}<span class="rank-val">${fmtNum(Number(p.stock))} u.</span></div>`;
   };
 
-  document.querySelector('#panelStockBajo h3').innerHTML = '<span>Productos con stock bajo <span class="tag">Inventario</span></span><a href="inventario.html" class="panel-link">Ver →</a>';
+  document.querySelector('#panelStockBajo h3').innerHTML = '<span>Productos con stock bajo <span class="tag">Inventario</span></span><a href="inventario" class="panel-link">Ver →</a>';
   document.getElementById('panelStockBajo').style.display = '';
   document.getElementById('listaStockBajo').innerHTML = alertas.length
     ? alertas.slice(0, 8).map(filaAlerta).join('')
     : '<div class="rank-row">Ningún producto está en su stock mínimo o por debajo.</div>';
 
-  document.querySelector('#panelAlertasMini h3').innerHTML = 'Alertas de stock <a href="inventario.html" class="panel-link">Ver →</a>';
+  document.querySelector('#panelAlertasMini h3').innerHTML = 'Alertas de stock <a href="inventario" class="panel-link">Ver →</a>';
   document.getElementById('panelAlertasMini').style.display = '';
   document.getElementById('listaAlertasMini').innerHTML = alertas.length
     ? alertas.slice(0, 4).map(filaAlerta).join('')
@@ -305,7 +305,7 @@ async function seccionClientes(kpis) {
   kpis.push({ orden: 2, html: kpiCard({ acento: 'blue', icono: '👥', label: 'Clientes registrados', value: fmtNum(datos.clientes.length),
     sub: ordenClientes[0] ? `Top: ${escapeHtml(ordenClientes[0].nombre)}` : 'Todavía no hay clientes.' }) });
 
-  document.querySelector('#panelTopClientesMini h3').innerHTML = 'Top clientes <a href="clientes.html" class="panel-link">Ver todos →</a>';
+  document.querySelector('#panelTopClientesMini h3').innerHTML = 'Top clientes <a href="clientes" class="panel-link">Ver todos →</a>';
   document.getElementById('panelTopClientesMini').style.display = '';
   document.getElementById('listaTopClientesMini').innerHTML = ordenClientes.length
     ? ordenClientes.slice(0, 5).map((c, i) => filaRank(c.nombre, Number(c.compras_totales) || 0, i)).join('')

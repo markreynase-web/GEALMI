@@ -19,6 +19,7 @@ import { tienePermiso, haySesionActiva, obtenerSesion } from './sesion.js';
 import { ESQUEMAS } from './esquemas.js';
 import { crearRegistro } from './api.js';
 import { exportarFilasCSV, LIMITE_FILAS_EXPORT } from './exportarCSV.js';
+import { exportarResumenPDF } from './exportarPDF.js';
 import { renderVentasDashboard } from './ventasDashboard.js';
 import { renderClientesDashboard } from './clientesDashboard.js';
 import { renderFinanzasDashboard } from './finanzasDashboard.js';
@@ -219,15 +220,6 @@ async function manejarArchivo(file) {
   }
 }
 
-function textoRangoActual() {
-  const wrap = document.getElementById('dateRangeWrap');
-  if (!wrap || wrap.style.display === 'none') return 'Todo el periodo disponible';
-  const d = document.getElementById('fechaDesde').value;
-  const h = document.getElementById('fechaHasta').value;
-  if (!d || !h) return 'Todo el periodo disponible';
-  return `Periodo: ${d} al ${h}`;
-}
-
 function restaurarDatosLocalSiExisten() {
   const datos = cargarDatosLocal(NAMESPACE);
   if (!datos || !datos.filas || !datos.filas.length) return;
@@ -247,21 +239,28 @@ function wireEventos() {
     manejarArchivo(file).finally(() => { e.target.value = ''; });
   });
 
-  document.getElementById('exportPdfBtn').addEventListener('click', () => {
-    const nombreNegocio = document.getElementById('bizName').value.trim() || 'Panel de datos';
-    const generadoEl = new Date().toLocaleString('es-PE', { dateStyle: 'long', timeStyle: 'short' });
-    document.getElementById('printBizName').textContent = nombreNegocio;
-    document.getElementById('printMeta').textContent = `Resumen ejecutivo · ${textoRangoActual()} · generado el ${generadoEl}`;
-
-    const tituloOriginal = document.title;
-    const fechaArchivo = new Date().toISOString().slice(0, 10);
-    document.title = `${nombreNegocio} - resumen ejecutivo - ${fechaArchivo}`;
-    window.print();
-    document.title = tituloOriginal;
+  // PDF real (js/exportarPDF.js): se genera y se descarga el archivo, ya no se
+  // abre el diálogo de impresión. Tarda un instante la primera vez (carga jsPDF).
+  const btnPdf = document.getElementById('exportPdfBtn');
+  btnPdf.addEventListener('click', async () => {
+    const textoOriginal = btnPdf.textContent;
+    btnPdf.disabled = true;
+    btnPdf.textContent = 'Generando PDF…';
+    try {
+      const nombre = await exportarResumenPDF();
+      mostrarEstado(`PDF generado: ${nombre}`, 'ok');
+    } catch (err) {
+      console.error('Exportar PDF:', err);
+      mostrarEstado(`No se pudo generar el PDF: ${err.message}`, 'error');
+    } finally {
+      btnPdf.disabled = false;
+      btnPdf.textContent = textoOriginal;
+    }
   });
 
-  // Chart.js no siempre detecta el cambio de layout que provoca window.print();
-  // forzamos el recálculo justo antes (para el PDF) y justo después (para volver a la pantalla).
+  // Ctrl+P sigue funcionando con el CSS de impresión; Chart.js no siempre detecta
+  // el cambio de layout que provoca imprimir: se fuerza el recálculo justo antes y
+  // justo después.
   window.addEventListener('beforeprint', redimensionarTodosLosGraficos);
   window.addEventListener('afterprint', redimensionarTodosLosGraficos);
 

@@ -73,10 +73,16 @@ SELECT 'Mi proyecto de datos', 'PD'
 WHERE NOT EXISTS (SELECT 1 FROM empresas);
 
 -- Los módulos que config/company.json ya tenía "enabled": true.
+--
+-- SOLO LA PRIMERA VEZ: cuando todavía ninguna empresa tiene módulos (la tabla acaba de crearse
+-- arriba). migrate.js vuelve a correr TODOS los .sql en cada ejecución; sin este filtro, cada
+-- "npm run migrate" volvía a encender estos módulos en la empresa semilla aunque el super admin
+-- los hubiera apagado a propósito desde su panel.
 INSERT INTO empresa_modulos (empresa_id, modulo_id)
 SELECT (SELECT id FROM empresas ORDER BY id LIMIT 1), m.id
 FROM modulos m
 WHERE m.id IN ('ventas', 'inventario', 'clientes', 'finanzas', 'rrhh')
+  AND NOT EXISTS (SELECT 1 FROM empresa_modulos)
 ON CONFLICT DO NOTHING;
 
 -- Cada usuario existente queda de miembro de la empresa semilla, con el

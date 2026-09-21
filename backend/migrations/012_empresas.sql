@@ -82,15 +82,20 @@ ON CONFLICT DO NOTHING;
 -- Cada usuario existente queda de miembro de la empresa semilla, con el
 -- rol que ya tenía en usuarios.rol_id (Fase 4).
 --
--- SOLO los que todavía no pertenecen a NINGUNA empresa. migrate.js vuelve a
--- correr TODOS los .sql en cada ejecución, y sin este filtro cada
--- "npm run migrate" volvía a agregar a TODOS los usuarios -- incluidos los de
--- otras empresas (creados después) -- como miembros de la empresa semilla,
--- con su rol antiguo de usuarios.rol_id: una fuga de acceso entre empresas.
+-- SOLO LA PRIMERA VEZ: cuando todavía no existe NINGUNA membresía en toda la base (la tabla
+-- acaba de crearse arriba). migrate.js vuelve a correr TODOS los .sql en cada ejecución, así que
+-- este relleno se ejecuta para siempre y cualquier filtro más laxo mete gente de nuevo en la
+-- empresa semilla con cada "npm run migrate":
+--   * sin filtro: TODOS los usuarios, también los de otras empresas (fuga entre empresas);
+--   * con "no pertenece a ninguna empresa" (primer arreglo): las cuentas que quedan sin empresa
+--     -- alguien a quien un administrador quitó de su empresa (DELETE /api/usuarios/:id solo
+--     borra la membresía) o los usuarios de una empresa que el super admin eliminó -- recuperaban
+--     el acceso a la semilla con su rol antiguo.
+-- El super admin no necesita membresía: su login no pasa por usuario_empresa.
 INSERT INTO usuario_empresa (usuario_id, empresa_id, rol_id)
 SELECT u.id, (SELECT id FROM empresas ORDER BY id LIMIT 1), u.rol_id
 FROM usuarios u
-WHERE NOT EXISTS (SELECT 1 FROM usuario_empresa ue WHERE ue.usuario_id = u.id)
+WHERE NOT EXISTS (SELECT 1 FROM usuario_empresa)
 ON CONFLICT (usuario_id, empresa_id) DO NOTHING;
 
 -- --- Columnas empresa_id en las tablas de negocio. ---

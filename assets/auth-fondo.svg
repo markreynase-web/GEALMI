@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 900" preserveAspectRatio="xMaxYMid slice" fill="none" aria-hidden="true" focusable="false">
+<g stroke="#3CB892" stroke-width="2" stroke-linejoin="miter" stroke-linecap="square" opacity="0.2">
+  <path d="M470 -20 L720 160"/>
+  <path d="M520 -20 L720 128"/>
+  <path d="M570 -20 L720 96"/>
+  <path d="M620 -20 L720 64"/>
+  <path d="M470 -20 L560 60 L720 -60"/>
+  <path d="M600 -20 L640 16 L720 -46"/>
+</g>
+<g stroke="#3CB892" stroke-width="2" stroke-linejoin="miter" stroke-linecap="square" opacity="0.16">
+  <path d="M470 920 L720 740"/>
+  <path d="M520 920 L720 772"/>
+  <path d="M570 920 L720 804"/>
+  <path d="M620 920 L720 836"/>
+  <path d="M470 920 L560 840 L720 960"/>
+  <path d="M600 920 L640 884 L720 946"/>
+</g>
+</svg>

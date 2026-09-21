@@ -2,16 +2,36 @@
 // Maneja el token JWT en el navegador. Se guarda en localStorage (no hay
 // namespace por módulo aquí a propósito: la sesión es global, la misma
 // persona navega entre Ventas/Inventario/Clientes sin volver a loguearse).
+//
+// "Mantener sesión iniciada" (pages/login): marcada = localStorage, como
+// siempre; desmarcada = sessionStorage, que se pierde al cerrar la pestaña
+// (útil en un computador compartido). La sesión vive en UNO de los dos, nunca
+// en ambos. Quien llama a guardarSesion() sin decir nada (p. ej. la
+// impersonación del super admin) conserva el almacén de la sesión que ya hay.
 
 const CLAVE = 'pd_sesion';
 
-export function guardarSesion({ token, usuario }) {
-  localStorage.setItem(CLAVE, JSON.stringify({ token, usuario }));
+function almacenActual() {
+  try {
+    if (sessionStorage.getItem(CLAVE) !== null) return sessionStorage;
+  } catch { /* sessionStorage no disponible: se usa localStorage */ }
+  return localStorage;
+}
+
+function escribirSesion(cruda, recordar) {
+  const destino = recordar === undefined ? almacenActual() : (recordar ? localStorage : sessionStorage);
+  const otro = destino === localStorage ? sessionStorage : localStorage;
+  destino.setItem(CLAVE, cruda);
+  try { otro.removeItem(CLAVE); } catch { /* nada que limpiar */ }
+}
+
+export function guardarSesion({ token, usuario }, { recordar } = {}) {
+  escribirSesion(JSON.stringify({ token, usuario }), recordar);
 }
 
 export function obtenerSesion() {
   try {
-    const cruda = localStorage.getItem(CLAVE);
+    const cruda = sessionStorage.getItem(CLAVE) ?? localStorage.getItem(CLAVE);
     return cruda ? JSON.parse(cruda) : null;
   } catch {
     return null;
@@ -20,6 +40,7 @@ export function obtenerSesion() {
 
 export function cerrarSesion() {
   localStorage.removeItem(CLAVE);
+  try { sessionStorage.removeItem(CLAVE); } catch { /* nada que limpiar */ }
 }
 
 // Decodifica el payload de un JWT (base64url, sin validar la firma -- eso
@@ -129,7 +150,7 @@ export function restaurarSesionSuperAdmin() {
   sessionStorage.removeItem(CLAVE_BACKUP_SUPER_ADMIN);
   if (!cruda) return false;
   try {
-    localStorage.setItem(CLAVE, cruda);
+    escribirSesion(cruda);
     return true;
   } catch {
     return false;

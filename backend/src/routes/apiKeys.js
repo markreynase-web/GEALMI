@@ -6,7 +6,7 @@
 
 import { Router } from 'express';
 import crypto from 'crypto';
-import bcrypt from 'bcryptjs';
+import { hashDeApiKey } from '../apiKeyHash.js';
 import { pool } from '../db.js';
 import { auth, requireEmpresa } from '../middleware/auth.js';
 import { verificarPermiso } from '../middleware/permisos.js';
@@ -67,7 +67,8 @@ router.post('/', verificarPermiso('api_keys.crear'), async (req, res) => {
     }
 
     const { keyCompleta, prefijo } = generarApiKey();
-    const hash = await bcrypt.hash(keyCompleta, 10);
+    // SHA-256, no bcrypt: la key es aleatoria de 160 bits (ver src/apiKeyHash.js).
+    const hash = hashDeApiKey(keyCompleta);
 
     const { rows } = await pool.query(
       `INSERT INTO api_keys (empresa_id, nombre, prefijo, key_hash, creado_por) VALUES ($1,$2,$3,$4,$5)

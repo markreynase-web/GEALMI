@@ -12,6 +12,11 @@
 -- sin volver a mostrar la key completa (mismo criterio que usan Stripe/GitHub
 -- con sus tokens). "key_hash" es la key COMPLETA hasheada con bcrypt, mismo
 -- mecanismo que usuarios.password_hash.
+--
+-- NOTA (paso posterior): las keys NUEVAS se guardan como "sha256:<hex>" y no con bcrypt --
+-- son aleatorias de 160 bits y bcrypt solo costaba ~60 ms de CPU por petición. Las guardadas
+-- con bcrypt siguen aceptándose y pasan a SHA-256 en su primer uso válido (sin migración):
+-- ver src/apiKeyHash.js.
 CREATE TABLE IF NOT EXISTS api_keys (
   id             SERIAL PRIMARY KEY,
   empresa_id     INTEGER NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,

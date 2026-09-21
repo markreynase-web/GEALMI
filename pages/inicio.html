@@ -111,225 +111,149 @@ import { renderSidebar } from '../components/sidebar.js';
 import { renderTopbar } from '../components/topbar.js';
 import { renderFooter } from '../components/footer.js';
 import { obtenerSesion, tienePermiso, haySesionActiva } from '../js/sesion.js';
-import { listarRegistros } from '../js/api.js';
+import { obtenerJSON } from '../js/api.js';
 import { fmtNum, escapeHtml } from '../js/utils.js';
 import { crearGraficoLineasComparativo } from '../js/charts.js';
-import { kpiCard, calcularDeltaMensual } from '../js/kpiCard.js';
+import { kpiCard, deltaPorcentaje } from '../js/kpiCard.js';
 import { nivelRiesgoStock } from '../js/stockRisk.js';
 
 if (!haySesionActiva()) location.replace('login');
 
+// Inicio ya NO baja los listados completos de cada módulo: GET /api/inicio/resumen (ver
+// backend/src/routes/inicio.js) devuelve solo los números y las pocas filas que se dibujan,
+// calculados en la base de datos. Una sección que la sesión no puede ver no viene en la respuesta.
 let config;
 let chartInstance = null;
-const datos = {}; // cache de lo que se pidió una sola vez: ventas/inventario/clientes/finanzas/usuarios
+let pedidoSerie = 0; // descarta la respuesta de un período que el usuario ya dejó atrás
 
-function esteMes(fechaStr) {
-  if (!fechaStr) return false;
-  const d = new Date(fechaStr);
-  const hoy = new Date();
-  return d.getFullYear() === hoy.getFullYear() && d.getMonth() === hoy.getMonth();
-}
-
-function diasHasta(fechaStr) {
-  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-  const f = new Date(fechaStr); f.setHours(0, 0, 0, 0);
-  return Math.round((f - hoy) / 86400000);
-}
-
-// Suma f[valorClave] agrupado por f[clave], de mayor a menor.
-function agregarPorClave(filas, clave, valorClave) {
-  const mapa = new Map();
-  filas.forEach(f => {
-    const k = f[clave] || 'Sin dato';
-    mapa.set(k, (mapa.get(k) || 0) + (Number(f[valorClave]) || 0));
-  });
-  return [...mapa.entries()].sort((a, b) => b[1] - a[1]);
-}
+const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
 function filaRank(nombre, valor, i) {
   return `<div class="rank-row"><span class="rank-num">${i + 1}</span><span class="rank-name">${escapeHtml(nombre)}</span><span class="rank-val">${fmtNum(valor)}</span></div>`;
 }
 
-const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+// ---------- Gráfico de ingresos y egresos ----------
 
-// Agrupa por día (YYYY-MM-DD) las filas ya filtradas al rango deseado.
-function agruparFinanzasPorDia(filas) {
-  const ing = new Map(), egr = new Map();
-  filas.forEach(f => {
-    const d = new Date(f.fecha);
-    const clave = d.toISOString().slice(0, 10);
-    const mapa = f.tipo === 'ingreso' ? ing : egr;
-    mapa.set(clave, (mapa.get(clave) || 0) + (Number(f.monto) || 0));
-  });
-  const claves = [...new Set([...ing.keys(), ...egr.keys()])].sort();
-  return {
-    etiquetas: claves.map(c => { const [, m, d] = c.split('-'); return `${d}/${m}`; }),
-    ingresos: claves.map(c => ing.get(c) || 0),
-    egresos: claves.map(c => egr.get(c) || 0)
-  };
+// El servidor entrega puntos { clave, ingresos, egresos } por día ('AAAA-MM-DD') o por mes
+// ('AAAA-MM'); acá se les pone etiqueta y, en "Este año", se rellenan los 12 meses.
+function seriesParaGrafico(serie) {
+  const { modo, granularidad, puntos } = serie;
+  if (modo === 'anio') {
+    const ingresos = new Array(12).fill(0), egresos = new Array(12).fill(0);
+    puntos.forEach(p => { const i = Number(p.clave.slice(5, 7)) - 1; ingresos[i] += p.ingresos; egresos[i] += p.egresos; });
+    return { etiquetas: MESES, ingresos, egresos };
+  }
+  const etiqueta = granularidad === 'dia'
+    ? (c) => { const [, m, d] = c.split('-'); return `${d}/${m}`; }
+    : (c) => { const [y, m] = c.split('-'); return `${MESES[Number(m) - 1]} ${y}`; };
+  return { etiquetas: puntos.map(p => etiqueta(p.clave)), ingresos: puntos.map(p => p.ingresos), egresos: puntos.map(p => p.egresos) };
 }
 
-// Agrupa por mes (YYYY-MM) las filas ya filtradas al rango deseado.
-function agruparFinanzasPorMesCalendario(filas) {
-  const ing = new Map(), egr = new Map();
-  filas.forEach(f => {
-    const d = new Date(f.fecha);
-    const clave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const mapa = f.tipo === 'ingreso' ? ing : egr;
-    mapa.set(clave, (mapa.get(clave) || 0) + (Number(f.monto) || 0));
-  });
-  const claves = [...new Set([...ing.keys(), ...egr.keys()])].sort();
-  return {
-    etiquetas: claves.map(c => { const [y, m] = c.split('-'); return `${MESES[Number(m) - 1]} ${y}`; }),
-    ingresos: claves.map(c => ing.get(c) || 0),
-    egresos: claves.map(c => egr.get(c) || 0)
-  };
+function mensajeEnGrafico(texto) {
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  document.getElementById('panelChart').querySelector('.chart-wrap').innerHTML = `<div class="chart-empty">${escapeHtml(texto)}</div>`;
 }
 
-function agruparFinanzasPorMes(filas, modo, desde, hasta) {
-  if (modo === '30d') {
-    const limite = new Date(); limite.setDate(limite.getDate() - 30);
-    return agruparFinanzasPorDia(filas.filter(f => new Date(f.fecha) >= limite));
-  }
-  if (modo === '6m') {
-    const limite = new Date(); limite.setMonth(limite.getMonth() - 6);
-    return agruparFinanzasPorMesCalendario(filas.filter(f => new Date(f.fecha) >= limite));
-  }
-  if (modo === 'personalizado') {
-    if (!desde || !hasta) return { etiquetas: [], ingresos: [], egresos: [] };
-    const desdeD = new Date(desde), hastaD = new Date(hasta);
-    const filtradas = filas.filter(f => { const d = new Date(f.fecha); return d >= desdeD && d <= hastaD; });
-    const diasRango = (hastaD - desdeD) / 86400000;
-    return diasRango > 45 ? agruparFinanzasPorMesCalendario(filtradas) : agruparFinanzasPorDia(filtradas);
-  }
-  const anioActual = new Date().getFullYear();
-  const ingresos = new Array(12).fill(0), egresos = new Array(12).fill(0);
-  filas.forEach(f => {
-    const d = new Date(f.fecha);
-    if (d.getFullYear() !== anioActual) return;
-    const arr = f.tipo === 'ingreso' ? ingresos : egresos;
-    arr[d.getMonth()] += Number(f.monto) || 0;
-  });
-  return { etiquetas: MESES, ingresos, egresos };
-}
-
-function dibujarChartFinanzas() {
-  const modo = document.getElementById('chartPeriodo').value;
-  const desde = document.getElementById('chartDesde').value;
-  const hasta = document.getElementById('chartHasta').value;
-  const { etiquetas, ingresos, egresos } = agruparFinanzasPorMes(datos.finanzas, modo, desde, hasta);
-  // El wrapper se busca por su propio id (fijo en el HTML), no a través del
-  // <canvas> -- si la llamada anterior no tenía datos, esta misma función ya
-  // reemplazó el canvas por el mensaje "sin datos", así que
-  // getElementById('chartIngresosEgresos') hubiera devuelto null y
-  // .closest(...) reventaba en la segunda vez que se abría el selector de
-  // período (ej. "Este año" sin datos -> "Últimos 30 días").
+function dibujarGrafico(serie) {
+  const { etiquetas, ingresos, egresos } = seriesParaGrafico(serie);
+  // El contenedor se busca por su propio id (fijo en el HTML), no a través del <canvas>: si una
+  // llamada anterior no tenía datos, ya reemplazó el canvas por el mensaje "sin datos".
   const wrap = document.getElementById('panelChart').querySelector('.chart-wrap');
-  wrap.innerHTML = '<canvas id="chartIngresosEgresos"></canvas>';
   if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
   if (!ingresos.some(v => v) && !egresos.some(v => v)) {
     wrap.innerHTML = '<div class="chart-empty">Todavía no hay movimientos de Finanzas para graficar en este período.</div>';
     return;
   }
+  wrap.innerHTML = '<canvas id="chartIngresosEgresos"></canvas>';
   const estilos = getComputedStyle(document.documentElement);
   const colorA = estilos.getPropertyValue('--teal').trim();
   const colorB = estilos.getPropertyValue('--blue').trim();
   const ctx = document.getElementById('chartIngresosEgresos').getContext('2d');
   chartInstance = crearGraficoLineasComparativo(ctx, {
-    etiquetas, serieA: ingresos, serieB: egresos,
-    labelA: 'Ingresos', labelB: 'Egresos', colorA, colorB
+    etiquetas, serieA: ingresos, serieB: egresos, labelA: 'Ingresos', labelB: 'Egresos', colorA, colorB
   });
 }
 
-async function seccionVentas(kpis) {
-  datos.ventas = (await listarRegistros(config.apiBaseUrl, 'ventas')) || [];
-  const filasMes = datos.ventas.filter(f => esteMes(f.fecha));
-  const totalMes = filasMes.reduce((s, f) => s + (Number(f.monto) || 0), 0);
-  const totalHistorico = datos.ventas.reduce((s, f) => s + (Number(f.monto) || 0), 0);
-  kpis.push({ orden: 1, html: kpiCard({ acento: 'teal', icono: '💰', label: 'Ventas este mes', value: fmtNum(totalMes),
-    sub: `${filasMes.length} venta(s) · histórico ${fmtNum(totalHistorico)}`,
-    delta: calcularDeltaMensual(datos.ventas, 'fecha', 'monto') }) });
+// Al cambiar el período se pide SOLO esa serie (unos pocos puntos), no los movimientos.
+async function cambiarPeriodoDelGrafico() {
+  const modo = document.getElementById('chartPeriodo').value;
+  const desde = document.getElementById('chartDesde').value;
+  const hasta = document.getElementById('chartHasta').value;
+  if (modo === 'personalizado') {
+    if (!desde || !hasta) { mensajeEnGrafico('Elige la fecha de inicio y la de fin para ver el gráfico.'); return; }
+    if (hasta < desde) { mensajeEnGrafico('La fecha "hasta" no puede ser anterior a "desde".'); return; }
+  }
+  const consulta = new URLSearchParams({ modo });
+  if (modo === 'personalizado') { consulta.set('desde', desde); consulta.set('hasta', hasta); }
+  const mio = ++pedidoSerie;
+  const serie = await obtenerJSON(config.apiBaseUrl, `/inicio/finanzas-serie?${consulta}`);
+  if (mio !== pedidoSerie) return;
+  if (!serie) { mensajeEnGrafico('No se pudo cargar el gráfico. Intenta de nuevo.'); return; }
+  dibujarGrafico(serie);
+}
 
-  const top = agregarPorClave(datos.ventas, 'producto', 'monto').slice(0, 5);
+// ---------- Secciones ----------
+
+function seccionVentas(v, kpis) {
+  kpis.push({ orden: 1, html: kpiCard({ acento: 'teal', icono: '💰', label: 'Ventas este mes', value: fmtNum(v.total_mes),
+    sub: `${v.cantidad_mes} venta(s) · histórico ${fmtNum(v.total_historico)}`,
+    delta: deltaPorcentaje(v.total_mes, v.total_mes_anterior) }) });
+
   document.getElementById('panelTopProductos').style.display = '';
-  document.getElementById('listaTopProductos').innerHTML = top.length
-    ? top.map((r, i) => filaRank(r[0], r[1], i)).join('')
+  document.getElementById('listaTopProductos').innerHTML = v.top_productos.length
+    ? v.top_productos.map((p, i) => filaRank(p.nombre, p.monto, i)).join('')
     : '<div class="rank-row">Todavía no hay ventas registradas.</div>';
 }
 
-async function seccionInventario(kpis) {
-  datos.inventario = (await listarRegistros(config.apiBaseUrl, 'inventario')) || [];
-  const alertas = datos.inventario.filter(p => Number(p.stock) <= Number(p.stock_minimo));
-  kpis.push({ orden: 3, html: kpiCard({ acento: 'orange', icono: '📦', label: 'Productos en inventario', value: fmtNum(datos.inventario.length),
-    sub: alertas.length ? `<span style="color:var(--coral);">${alertas.length} con stock bajo</span>` : 'Todo el stock por encima del mínimo' }) });
+function seccionInventario(inv, kpis) {
+  kpis.push({ orden: 3, html: kpiCard({ acento: 'orange', icono: '📦', label: 'Productos en inventario', value: fmtNum(inv.total),
+    sub: inv.alertas_total ? `<span style="color:var(--coral);">${inv.alertas_total} con stock bajo</span>` : 'Todo el stock por encima del mínimo' }) });
 
   const filaAlerta = p => {
     const riesgo = nivelRiesgoStock(p.stock, p.stock_minimo);
     const badge = riesgo ? `<span class="stock-risk-badge stock-risk-${riesgo.nivel}">${riesgo.icono} ${riesgo.etiqueta}</span>` : '';
-    return `<div class="rank-row"><span class="rank-name">${escapeHtml(p.nombre)}</span>${badge}<span class="rank-val">${fmtNum(Number(p.stock))} u.</span></div>`;
+    return `<div class="rank-row"><span class="rank-name">${escapeHtml(p.nombre)}</span>${badge}<span class="rank-val">${fmtNum(p.stock)} u.</span></div>`;
   };
 
   document.querySelector('#panelStockBajo h3').innerHTML = '<span>Productos con stock bajo <span class="tag">Inventario</span></span><a href="inventario" class="panel-link">Ver →</a>';
   document.getElementById('panelStockBajo').style.display = '';
-  document.getElementById('listaStockBajo').innerHTML = alertas.length
-    ? alertas.slice(0, 8).map(filaAlerta).join('')
+  document.getElementById('listaStockBajo').innerHTML = inv.alertas.length
+    ? inv.alertas.slice(0, 8).map(filaAlerta).join('')
     : '<div class="rank-row">Ningún producto está en su stock mínimo o por debajo.</div>';
 
   document.querySelector('#panelAlertasMini h3').innerHTML = 'Alertas de stock <a href="inventario" class="panel-link">Ver →</a>';
   document.getElementById('panelAlertasMini').style.display = '';
-  document.getElementById('listaAlertasMini').innerHTML = alertas.length
-    ? alertas.slice(0, 4).map(filaAlerta).join('')
+  document.getElementById('listaAlertasMini').innerHTML = inv.alertas.length
+    ? inv.alertas.slice(0, 4).map(filaAlerta).join('')
     : '<div class="rank-row">Sin alertas de stock.</div>';
 
-  // Ventana de -30 a +30 días: sin el límite inferior, un producto vencido
-  // hace años se quedaría mostrándose acá para siempre (el filtro solo
-  // pedía "<=30", sin piso). Con esto se ven los que vencen pronto y los
-  // que vencieron hace poco (todavía accionable), no todo el historial.
-  const vencen = datos.inventario
-    .filter(p => p.fecha_vencimiento && diasHasta(p.fecha_vencimiento) <= 30 && diasHasta(p.fecha_vencimiento) >= -30)
-    .sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+  // Ventana de -30 a +30 días (la arma el servidor): lo que vence pronto y lo que venció hace poco.
   document.getElementById('panelVencimientos').style.display = '';
-  document.getElementById('listaVencimientos').innerHTML = vencen.length
-    ? vencen.slice(0, 8).map(p => {
-        const dias = diasHasta(p.fecha_vencimiento);
-        const urgente = dias <= 7;
-        return `<div class="rank-row"><span class="rank-name">${escapeHtml(p.nombre)}</span><span class="rank-val" style="${urgente ? 'color:var(--coral);' : ''}">${escapeHtml(String(p.fecha_vencimiento).slice(0, 10))}${dias < 0 ? ' (vencido)' : ` (${dias} día${dias === 1 ? '' : 's'})`}</span></div>`;
+  document.getElementById('listaVencimientos').innerHTML = inv.vencimientos.length
+    ? inv.vencimientos.map(p => {
+        const urgente = p.dias <= 7;
+        return `<div class="rank-row"><span class="rank-name">${escapeHtml(p.nombre)}</span><span class="rank-val" style="${urgente ? 'color:var(--coral);' : ''}">${escapeHtml(p.fecha_vencimiento)}${p.dias < 0 ? ' (vencido)' : ` (${p.dias} día${p.dias === 1 ? '' : 's'})`}</span></div>`;
       }).join('')
     : '<div class="rank-row">Ningún producto vence en los próximos 30 días.</div>';
 }
 
-async function seccionClientes(kpis) {
-  datos.clientes = (await listarRegistros(config.apiBaseUrl, 'clientes')) || [];
-  const ordenClientes = [...datos.clientes].sort((a, b) => (Number(b.compras_totales) || 0) - (Number(a.compras_totales) || 0));
-  kpis.push({ orden: 2, html: kpiCard({ acento: 'blue', icono: '👥', label: 'Clientes registrados', value: fmtNum(datos.clientes.length),
-    sub: ordenClientes[0] ? `Top: ${escapeHtml(ordenClientes[0].nombre)}` : 'Todavía no hay clientes.' }) });
+function seccionClientes(c, kpis) {
+  kpis.push({ orden: 2, html: kpiCard({ acento: 'blue', icono: '👥', label: 'Clientes registrados', value: fmtNum(c.total),
+    sub: c.top[0] ? `Top: ${escapeHtml(c.top[0].nombre)}` : 'Todavía no hay clientes.' }) });
 
   document.querySelector('#panelTopClientesMini h3').innerHTML = 'Top clientes <a href="clientes" class="panel-link">Ver todos →</a>';
   document.getElementById('panelTopClientesMini').style.display = '';
-  document.getElementById('listaTopClientesMini').innerHTML = ordenClientes.length
-    ? ordenClientes.slice(0, 5).map((c, i) => filaRank(c.nombre, Number(c.compras_totales) || 0, i)).join('')
+  document.getElementById('listaTopClientesMini').innerHTML = c.top.length
+    ? c.top.map((x, i) => filaRank(x.nombre, x.compras_totales, i)).join('')
     : '<div class="rank-row">Todavía no hay clientes registrados.</div>';
 }
 
-async function seccionFinanzas(kpis) {
-  datos.finanzas = (await listarRegistros(config.apiBaseUrl, 'finanzas')) || [];
-  const ingresos = datos.finanzas.filter(f => f.tipo === 'ingreso').reduce((s, f) => s + (Number(f.monto) || 0), 0);
-  const egresos = datos.finanzas.filter(f => f.tipo === 'egreso').reduce((s, f) => s + (Number(f.monto) || 0), 0);
-
-  // Balance es un neto (ingresos - egresos), no una sola columna sumable --
-  // calcularDeltaMensual() no aplica directo acá, así que se calcula el
-  // neto mes actual vs. mes anterior a mano, sobre los mismos datos ya
-  // cargados. Math.abs() en el denominador porque un mes anterior en
-  // negativo (más egresos que ingresos) no debe invertir el signo del %.
-  const hoy = new Date();
-  const netoMes = (mes, anio) => datos.finanzas
-    .filter(f => { const d = new Date(f.fecha); return d.getMonth() === mes && d.getFullYear() === anio; })
-    .reduce((s, f) => s + (f.tipo === 'ingreso' ? Number(f.monto) || 0 : -(Number(f.monto) || 0)), 0);
-  const refPrevio = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-  const netoActual = netoMes(hoy.getMonth(), hoy.getFullYear());
-  const netoPrevio = netoMes(refPrevio.getMonth(), refPrevio.getFullYear());
-  const deltaBalance = netoPrevio
-    ? (() => { const pct = ((netoActual - netoPrevio) / Math.abs(netoPrevio)) * 100; return { direccion: pct >= 0 ? 'up' : 'down', texto: `${Math.abs(pct).toFixed(1)}% vs. mes anterior` }; })()
+function seccionFinanzas(f, kpis) {
+  const { ingresos, egresos } = f;
+  // Balance es un neto (ingresos - egresos), no una sola columna sumable. Math.abs() en el
+  // denominador porque un mes anterior en negativo (más egresos que ingresos) no debe invertir el signo del %.
+  const deltaBalance = f.neto_mes_anterior
+    ? (() => { const pct = ((f.neto_mes - f.neto_mes_anterior) / Math.abs(f.neto_mes_anterior)) * 100; return { direccion: pct >= 0 ? 'up' : 'down', texto: `${Math.abs(pct).toFixed(1)}% vs. mes anterior` }; })()
     : null;
 
   kpis.push({ orden: 5, html: kpiCard({ acento: 'green', icono: '💵', label: 'Balance (ingresos − egresos)', value: fmtNum(ingresos - egresos),
@@ -338,11 +262,11 @@ async function seccionFinanzas(kpis) {
   document.getElementById('panelChart').style.display = '';
   document.getElementById('chartPeriodo').addEventListener('change', (e) => {
     document.getElementById('chartPeriodoCustom').style.display = e.target.value === 'personalizado' ? '' : 'none';
-    dibujarChartFinanzas();
+    cambiarPeriodoDelGrafico();
   });
-  document.getElementById('chartDesde').addEventListener('change', dibujarChartFinanzas);
-  document.getElementById('chartHasta').addEventListener('change', dibujarChartFinanzas);
-  dibujarChartFinanzas();
+  document.getElementById('chartDesde').addEventListener('change', cambiarPeriodoDelGrafico);
+  document.getElementById('chartHasta').addEventListener('change', cambiarPeriodoDelGrafico);
+  dibujarGrafico(f.serie); // "Este año" ya vino en el resumen
 
   const maxVal = Math.max(ingresos, egresos, 1);
   document.getElementById('panelFinanzasResumen').style.display = '';
@@ -353,10 +277,8 @@ async function seccionFinanzas(kpis) {
       <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${(egresos / maxVal * 100).toFixed(0)}%; background:var(--blue);"></div></div></div>`;
 }
 
-async function seccionUsuarios(kpis) {
-  const filas = (await listarRegistros(config.apiBaseUrl, 'usuarios')) || [];
-  const activos = filas.filter(u => u.activo).length;
-  kpis.push({ orden: 4, html: kpiCard({ acento: 'purple', icono: '👤', label: 'Usuarios activos', value: fmtNum(activos), sub: `${filas.length} en total` }) });
+function seccionUsuarios(u, kpis) {
+  kpis.push({ orden: 4, html: kpiCard({ acento: 'purple', icono: '👤', label: 'Usuarios activos', value: fmtNum(u.activos), sub: `${u.total} en total` }) });
 }
 
 async function seccionActividad() {
@@ -390,22 +312,27 @@ function aplicarSaludo() {
   renderFooter();
   aplicarSaludo();
 
-  const kpis = [];
-  const tareas = [];
-  if (tienePermiso('ventas.ver')) tareas.push(seccionVentas(kpis));
-  if (tienePermiso('inventario.ver')) tareas.push(seccionInventario(kpis));
-  if (tienePermiso('clientes.ver')) tareas.push(seccionClientes(kpis));
-  if (tienePermiso('finanzas.ver')) tareas.push(seccionFinanzas(kpis));
-  if (tienePermiso('usuarios.ver')) tareas.push(seccionUsuarios(kpis));
-  if (tienePermiso('auditoria.ver')) tareas.push(seccionActividad());
-
-  if (!tareas.length) {
-    document.getElementById('sinPermisos').style.display = '';
+  const actividad = tienePermiso('auditoria.ver') ? seccionActividad() : null;
+  const resumen = await obtenerJSON(config.apiBaseUrl, '/inicio/resumen');
+  if (!resumen) {
+    document.getElementById('kpisResumen').innerHTML = '<div class="rank-row">No se pudo cargar el resumen. Revisa tu conexión y recarga la página.</div>';
+    await actividad;
     return;
   }
 
-  await Promise.all(tareas);
+  const kpis = [];
+  if (resumen.ventas) seccionVentas(resumen.ventas, kpis);
+  if (resumen.inventario) seccionInventario(resumen.inventario, kpis);
+  if (resumen.clientes) seccionClientes(resumen.clientes, kpis);
+  if (resumen.finanzas) seccionFinanzas(resumen.finanzas, kpis);
+  if (resumen.usuarios) seccionUsuarios(resumen.usuarios, kpis);
+
+  if (!kpis.length && !actividad) {
+    document.getElementById('sinPermisos').style.display = '';
+    return;
+  }
   document.getElementById('kpisResumen').innerHTML = kpis.sort((a, b) => a.orden - b.orden).map(k => k.html).join('');
+  await actividad;
 })();
 </script>
 </body>

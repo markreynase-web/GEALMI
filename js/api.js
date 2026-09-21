@@ -61,6 +61,12 @@ async function pedirJSON(baseUrl, path, opciones = {}) {
   }
 }
 
+// Un GET cualquiera a la API con la sesión del usuario: si vence, limpia la sesión y manda a
+// login (igual que el resto de este archivo). Devuelve null si algo falla.
+export function obtenerJSON(baseUrl, path) {
+  return pedirJSON(baseUrl, path);
+}
+
 export async function backendDisponible(baseUrl) {
   const r = await pedirJSON(baseUrl, '/salud');
   return !!r;

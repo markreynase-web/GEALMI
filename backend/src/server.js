@@ -36,6 +36,8 @@ import segurosVisionRouter from './routes/segurosVision.js';
 import comprasRouter from './routes/compras.js';
 import rrhhRouter from './routes/rrhh.js';
 import marketingRouter from './routes/marketing.js';
+import inicioRouter from './routes/inicio.js';
+import { responderSaludDb } from './salud.js';
 import produccionRouter from './routes/produccion.js';
 import superadminRouter from './routes/superadmin.js';
 import gealmiAiRouter from './routes/gealmiAi.js';
@@ -168,6 +170,9 @@ app.use(express.json());
 // Endpoint de salud: el frontend lo usa para saber si el backend está disponible
 // antes de intentar leer/escribir datos (si no responde, cae a modo local).
 app.get('/api/salud', (req, res) => res.json({ ok: true }));
+// Igual, pero además consulta la base de datos (ver src/salud.js): es la que se le da a
+// un monitor externo para mantener despierto el servicio y enterarse si algo falla.
+app.get('/api/salud/db', responderSaludDb);
 
 if (!process.env.JWT_SECRET) {
   console.error(
@@ -218,6 +223,7 @@ app.use('/api/seguros_vision', segurosVisionRouter);
 app.use('/api/compras', comprasRouter);
 app.use('/api/rrhh', rrhhRouter);
 app.use('/api/marketing', marketingRouter);
+app.use('/api/inicio', inicioRouter);
 app.use('/api/produccion', produccionRouter);
 app.use('/api/superadmin', superadminRouter);
 app.use('/api/gealmi-ai', gealmiAiRouter);

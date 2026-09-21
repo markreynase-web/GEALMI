@@ -3,398 +3,498 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GEALMI — Un núcleo. Cualquier industria. Decide mejor.</title>
+<title>GEALMI — Todo tu negocio en un solo lugar</title>
 <meta name="description" content="GEALMI es una plataforma SaaS modular de gestión empresarial e inteligencia operativa: un núcleo compartido (ventas, inventario, clientes, finanzas) más módulos especializados por industria.">
-<link rel="icon" href="assets/logo-icon.png">
+<link rel="icon" type="image/svg+xml" href="assets/brand/gealmi-icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
 <style>
-  /* Mismo diseño que la vista previa aprobada: sistema navy/cyan derivado
-     del logo, tal cual. No se reutilizan las variables de css/base.css a
-     propósito -- esta landing es autocontenida, igual que la vista previa. */
+  /* Identidad de GEALMI (tablero de marca): azul oscuro, verde principal, verde claro, gris y blanco.
+     Esta landing sigue siendo autocontenida a propósito: no reutiliza css/base.css, que pertenece
+     a la interfaz de la app y se rediseña por separado. */
   :root{
-    --ink:        #0E1B45;
-    --brand:      #16295C;
-    --brand-2:    #1C6F96;
-    --teal:       #0FA69C;
-    --cyan:       #2EE2CE;
-    --mist:       #E3FBF6;
-    --paper:      #FFFFFF;
+    --navy:       #0F172A;   /* Azul oscuro: solidez, confianza */
+    --green:      #3CB892;   /* Verde principal: crecimiento */
+    --green-soft: #A7D7C4;   /* Verde claro */
+    --gray:       #6B7280;   /* Gris */
+    --white:      #F8FAFC;   /* Blanco */
 
-    --warn:       #C98A3C;
-    --danger:     #C4544B;
+    /* Derivados, calculados para cumplir contraste WCAG AA:
+       - el verde de marca solo alcanza 2.4:1 sobre blanco, así que el texto verde sobre fondo claro usa --green-ink (5.8:1);
+       - los botones verdes llevan texto azul oscuro (7.2:1), nunca blanco. */
+    --green-ink:   #146F56;
+    --green-hover: #4CC7A1;
+    --mist:        #EAF6F1;
+    --deep-green:  #0B3F37;
 
-    --text-1:     var(--brand);
-    --text-2:     #4E5A78;
-    --text-on-dark-1: #F3F8FC;
-    --text-on-dark-2: #A9BBDB;
+    --text:        var(--navy);
+    --text-2:      #4B5563;
+    --text-dark-1: var(--white);
+    --text-dark-2: #CBD5E1;
+    --line:        #E2E8F0;
+    --line-dark:   rgba(248,250,252,0.14);
+    --focus:       var(--green-ink);
 
-    --border-light: #E1E7F0;
-    --border-dark:  rgba(255,255,255,0.14);
-
-    --r-pill: 999px;
-    --r-lg: 22px;
-    --r-md: 14px;
-    --r-sm: 9px;
-
-    --sp-1: 8px; --sp-2: 12px; --sp-3: 16px; --sp-4: 24px; --sp-5: 32px;
-    --sp-6: 48px; --sp-7: 64px; --sp-8: 96px; --sp-9: 128px;
-
-    --font-display: 'Bricolage Grotesque', 'Inter', sans-serif;
-    --font-body: 'Inter', 'Segoe UI', sans-serif;
-    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-
+    --r-pill: 999px; --r-xl: 24px; --r-lg: 18px; --r-md: 12px;
+    --font-display: 'Poppins', 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --ease: cubic-bezier(.22,.61,.36,1);
-    --dur-fast: 180ms;
-    --dur-med: 320ms;
 
-    --shadow-card: 0 1px 2px rgba(14,27,69,0.04), 0 8px 24px -12px rgba(14,27,69,0.18);
-    --shadow-dark-card: 0 1px 0 rgba(255,255,255,0.06) inset, 0 20px 40px -20px rgba(0,0,0,0.55);
+    /* Escala de capas: nada de z-index arbitrarios. */
+    --z-nav: 40; --z-menu: 45; --z-skip: 100;
+
+    --grad-dark:
+      radial-gradient(60% 70% at 88% 12%, rgba(60,184,146,0.26), transparent 62%),
+      radial-gradient(45% 55% at 4% 100%, rgba(60,184,146,0.10), transparent 60%),
+      linear-gradient(135deg, var(--navy) 0%, #0C2B30 55%, var(--deep-green) 100%);
   }
 
   *,*::before,*::after{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
+  body{ margin:0; overflow-x:clip; background:var(--white); color:var(--text); font-family:var(--font-body); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  img,svg{ display:block; max-width:100%; }
+  a{ color:inherit; }
+  button{ font:inherit; }
+  h1,h2,h3,h4{ font-family:var(--font-display); margin:0; line-height:1.12; letter-spacing:-0.02em; text-wrap:balance; }
+  p{ margin:0; }
+  ul{ margin:0; padding:0; list-style:none; }
+  section[id]{ scroll-margin-top:84px; }
+
+  .container{ width:100%; max-width:1200px; margin-inline:auto; padding-inline:24px; }
+  @media (min-width:860px){ .container{ padding-inline:40px; } }
+
+  :focus-visible{ outline:3px solid var(--focus); outline-offset:3px; border-radius:6px; }
+  .on-dark{ --focus:var(--green); }
+  .skip-link{ position:absolute; left:12px; top:-64px; z-index:var(--z-skip); background:var(--green); color:var(--navy); padding:12px 18px; border-radius:var(--r-md); font-weight:600; text-decoration:none; transition:top .18s var(--ease); }
+  .skip-link:focus{ top:12px; }
+
   @media (prefers-reduced-motion: reduce){
     html{ scroll-behavior:auto; }
     *,*::before,*::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
   }
 
-  html,body{ max-width:100%; overflow-x:hidden; }
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--text-1);
-    font-family:var(--font-body);
-    font-size:16px;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
+  /* ---------- Iconos: un solo set, misma retícula y mismo trazo ---------- */
+  .ico{ width:20px; height:20px; flex:none; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+  .logo-mark{ display:block; width:34px; height:30px; color:var(--navy); }
 
-  img,svg{ display:block; max-width:100%; }
-  a{ color:inherit; }
-  button{ font:inherit; }
-
-  h1,h2,h3,h4{
-    font-family:var(--font-display);
-    color:inherit;
-    margin:0;
-    line-height:1.08;
-    text-wrap:balance;
-    letter-spacing:-0.01em;
-  }
-  p{ margin:0; }
-
-  .container{
-    width:100%;
-    max-width:1180px;
-    margin-inline:auto;
-    padding-inline:var(--sp-4);
-  }
-  @media (min-width:860px){ .container{ padding-inline:var(--sp-6); } }
-
-  .eyebrow{
-    font-family:var(--font-mono);
-    font-weight:500;
-    font-size:12.5px;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-  }
-
-  :focus-visible{ outline:2.5px solid var(--cyan); outline-offset:3px; border-radius:4px; }
-  .skip-link{
-    position:absolute; left:12px; top:-60px; z-index:200; background:var(--cyan); color:var(--ink);
-    padding:10px 16px; border-radius:var(--r-sm); font-weight:600; text-decoration:none; transition:top var(--dur-fast) var(--ease);
-  }
-  .skip-link:focus{ top:12px; }
-
-  /* ---------- Buttons ---------- */
-  .btn{
-    display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    height:48px; padding-inline:24px;
-    border-radius:var(--r-pill);
-    font-family:var(--font-body); font-weight:600; font-size:15px;
-    border:1.5px solid transparent;
-    cursor:pointer;
-    text-decoration:none;
-    transition:transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
-    white-space:nowrap;
-  }
+  /* ---------- Botones ---------- */
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:48px; padding:0 26px; border-radius:var(--r-pill); border:1.5px solid transparent; font-family:var(--font-body); font-weight:600; font-size:15px; line-height:1; text-decoration:none; white-space:nowrap; cursor:pointer; touch-action:manipulation;
+    transition:transform .18s var(--ease), background-color .18s var(--ease), border-color .18s var(--ease), box-shadow .18s var(--ease), color .18s var(--ease); }
   .btn:active{ transform:translateY(1px); }
-  .btn-primary{ background:var(--brand); color:var(--text-on-dark-1); }
-  .btn-primary:hover{ background:#1B3272; box-shadow:0 0 0 5px rgba(46,226,206,0.16); }
-  .btn-on-dark{ background:var(--cyan); color:var(--ink); }
-  .btn-on-dark:hover{ background:#5CEDDC; box-shadow:0 0 0 5px rgba(46,226,206,0.22); }
-  .btn-ghost-dark{ background:transparent; border-color:var(--border-dark); color:var(--text-on-dark-1); }
-  .btn-ghost-dark:hover{ border-color:var(--cyan); color:var(--cyan); }
-  .btn-ghost-light{ background:transparent; border-color:var(--border-light); color:var(--text-1); }
-  .btn-ghost-light:hover{ border-color:var(--brand-2); background:var(--mist); }
-  .btn-sm{ height:40px; padding-inline:18px; font-size:14px; }
+  .btn .ico{ width:18px; height:18px; }
+  .btn-primary{ background:var(--green); color:var(--navy); }
+  .btn-primary:hover{ background:var(--green-hover); box-shadow:0 0 0 5px rgba(60,184,146,0.22); }
+  .btn-ghost-dark{ background:transparent; border-color:rgba(248,250,252,0.30); color:var(--text-dark-1); }
+  .btn-ghost-dark:hover{ border-color:var(--green); color:var(--green); }
+  .btn-outline{ background:#fff; border-color:#CBD5E1; color:var(--navy); }
+  .btn-outline:hover{ border-color:var(--green); background:var(--mist); }
+  .btn-sm{ min-height:44px; padding:0 20px; font-size:14px; }
   .btn-block{ width:100%; }
-  .link-nav-login{ font-size:14.5px; font-weight:600; color:var(--text-on-dark-2); text-decoration:none; }
-  .link-nav-login:hover{ color:var(--text-on-dark-1); }
 
-  /* ---------- Nav ---------- */
-  .nav{ position:sticky; top:0; z-index:100; background:rgba(14,27,69,0.0); border-bottom:1px solid transparent; transition:background var(--dur-med) var(--ease), border-color var(--dur-med) var(--ease), backdrop-filter var(--dur-med) var(--ease); }
-  .nav.is-scrolled{ background:rgba(14,27,69,0.86); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); border-bottom-color:var(--border-dark); }
-  .nav-row{ display:flex; align-items:center; justify-content:space-between; height:76px; gap:var(--sp-4); }
-  .brand-mark{ display:flex; align-items:center; gap:10px; text-decoration:none; }
-  .brand-mark img{ width:34px; height:34px; border-radius:9px; }
-  .brand-mark .logotype{ font-family:var(--font-display); font-weight:700; font-size:19px; color:var(--text-on-dark-1); letter-spacing:-0.01em; }
-  .nav-links{ display:none; align-items:center; gap:var(--sp-5); list-style:none; margin:0; padding:0; }
-  .nav-links a{ text-decoration:none; font-size:14.5px; font-weight:500; color:var(--text-on-dark-2); transition:color var(--dur-fast) var(--ease); }
-  .nav-links a:hover{ color:var(--text-on-dark-1); }
-  .nav-actions{ display:flex; align-items:center; gap:var(--sp-4); }
-  .nav-burger{ display:inline-flex; width:40px; height:40px; align-items:center; justify-content:center; background:transparent; border:1px solid var(--border-dark); border-radius:var(--r-sm); color:var(--text-on-dark-1); cursor:pointer; }
-  @media (min-width:860px){ .nav-links{ display:flex; } .nav-burger{ display:none; } }
-  @media (max-width:520px){ .link-nav-login{ display:none; } }
-  @media (max-width:640px){ .nav-actions .btn-sm{ display:none; } }
-  .mobile-menu{ display:none; flex-direction:column; gap:var(--sp-1); padding:var(--sp-3) 0 var(--sp-4); border-top:1px solid var(--border-dark); }
+  /* ---------- Cabecera ---------- */
+  .nav{ position:sticky; top:0; z-index:var(--z-nav); background:rgba(248,250,252,0.88); backdrop-filter:blur(14px) saturate(150%); -webkit-backdrop-filter:blur(14px) saturate(150%); border-bottom:1px solid transparent; transition:border-color .2s var(--ease), box-shadow .2s var(--ease); }
+  .nav.is-scrolled{ border-bottom-color:var(--line); box-shadow:0 10px 28px -18px rgba(15,23,42,0.35); }
+  .nav-row{ display:flex; align-items:center; justify-content:space-between; gap:24px; height:72px; }
+  .brand{ display:flex; align-items:center; gap:10px; min-height:44px; text-decoration:none; color:var(--navy); }
+  .wordmark{ font-family:var(--font-display); font-weight:700; font-size:19px; letter-spacing:0.12em; }
+  .nav-links{ display:none; align-items:center; gap:32px; }
+  .nav-links a{ position:relative; display:inline-flex; align-items:center; min-height:44px; padding:0 2px; text-decoration:none; font-size:14.5px; font-weight:500; color:#334155; transition:color .18s var(--ease); }
+  .nav-links a::after{ content:''; position:absolute; left:0; right:0; bottom:6px; height:2px; border-radius:2px; background:var(--green); transform:scaleX(0); transform-origin:left; transition:transform .22s var(--ease); }
+  .nav-links a:hover{ color:var(--navy); }
+  .nav-links a:hover::after{ transform:scaleX(1); }
+  .nav-actions{ display:flex; align-items:center; gap:20px; }
+  .nav-login{ padding:12px 4px; font-size:14.5px; font-weight:600; color:var(--navy); text-decoration:none; }
+  .nav-login:hover{ color:var(--green-ink); }
+  .nav-burger{ display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; background:#fff; border:1px solid var(--line); border-radius:var(--r-md); color:var(--navy); cursor:pointer; }
+  .mobile-menu{ display:none; flex-direction:column; padding:8px 0 20px; border-top:1px solid var(--line); }
   .mobile-menu.is-open{ display:flex; }
-  .mobile-menu a{ text-decoration:none; color:var(--text-on-dark-1); font-size:15px; font-weight:500; padding:10px 4px; }
-  @media (min-width:860px){ .mobile-menu{ display:none !important; } }
+  .mobile-menu a:not(.btn){ display:flex; align-items:center; min-height:48px; padding:0 4px; text-decoration:none; font-size:16px; font-weight:500; color:var(--navy); border-bottom:1px solid var(--line); }
+  .mobile-menu .btn{ margin-top:16px; }
+  @media (min-width:860px){ .nav-links{ display:flex; } .nav-burger, .mobile-menu{ display:none !important; } }
+  @media (max-width:859px){ .nav-actions .btn{ display:none; } }
+  @media (max-width:420px){ .nav-login{ display:none; } }
 
-  /* ---------- Sections ---------- */
-  section{ position:relative; }
-  .band-dark{ background:var(--ink); color:var(--text-on-dark-1); }
-  .band-light{ background:var(--paper); color:var(--text-1); }
-  .band-mist{ background:var(--mist); color:var(--text-1); }
-  .section-pad{ padding-block:var(--sp-8); }
-  @media (max-width:600px){ .section-pad{ padding-block:var(--sp-7); } }
-
-  .section-head{ max-width:640px; margin-bottom:var(--sp-6); }
-  .section-head .eyebrow{ color:var(--teal); margin-bottom:var(--sp-2); display:block; }
-  .band-light .section-head .eyebrow, .band-mist .section-head .eyebrow{ color:var(--brand-2); }
-  .section-head h2{ font-size:clamp(28px,3.6vw,40px); margin-bottom:var(--sp-3); }
-  .section-head p{ font-size:17px; color:var(--text-2); }
-  .band-dark .section-head p{ color:var(--text-on-dark-2); }
+  /* ---------- Bandas y encabezados de sección ---------- */
+  .band-dark{ background:var(--grad-dark); color:var(--text-dark-1); }
+  .band-light{ background:var(--white); }
+  .band-mist{ background:var(--mist); }
+  .section-pad{ padding-block:96px; }
+  @media (max-width:640px){ .section-pad{ padding-block:64px; } }
+  .section-head{ max-width:760px; margin-bottom:48px; }
+  .eyebrow{ display:block; margin-bottom:12px; font-family:var(--font-display); font-weight:600; font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--green-ink); }
+  .on-dark .eyebrow{ color:var(--green); }
+  .section-head h2{ font-size:clamp(28px,3.6vw,42px); font-weight:600; margin-bottom:16px; }
+  .section-head p{ font-size:17.5px; color:var(--text-2); }
+  .on-dark .section-head p{ color:var(--text-dark-2); }
 
   /* ---------- Hero ---------- */
-  .hero{ overflow:hidden; padding-top:var(--sp-8); padding-bottom:var(--sp-9); }
-  .hero-inner{ position:relative; z-index:2; max-width:760px; }
-  .hero canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:1; opacity:0.9; }
-  .hero .container{ position:relative; }
-  .hero .eyebrow{ color:var(--cyan); margin-bottom:var(--sp-4); display:inline-block; }
-  .hero h1{ font-size:clamp(46px,7.2vw,84px); font-weight:800; margin-bottom:var(--sp-3); }
-  .hero .subhead{ font-family:var(--font-display); font-weight:600; font-size:clamp(19px,2.4vw,26px); color:var(--cyan); margin-bottom:var(--sp-4); text-wrap:balance; }
-  .hero .lede{ font-size:18px; color:var(--text-on-dark-2); max-width:560px; margin-bottom:var(--sp-6); }
-  .hero .cta-row{ display:flex; flex-wrap:wrap; gap:var(--sp-3); }
+  .hero{ position:relative; overflow:hidden; padding:80px 0 96px; }
+  .hero::before{ content:''; position:absolute; inset:0; pointer-events:none;
+    background-image:linear-gradient(rgba(248,250,252,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(248,250,252,0.045) 1px, transparent 1px);
+    background-size:56px 56px; -webkit-mask-image:radial-gradient(70% 80% at 70% 30%, #000, transparent 75%); mask-image:radial-gradient(70% 80% at 70% 30%, #000, transparent 75%); }
+  .hero-grid{ position:relative; display:grid; gap:56px; align-items:center; }
+  @media (min-width:980px){ .hero-grid{ grid-template-columns:minmax(0,0.86fr) minmax(0,1.14fr); gap:40px; } }
+  .chip{ display:inline-flex; align-items:center; gap:8px; padding:7px 14px; margin-bottom:24px; border-radius:var(--r-pill); border:1px solid rgba(60,184,146,0.42); background:rgba(60,184,146,0.10); color:var(--green); font-size:13px; font-weight:600; letter-spacing:0.02em; }
+  .chip::before{ content:''; width:7px; height:7px; border-radius:50%; background:var(--green); }
+  .hero h1{ font-size:clamp(38px,5.3vw,66px); font-weight:700; line-height:1.05; letter-spacing:-0.03em; margin-bottom:22px; }
+  .hero h1 em{ font-style:normal; color:var(--green); }
+  .hero .lede{ max-width:520px; margin-bottom:36px; font-size:clamp(17px,1.7vw,19.5px); line-height:1.65; color:var(--text-dark-2); }
+  .cta-row{ display:flex; flex-wrap:wrap; gap:14px; }
+  .hero-points{ display:grid; gap:12px; margin-top:36px; }
+  .hero-points li{ display:flex; align-items:center; gap:12px; font-size:15px; color:var(--text-dark-2); }
+  .hero-points .ico{ width:18px; height:18px; color:var(--green); stroke-width:2.2; }
 
-  /* ---------- Cards / grids ---------- */
-  .grid{ display:grid; gap:var(--sp-4); }
-  .grid-5{ grid-template-columns:repeat(1,1fr); }
-  .grid-4{ grid-template-columns:repeat(1,1fr); }
-  .grid-3{ grid-template-columns:repeat(1,1fr); }
-  .grid-2{ grid-template-columns:repeat(1,1fr); }
-  @media (min-width:640px){ .grid-4{ grid-template-columns:repeat(2,1fr); } .grid-5{ grid-template-columns:repeat(2,1fr); } .grid-3{ grid-template-columns:repeat(2,1fr); } }
-  @media (min-width:960px){ .grid-5{ grid-template-columns:repeat(3,1fr); } .grid-4{ grid-template-columns:repeat(4,1fr); } .grid-3{ grid-template-columns:repeat(3,1fr); } .grid-2{ grid-template-columns:1.05fr 0.95fr; } }
+  /* Vista previa del panel: ilustración hecha con HTML/CSS (no es una captura ni datos reales). */
+  .hero-visual{ position:relative; }
+  .hero-visual::before{ content:''; position:absolute; inset:6% -3% -8% 8%; z-index:0; background:radial-gradient(closest-side, rgba(60,184,146,0.38), transparent 72%); filter:blur(34px); }
+  .app-window{ position:relative; z-index:1; display:grid; grid-template-columns:1fr; overflow:hidden; border-radius:22px; background:var(--white); color:var(--navy); box-shadow:0 44px 90px -32px rgba(2,6,23,0.8), 0 0 0 1px rgba(248,250,252,0.10); }
+  @media (min-width:640px){ .app-window{ grid-template-columns:184px 1fr; } }
+  /* En pantallas anchas el panel se asoma un poco por el borde derecho, como en la maqueta. */
+  @media (min-width:1100px){
+    .hero-visual{ margin-right:-56px; }
+    .app-window{ transform:perspective(1800px) rotateY(-6deg) rotateX(1.5deg); transform-origin:left center; }
+  }
+  .app-side{ display:none; flex-direction:column; gap:4px; padding:20px 14px; background:linear-gradient(180deg, var(--navy), #0C2B30); }
+  @media (min-width:640px){ .app-side{ display:flex; } }
+  .app-side .app-brand{ display:flex; align-items:center; gap:10px; margin:0 6px 18px; color:var(--white); font-family:var(--font-display); font-weight:700; font-size:13px; letter-spacing:0.12em; }
+  .app-side .logo-mark{ width:28px; height:25px; color:var(--white); }
+  .app-nav{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; font-size:12.5px; font-weight:500; color:var(--text-dark-2); }
+  .app-nav .ico{ width:16px; height:16px; }
+  .app-nav.is-active{ background:rgba(60,184,146,0.16); color:var(--white); }
+  .app-nav.is-active .ico{ color:var(--green); }
+  .app-main{ padding:22px; }
+  .app-title{ margin-bottom:14px; font-family:var(--font-display); font-weight:600; font-size:16px; letter-spacing:-0.01em; }
+  .kpis{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px; }
+  .kpi, .panel{ background:#fff; border:1px solid var(--line); border-radius:var(--r-md); padding:12px; }
+  .kpi small{ display:block; font-size:11px; color:var(--text-2); }
+  .kpi b{ display:block; margin:2px 0; font-size:clamp(14px,1.5vw,19px); font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .kpi .delta{ font-size:11px; font-weight:600; color:var(--green-ink); }
+  .panels{ display:grid; grid-template-columns:1.25fr 1fr; gap:10px; }
+  @media (max-width:520px){ .panels{ grid-template-columns:1fr; } .panel-top{ display:none; } }
+  .panel-title{ font-size:12px; font-weight:600; }
+  .bars{ display:flex; align-items:flex-end; gap:8px; height:96px; margin-top:10px; }
+  .bars span{ flex:1; height:var(--h); border-radius:5px 5px 2px 2px; background:linear-gradient(180deg, var(--green), #2C9E7C); }
+  .bars span:last-child{ background:linear-gradient(180deg, #4CC7A1, var(--green)); }
+  .bar-labels{ display:flex; gap:8px; margin-top:6px; font-size:10.5px; color:var(--gray); }
+  .bar-labels span{ flex:1; text-align:center; }
+  .top-list{ display:grid; gap:9px; margin-top:12px; font-size:12px; }
+  .top-list li{ display:flex; align-items:center; gap:8px; }
+  .top-list i{ width:8px; height:8px; border-radius:50%; background:var(--c); }
+  .top-list b{ margin-left:auto; font-variant-numeric:tabular-nums; }
 
-  .card{ background:var(--paper); border:1px solid var(--border-light); border-radius:var(--r-md); padding:var(--sp-4); box-shadow:var(--shadow-card); transition:transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
-  .card:hover{ transform:translateY(-3px); border-color:var(--brand-2); }
-  .card-icon{ width:44px; height:44px; border-radius:var(--r-sm); background:var(--mist); color:var(--brand-2); display:flex; align-items:center; justify-content:center; margin-bottom:var(--sp-3); }
-  .card h3{ font-size:17px; font-weight:700; margin-bottom:6px; }
-  .card p{ font-size:14.5px; color:var(--text-2); }
+  /* ---------- Tarjetas ---------- */
+  .grid{ display:grid; gap:20px; }
+  .grid-5, .grid-4, .plans{ grid-template-columns:1fr; }
+  @media (min-width:640px){ .grid-5, .grid-4{ grid-template-columns:repeat(2,1fr); } .grid-5 > :last-child{ grid-column:1 / -1; } }
+  /* 5 tarjetas sin hueco: tres arriba y dos más anchas abajo. */
+  @media (min-width:960px){
+    .grid-4{ grid-template-columns:repeat(4,1fr); }
+    .grid-5{ grid-template-columns:repeat(6,1fr); }
+    .grid-5 > *{ grid-column:span 2; }
+    .grid-5 > :nth-child(n+4){ grid-column:span 3; }
+  }
+  /* Planes: apilados hasta que caben tres columnas cómodas. */
+  .plans{ max-width:620px; margin-inline:auto; }
+  @media (min-width:960px){ .plans{ grid-template-columns:repeat(3,1fr); max-width:none; } }
+  .card{ padding:26px; background:#fff; border:1px solid var(--line); border-radius:var(--r-lg); transition:transform .22s var(--ease), border-color .22s var(--ease), box-shadow .22s var(--ease); }
+  @media (hover:hover){ .card:hover{ transform:translateY(-3px); border-color:var(--green-soft); box-shadow:0 20px 40px -24px rgba(15,23,42,0.3); } }
+  .card-icon{ display:grid; place-items:center; width:48px; height:48px; margin-bottom:18px; border-radius:14px; background:var(--mist); color:var(--green-ink); }
+  .card-icon .ico{ width:23px; height:23px; }
+  .band-mist .card-icon{ background:var(--white); }
+  .card h3{ margin-bottom:8px; font-size:18px; font-weight:600; letter-spacing:-0.01em; }
+  .card p{ font-size:15px; color:var(--text-2); }
 
-  /* ---------- Reveal-on-scroll ---------- */
-  .reveal{ opacity:0; transform:translateY(18px); transition:opacity 640ms var(--ease), transform 640ms var(--ease); }
-  .reveal.is-visible{ opacity:1; transform:none; }
-  @media (prefers-reduced-motion: reduce){ .reveal{ opacity:1; transform:none; transition:none; } }
+  /* ---------- Nuestro origen: GE + AL + MI = GEALMI ---------- */
+  .sr-only{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+  .equation{ display:grid; grid-template-columns:1fr; gap:16px; margin-bottom:64px; }
+  .eq-op{ display:none; place-items:center; font-family:var(--font-display); font-size:34px; font-weight:600; color:var(--green-soft); }
+  @media (min-width:720px){ .equation{ grid-template-columns:repeat(3,1fr); } .eq-result{ grid-column:1 / -1; } }
+  @media (min-width:1100px){
+    .equation{ grid-template-columns:1fr auto 1fr auto 1fr auto 1.1fr; align-items:stretch; gap:14px; }
+    .eq-op{ display:grid; }
+    .eq-result{ grid-column:auto; }
+  }
+  .eq-card{ display:flex; flex-direction:column; padding:28px; background:rgba(15,23,42,0.5); border:1px solid var(--line-dark); border-radius:var(--r-xl); transition:border-color .22s var(--ease); }
+  @media (hover:hover){ .eq-card:hover{ border-color:rgba(60,184,146,0.55); } }
+  .eq-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:26px; }
+  .eq-letters{ font-family:var(--font-display); font-weight:700; font-size:clamp(54px,5.2vw,72px); line-height:0.95; letter-spacing:-0.03em; color:var(--green); }
+  .eq-chip{ display:grid; place-items:center; flex:none; width:44px; height:44px; border-radius:13px; background:rgba(60,184,146,0.14); color:var(--green); }
+  .eq-chip .ico{ width:22px; height:22px; }
+  .eq-card h3{ font-size:20px; font-weight:600; letter-spacing:-0.01em; }
+  .eq-verb{ margin-top:auto; padding-top:22px; font-size:13px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--green-soft); }
+  /* La tarjeta resultado usa la versión "en color" del logo (tablero de marca): G blanca y barra azul oscuro sobre verde. */
+  .eq-result{ display:flex; flex-direction:column; justify-content:space-between; gap:28px; padding:28px; border-radius:var(--r-xl); background:linear-gradient(155deg, #3CB892 0%, #2C9E7C 100%); box-shadow:0 30px 60px -30px rgba(60,184,146,0.6); }
+  .eq-sum{ font-size:13px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--navy); }
+  .eq-mark{ width:88px; height:78px; color:var(--white); --green:var(--navy); }
+  .eq-word{ font-family:var(--font-display); font-weight:700; font-size:26px; letter-spacing:0.14em; color:var(--navy); }
+  .origen-copy{ display:grid; gap:28px; margin-bottom:56px; }
+  @media (min-width:900px){ .origen-copy{ grid-template-columns:1fr 1fr; gap:56px; } }
+  .origen-copy p{ max-width:60ch; font-size:17.5px; color:var(--text-dark-2); }
+  .industries{ display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+  .industries li{ padding:8px 16px; border:1px solid var(--line-dark); border-radius:var(--r-pill); background:rgba(248,250,252,0.05); font-size:14.5px; font-weight:500; color:var(--text-dark-1); }
+  .tagline{ padding-top:44px; border-top:1px solid var(--line-dark); text-align:center; font-family:var(--font-display); font-size:clamp(24px,3.2vw,36px); font-weight:600; letter-spacing:-0.02em; }
+  .tagline span{ color:var(--green); }
 
-  /* ---------- Nuestro origen ---------- */
-  .origen-narrative{ display:grid; gap:var(--sp-7); align-items:center; }
-  @media (min-width:960px){ .origen-narrative{ grid-template-columns:0.95fr 1.05fr; } }
-  .origen-narrative h2{ font-size:clamp(30px,4vw,44px); margin-bottom:var(--sp-4); }
-  .origen-narrative .lede{ font-size:17.5px; color:var(--text-on-dark-2); max-width:54ch; }
-  .origen-narrative .lede + .lede{ margin-top:var(--sp-3); }
+  /* ---------- GEALMI AI ---------- */
+  .ai-layout{ display:grid; gap:40px; }
+  @media (min-width:960px){ .ai-layout{ grid-template-columns:1fr 1fr; align-items:center; } }
+  .ai-cards{ display:grid; gap:16px; grid-template-columns:1fr; }
+  @media (min-width:640px){ .ai-cards{ grid-template-columns:repeat(2,1fr); } }
+  .chat-mock{ padding:24px; background:var(--grad-dark); color:var(--text-dark-1); border-radius:var(--r-xl); box-shadow:0 30px 60px -30px rgba(15,23,42,0.6); }
+  .chat-head{ display:flex; align-items:center; gap:10px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--line-dark); font-size:13px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-dark-2); }
+  .chat-head i{ width:9px; height:9px; border-radius:50%; background:var(--green); box-shadow:0 0 0 4px rgba(60,184,146,0.22); }
+  .bubble{ max-width:90%; padding:13px 17px; margin-bottom:14px; border-radius:18px; font-size:15px; line-height:1.6; }
+  .bubble-user{ margin-left:auto; background:#1E293B; border-bottom-right-radius:5px; }
+  .bubble-ai{ background:rgba(60,184,146,0.12); border:1px solid rgba(60,184,146,0.35); border-bottom-left-radius:5px; }
 
-  .acronimo-list{ list-style:none; padding:0; margin:0 0 var(--sp-4); display:flex; flex-direction:column; gap:5px; }
-  .acronimo-list li{ font-family:var(--font-display); font-size:19px; color:var(--text-on-dark-1); }
-  .acronimo-list strong{ color:var(--cyan); font-weight:800; }
-  .origen-tagline{ margin-top:var(--sp-4); font-family:var(--font-display); font-size:21px; font-weight:700; color:var(--text-on-dark-1); }
-
-  /* Barras agrupadas en 3 columnas (GE / AL / MI) -- refuerza el acrónimo
-     del nombre en vez de ser solo decoración abstracta. */
-  .acro-board{ display:flex; gap:28px; align-items:stretch; height:280px; padding:var(--sp-5) var(--sp-4) var(--sp-4); background:#0A153A; border:1px solid var(--border-dark); border-radius:var(--r-lg); overflow:hidden; }
-  .acro-group{ flex:1; display:flex; flex-direction:column; gap:10px; min-width:0; }
-  .acro-bars{ display:flex; gap:10px; align-items:flex-end; flex:1; min-height:0; }
-  .acro-label{ text-align:center; font-family:var(--font-mono); font-size:12px; letter-spacing:0.14em; color:var(--cyan); text-transform:uppercase; flex-shrink:0; }
-  .cord{ position:relative; flex:1; height:100%; border-radius:6px; background:linear-gradient(180deg, rgba(46,226,206,0.05), rgba(28,111,150,0.35)); }
-  .cord .knot{ position:absolute; left:50%; width:14px; height:14px; border-radius:50%; background:var(--cyan); transform:translate(-50%,-50%); box-shadow:0 0 0 4px rgba(46,226,206,0.14); animation:knot-float 4.2s ease-in-out infinite; }
-  @keyframes knot-float{ 0%,100%{ transform:translate(-50%,-50%) scale(1); } 50%{ transform:translate(-50%,-58%) scale(1.08); } }
-  @media (prefers-reduced-motion: reduce){ .cord .knot{ animation:none; } }
-
-  /* ---------- AI chat mock ---------- */
-  .ai-layout{ display:grid; gap:var(--sp-6); }
-  @media (min-width:960px){ .ai-layout{ grid-template-columns:1fr 1fr; align-items:start; } }
-  .chat-mock{ background:var(--ink); border:1px solid var(--border-dark); border-radius:var(--r-lg); padding:var(--sp-4); box-shadow:var(--shadow-dark-card); }
-  .chat-mock .chat-head{ display:flex; align-items:center; gap:10px; padding-bottom:var(--sp-3); margin-bottom:var(--sp-3); border-bottom:1px solid var(--border-dark); }
-  .chat-mock .chat-head .dot{ width:9px; height:9px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 3px rgba(15,166,156,0.25); }
-  .chat-mock .chat-head span{ font-family:var(--font-mono); font-size:12.5px; letter-spacing:0.06em; color:var(--text-on-dark-2); text-transform:uppercase; }
-  .bubble{ max-width:88%; padding:12px 16px; border-radius:16px; font-size:14.5px; line-height:1.55; margin-bottom:var(--sp-3); }
-  .bubble-user{ background:#1B3272; color:var(--text-on-dark-1); margin-left:auto; border-bottom-right-radius:4px; }
-  .bubble-ai{ background:rgba(46,226,206,0.10); border:1px solid rgba(46,226,206,0.28); color:var(--text-on-dark-1); border-bottom-left-radius:4px; }
-  .bubble-ai b{ color:var(--cyan); }
-
-  /* ---------- Dashboard preview ---------- */
-  .browser-frame{ background:var(--paper); border:1px solid var(--border-light); border-radius:var(--r-lg); box-shadow:0 30px 70px -30px rgba(14,27,69,0.35); overflow:hidden; }
-  .browser-chrome{ display:flex; align-items:center; gap:10px; padding:12px 16px; background:#F4F7FB; border-bottom:1px solid var(--border-light); }
-  .browser-chrome .dots{ display:flex; gap:6px; }
-  .browser-chrome .dots span{ width:9px; height:9px; border-radius:50%; background:#D4DCE8; }
-  .browser-chrome .url{ font-family:var(--font-mono); font-size:12px; color:var(--text-2); background:#fff; border:1px solid var(--border-light); border-radius:var(--r-pill); padding:5px 14px; }
-  .dash-body{ display:grid; grid-template-columns:64px 1fr; min-height:420px; }
-  .dash-side{ background:var(--brand); display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 0; }
-  .dash-side .side-icon{ width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--text-on-dark-2); }
-  .dash-side .side-icon.active{ background:rgba(46,226,206,0.18); color:var(--cyan); }
-  .dash-main{ padding:var(--sp-4); overflow-x:auto; }
-  .kpi-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-3); margin-bottom:var(--sp-4); }
+  /* ---------- Vista previa del producto ---------- */
+  .browser{ overflow:hidden; background:#fff; border:1px solid var(--line); border-radius:var(--r-xl); box-shadow:0 34px 70px -34px rgba(15,23,42,0.4); }
+  .browser-bar{ display:flex; align-items:center; gap:12px; padding:13px 18px; background:#F1F5F9; border-bottom:1px solid var(--line); }
+  .browser-bar .dots{ display:flex; gap:6px; }
+  .browser-bar .dots i{ width:10px; height:10px; border-radius:50%; background:#CBD5E1; }
+  .browser-bar .url{ padding:5px 16px; background:#fff; border:1px solid var(--line); border-radius:var(--r-pill); font-size:12.5px; color:var(--text-2); }
+  .dash{ display:grid; grid-template-columns:64px 1fr; }
+  .dash-side{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:20px 0; background:linear-gradient(180deg, var(--navy), #0C2B30); }
+  .dash-side .logo-mark{ width:28px; height:25px; margin-bottom:10px; color:var(--white); }
+  .dash-side span{ display:grid; place-items:center; width:38px; height:38px; border-radius:11px; color:var(--text-dark-2); }
+  .dash-side span.is-active{ background:rgba(60,184,146,0.18); color:var(--green); }
+  .dash-main{ padding:24px; overflow-x:auto; }
+  .kpi-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:20px; }
   @media (min-width:640px){ .kpi-row{ grid-template-columns:repeat(4,1fr); } }
-  .kpi-tile{ background:var(--mist); border:1px solid var(--border-light); border-radius:var(--r-md); padding:14px 16px; }
-  .kpi-tile .kpi-label{ font-size:12px; color:var(--text-2); margin-bottom:6px; }
-  .kpi-tile .kpi-value{ font-family:var(--font-mono); font-weight:600; font-size:22px; font-variant-numeric:tabular-nums; }
-  .kpi-tile .kpi-delta{ font-family:var(--font-mono); font-size:12px; margin-top:4px; display:inline-flex; align-items:center; gap:4px; }
-  .kpi-delta.up{ color:#0C8E6B; }
-  .kpi-delta.down{ color:var(--danger); }
-  .chart-wrap{ background:var(--paper); border:1px solid var(--border-light); border-radius:var(--r-md); padding:16px; margin-bottom:var(--sp-4); }
-  .chart-wrap .chart-legend{ display:flex; gap:16px; margin-bottom:10px; font-size:12px; color:var(--text-2); }
-  .chart-wrap .chart-legend .lg{ display:inline-flex; align-items:center; gap:6px; }
-  .chart-wrap .chart-legend .sw{ width:9px; height:9px; border-radius:3px; }
-  .mini-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
-  .mini-table thead th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-2); padding:8px 10px; border-bottom:1px solid var(--border-light); white-space:nowrap; }
-  .mini-table tbody td{ padding:9px 10px; border-bottom:1px solid var(--border-light); white-space:nowrap; }
-  .pill{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:4px 10px; border-radius:var(--r-pill); }
-  .pill::before{ content:''; width:6px; height:6px; border-radius:50%; }
-  .pill-ok{ background:rgba(15,166,156,0.12); color:#0C8E6B; }
-  .pill-ok::before{ background:#0C8E6B; }
-  .pill-warn{ background:rgba(201,138,60,0.14); color:#9C6A26; }
-  .pill-warn::before{ background:#9C6A26; }
-  .pill-danger{ background:rgba(196,84,75,0.12); color:var(--danger); }
-  .pill-danger::before{ background:var(--danger); }
+  .kpi-tile{ padding:14px 16px; background:var(--white); border:1px solid var(--line); border-radius:var(--r-md); }
+  .kpi-tile small{ display:block; font-size:12.5px; color:var(--text-2); }
+  .kpi-tile b{ display:block; margin:4px 0 2px; font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .kpi-tile .delta{ font-size:12.5px; font-weight:600; color:var(--green-ink); }
+  .kpi-tile .delta.is-down{ color:#B42318; }
+  .chart-box{ margin-bottom:20px; padding:16px; border:1px solid var(--line); border-radius:var(--r-md); }
+  .legend{ display:flex; flex-wrap:wrap; gap:16px; margin-bottom:10px; font-size:12.5px; color:var(--text-2); }
+  .legend span{ display:inline-flex; align-items:center; gap:7px; }
+  .legend i{ width:14px; height:3px; border-radius:2px; background:var(--c); }
+  .chart-box svg{ width:100%; height:auto; }
+  .table-wrap{ overflow-x:auto; }
+  .mini-table{ width:100%; border-collapse:collapse; font-size:14px; }
+  .mini-table th{ padding:9px 12px; text-align:left; font-size:12px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-2); border-bottom:1px solid var(--line); white-space:nowrap; }
+  .mini-table td{ padding:11px 12px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  .status{ display:inline-flex; align-items:center; gap:7px; padding:4px 11px; border-radius:var(--r-pill); font-size:12.5px; font-weight:600; }
+  .status::before{ content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .status-ok{ background:#E3F5EE; color:#0F6B52; }
+  .status-warn{ background:#FEF3C7; color:#8A5A0B; }
+  .status-bad{ background:#FEE4E2; color:#B42318; }
 
-  /* ---------- Pricing ---------- */
-  .plan{ background:var(--paper); border:1px solid var(--border-light); border-radius:var(--r-lg); padding:var(--sp-5); display:flex; flex-direction:column; gap:var(--sp-4); }
-  .plan.is-featured{ border:1.5px solid var(--brand-2); box-shadow:0 24px 48px -24px rgba(28,111,150,0.35); }
-  .plan-badge{ font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--brand-2); }
-  .plan h3{ font-size:24px; }
-  .plan .plan-desc{ font-size:14.5px; color:var(--text-2); min-height:44px; }
-  .plan-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; flex:1; }
-  .plan-list li{ display:flex; align-items:flex-start; gap:10px; font-size:14.5px; color:var(--text-1); }
-  .plan-list svg{ flex:none; margin-top:2px; color:var(--teal); }
+  /* ---------- Planes ---------- */
+  .plan{ display:flex; flex-direction:column; gap:22px; padding:34px; background:#fff; border:1px solid var(--line); border-radius:var(--r-xl); }
+  .plan.is-featured{ position:relative; border:2px solid var(--green); box-shadow:0 34px 64px -34px rgba(60,184,146,0.6); }
+  .plan-tag{ font-size:12.5px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-2); }
+  .plan-flag{ position:absolute; top:-15px; left:34px; padding:6px 14px; border-radius:var(--r-pill); background:var(--green); color:var(--navy); font-size:12.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; }
+  .plan h3{ margin-top:10px; font-size:44px; font-weight:700; letter-spacing:-0.03em; }
+  .plan h3 small{ font-family:var(--font-body); font-size:15px; font-weight:500; letter-spacing:0; color:var(--text-2); }
+  .plan h3.is-custom{ font-size:26px; letter-spacing:-0.02em; }
+  .plan-desc{ min-height:52px; font-size:15px; color:var(--text-2); }
+  .plan-list{ display:grid; flex:1; align-content:start; gap:12px; }
+  .plan-list li{ display:flex; align-items:flex-start; gap:12px; font-size:15px; }
+  .plan-list .ico{ width:18px; height:18px; margin-top:3px; color:var(--green-ink); stroke-width:2.2; }
 
-  /* ---------- CTA / Contacto ---------- */
+  /* ---------- Contacto ---------- */
   .cta-band{ text-align:center; }
-  .cta-band h2{ font-size:clamp(28px,4vw,42px); margin-bottom:var(--sp-3); max-width:680px; margin-inline:auto; }
-  .cta-band .cta-row{ display:flex; justify-content:center; gap:var(--sp-3); flex-wrap:wrap; margin-top:var(--sp-5); }
+  .cta-band h2{ max-width:700px; margin:0 auto 16px; font-size:clamp(30px,4.2vw,46px); font-weight:600; }
+  .cta-band .lede{ max-width:560px; margin-inline:auto; font-size:18px; color:var(--text-dark-2); }
+  .cta-band .cta-row{ justify-content:center; margin-top:36px; }
 
-  /* ---------- Footer ---------- */
-  footer.band-dark{ padding-block:var(--sp-7) var(--sp-5); }
-  .footer-top{ display:flex; flex-direction:column; gap:var(--sp-6); padding-bottom:var(--sp-6); border-bottom:1px solid var(--border-dark); }
+  /* ---------- Pie ---------- */
+  footer{ padding-block:72px 32px; background:var(--navy); color:var(--text-dark-1); }
+  .footer-top{ display:flex; flex-direction:column; gap:48px; padding-bottom:48px; border-bottom:1px solid var(--line-dark); }
   @media (min-width:760px){ .footer-top{ flex-direction:row; justify-content:space-between; } }
-  .footer-brand{ display:flex; align-items:center; gap:10px; }
-  .footer-brand img{ width:32px; height:32px; border-radius:8px; }
-  .footer-brand .logotype{ font-family:var(--font-display); font-weight:700; font-size:20px; color:var(--text-on-dark-1); }
-  .footer-brand-text p{ margin-top:8px; color:var(--text-on-dark-2); font-size:14px; max-width:320px; }
-  .footer-cols{ display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-5); }
-  @media (min-width:520px){ .footer-cols{ grid-template-columns:repeat(3,1fr); gap:var(--sp-7); } }
-  .footer-cols h4{ font-family:var(--font-body); font-size:12.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-on-dark-2); margin-bottom:12px; }
-  .footer-cols ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px; }
-  .footer-cols a{ text-decoration:none; color:var(--text-on-dark-1); font-size:14px; }
-  .footer-cols a:hover{ color:var(--cyan); }
-  .footer-bottom{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:var(--sp-2); padding-top:var(--sp-5); font-size:13px; color:var(--text-on-dark-2); }
+  footer .brand{ color:var(--white); }
+  footer .logo-mark{ color:var(--white); }
+  .footer-brand p{ max-width:320px; margin-top:14px; font-size:15px; color:var(--text-dark-2); }
+  .footer-cols{ display:grid; grid-template-columns:repeat(2,1fr); gap:32px; }
+  @media (min-width:520px){ .footer-cols{ grid-template-columns:repeat(3,1fr); gap:64px; } }
+  .footer-cols h3{ margin-bottom:14px; font-family:var(--font-body); font-size:12.5px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dark-2); }
+  .footer-cols ul{ display:grid; gap:4px; }
+  .footer-cols a{ display:inline-flex; align-items:center; min-height:44px; text-decoration:none; font-size:15px; color:var(--text-dark-1); }
+  .footer-cols a:hover{ color:var(--green); }
+  .footer-bottom{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; padding-top:28px; font-size:13.5px; color:var(--text-dark-2); }
+
+  /* ---------- Aparición al desplazarse (solo si hay JavaScript) ---------- */
+  .js .reveal{ opacity:0; transform:translateY(16px); transition:opacity .55s var(--ease), transform .55s var(--ease); }
+  .js .reveal.is-visible{ opacity:1; transform:none; }
+  .js .grid > .reveal:nth-child(2){ transition-delay:.05s; } .js .grid > .reveal:nth-child(3){ transition-delay:.1s; }
+  .js .grid > .reveal:nth-child(4){ transition-delay:.15s; } .js .grid > .reveal:nth-child(5){ transition-delay:.2s; }
+  @media (prefers-reduced-motion: reduce){ .js .reveal{ opacity:1; transform:none; } }
 </style>
 <!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
      igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
      (importado por todas las páginas), no acá. -->
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0E1B45">
+<meta name="theme-color" content="#0F172A">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GEALMI">
-<link rel="apple-touch-icon" href="/assets/logo-icon.png">
+<link rel="apple-touch-icon" href="/assets/brand/gealmi-apple-touch.png">
 </head>
 <body>
 
+<!-- Símbolos reutilizables: la marca (logo) y el set de iconos (retícula 24 px, trazo 1.75). -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="gi-mark" viewBox="0 0 353.9 312.1"><path fill="currentColor" d="M302.5 56.8C302.2 57.4 304.6 55.6 301.6 58.6C298.6 61.7 291.6 68.4 284.6 75.1C277.6 81.8 264.5 94.1 259.4 98.8C254.2 103.5 255.5 101.7 253.6 103.2C252.9 102.9 254 104.6 251.6 102.4C249.2 100.1 242.9 93.1 239.2 89.8C235.6 86.5 233.2 84.7 229.6 82.4C226 80 222.3 77.8 217.6 75.6C212.9 73.5 206.6 71.1 201.6 69.5C196.6 68 191.4 67 187.6 66.3C183.8 65.7 181.6 65.6 178.6 65.4C175.6 65.2 173.6 65.1 169.6 65.2C165.6 65.4 159.9 65.5 154.6 66.4C149.3 67.2 143.4 68.4 137.6 70.4C131.8 72.4 123.8 76.3 119.6 78.3C115.4 80.3 115.3 80.5 112.6 82.5C109.9 84.4 106.4 86.9 103.1 89.8C99.9 92.7 95.6 97 93 99.8C90.4 102.6 89.2 104.3 87.4 106.8C85.6 109.3 84 111.6 82.3 114.8C80.6 118 78.5 122.5 77.2 125.8C75.9 129.1 75.2 131.3 74.3 134.8C73.5 138.3 72.7 143 72.2 146.8C71.8 150.6 71.9 154.6 71.9 157.8C71.9 161 71.9 162.6 72.4 165.8C72.8 169 73.6 173.8 74.3 176.8C75 179.8 75 180.5 76.4 183.8C77.7 187.1 80.4 193.3 82.2 196.8C84 200.3 85 201.8 87.2 204.8C89.5 207.8 92.8 211.8 95.6 214.8C98.4 217.8 101.6 220.6 104.1 222.8C106.6 225 108.2 226.2 110.6 227.9C113 229.6 114.8 230.9 118.6 232.9C122.4 234.9 127.8 237.9 133.6 239.9C139.4 242 148.1 244.2 153.6 245.3C159.1 246.4 162.1 246.2 166.6 246.4C171.1 246.6 176.8 246.5 180.6 246.2C184.4 246 187.3 245.5 189.6 245.1C191.9 244.7 193.5 244.2 194.6 243.8C195.7 243.4 195.5 243.1 196 242.8C196.1 230.8 196.4 213.2 196.3 206.8C196.2 200.4 195.8 205.2 195.6 204.3C194.6 204.1 199.3 203.7 192.6 203.6C185.9 203.4 162.1 203.6 155.6 203.5C149.1 203.5 154.3 203.3 153.6 203.2C153.2 202.4 152.7 201.6 152.3 200.8C152.4 200.5 152.4 200.1 152.5 199.8C153.4 198.8 147.9 203.8 155.3 196.8C162.6 189.8 189.2 164.5 196.6 157.8C204 151.1 198.3 156.7 199.6 156.4C200.9 156 194.6 155.9 204.6 155.8C214.6 155.7 250.1 155.8 259.6 155.8C269.1 155.8 261 155.7 261.6 155.9C262.2 156 262.9 156.5 263.3 156.8C263.7 157.1 263.7 157.5 263.9 157.8C263.8 200.7 263.7 243.7 263.6 286.6C263.3 287 264.2 286.8 262.6 287.8C260.9 288.8 257.9 290.7 253.6 292.8C249.2 294.9 242.6 297.9 236.6 300.2C230.6 302.4 224.1 304.5 217.6 306.1C211.1 307.8 202.6 309.3 197.6 310.1C192.6 311 192.4 311 187.6 311.3C182.8 311.6 174.6 312 168.6 311.9C162.6 311.9 158.1 311.8 151.6 311C145.1 310.2 135.3 308.3 129.6 307.2C123.9 306 122.4 305.6 117.6 304.1C112.8 302.6 105.6 300 100.6 298C95.6 296 92.6 294.6 87.6 292C82.6 289.3 75.3 285 70.6 282.1C65.9 279.1 63.4 277.1 59.6 274.1C55.8 271 51.8 267.5 48 263.8C44.1 260.1 39.8 255.7 36.4 251.8C33 247.9 30.3 244.3 27.6 240.7C24.9 237 22.9 233.9 20.5 229.8C18.1 225.7 15.2 220.1 13.2 215.8C11.1 211.5 9.8 208.6 8.2 203.8C6.5 199 4.4 191.5 3.2 186.8C2.1 182.1 1.9 180.6 1.3 175.8C0.8 171 0.1 164.3 0.1 157.8C0.1 151.3 0.7 142.3 1.2 136.8C1.8 131.3 2.1 129.6 3.2 124.8C4.4 120 6.5 112.6 8.2 107.8C9.8 103 11.3 99.8 13.1 95.8C15 91.8 17.1 87.6 19.3 83.8C21.4 80 23.4 76.8 26.2 72.8C29 68.8 33 63.6 36.3 59.8C39.6 56 41.9 53.5 45.8 49.8C49.7 46.1 55.5 40.8 59.6 37.4C63.7 34 65.9 32.4 70.6 29.5C75.3 26.5 82.6 22.3 87.6 19.6C92.6 17 95.4 15.7 100.6 13.7C105.8 11.6 113.8 8.8 118.6 7.3C123.4 5.8 123.8 5.6 129.6 4.5C135.4 3.3 145.6 1.3 153.6 0.6C161.6 -0.2 170.6 -0.1 177.6 0.1C184.6 0.2 189.8 0.6 195.6 1.4C201.4 2.1 207.8 3.4 212.6 4.5C217.4 5.5 219.8 6 224.6 7.5C229.4 9 236.9 11.7 241.6 13.5C246.3 15.3 247.6 15.9 252.6 18.5C257.6 21.1 265.5 25.3 271.6 29.4C277.7 33.4 284.5 38.7 289.3 42.8C294.2 46.9 298.5 51.5 300.7 53.8C302.9 56.1 301.9 55.8 302.5 56.8Z"/><rect x="296" y="102.8" width="57.9" height="209.3" rx="5.7" fill="var(--green)"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 3h5"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24"><path d="M5 20v-9M12 20V5M19 20V8"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m15.6 8.4-1.9 4.6-4.6 1.9 1.9-4.6z"/></symbol>
+    <symbol id="i-package" viewBox="0 0 24 24"><path d="M12 3.2 4 7.4v9.2l8 4.2 8-4.2V7.4z"/><path d="m4 7.4 8 4.2 8-4.2M12 11.6v9.2"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.2" r="3.4"/><path d="M2.8 19.8c0-3.5 2.8-5.6 6.2-5.6s6.2 2.1 6.2 5.6"/><path d="M15.4 4.9a3.4 3.4 0 0 1 0 6.6M18.2 14.6c2 .6 3.2 2.4 3.2 5.2"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h3"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.2 19.5 6v5.6c0 4.4-3 7.6-7.5 9.2-4.5-1.6-7.5-4.8-7.5-9.2V6z"/><path d="m9 12 2.2 2.2L15.2 10"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4.5" width="14" height="16.5" rx="2.2"/><path d="M9 4.5v-1h6v1M8.5 11h7M8.5 15h4.5"/></symbol>
+    <symbol id="i-file-chart" viewBox="0 0 24 24"><path d="M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/><path d="M14 3.5V8h4.5M9 17v-3M12 17v-5M15 17v-2"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><rect x="4.5" y="3.5" width="10" height="17" rx="1.8"/><path d="M14.5 9.5h3a2 2 0 0 1 2 2v9h-5M8 8h3M8 12h3M8 16h3"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3.5 1.9 5.3 5.3 1.9-5.3 1.9L12 17.9l-1.9-5.3-5.3-1.9 5.3-1.9z"/><path d="M19 16.5v4M17 18.5h4"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="m3.5 17 5.8-5.8 4 4L20.5 8"/><path d="M15 8h5.5v5.5"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17.5" cy="19.5" r="1.4"/><path d="M2.8 3.8h2.6l2.3 10.6a1.6 1.6 0 0 0 1.6 1.2h7.4a1.6 1.6 0 0 0 1.5-1.1l1.8-6.2H6.3"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M4 5.5h16v11H9.5L5 20.2v-3.7H4z"/><path d="M8.5 9.5h7M8.5 12.5h4"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5v-5h4v5"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.6M12 18.4V21M3 12h2.6M18.4 12H21M5.6 5.6l1.9 1.9M16.5 16.5l1.9 1.9M18.4 5.6l-1.9 1.9M7.5 16.5l-1.9 1.9"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="m3.6 7.6 8.4 6 8.4-6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.6 4.3 4.2L19 7.4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  </defs>
+</svg>
+
 <a class="skip-link" href="#main">Saltar al contenido principal</a>
 
-<header class="nav band-dark" id="siteNav">
-  <div class="container nav-row">
-    <a class="brand-mark" href="#top" aria-label="GEALMI, inicio">
-      <img src="assets/logo-icon.png" alt="">
-      <span class="logotype">GEALMI</span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="#solucion">Producto</a></li>
-      <li><a href="#origen">Nosotros</a></li>
-      <li><a href="#gealmi-ai">GEALMI AI</a></li>
-      <li><a href="#planes">Planes</a></li>
-    </ul>
-    <div class="nav-actions">
-      <a class="link-nav-login" href="pages/login">Iniciar sesión</a>
-      <a class="btn btn-on-dark btn-sm" href="#contacto">Solicitar demostración</a>
-      <button class="nav-burger" id="burgerBtn" aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menú">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 4.5H16M2 9H16M2 13.5H16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      </button>
+<header class="nav" id="siteNav">
+  <div class="container">
+    <div class="nav-row">
+      <a class="brand" href="#top" aria-label="GEALMI, inicio">
+        <svg class="logo-mark" aria-hidden="true"><use href="#gi-mark"/></svg>
+        <span class="wordmark">GEALMI</span>
+      </a>
+      <nav aria-label="Principal">
+        <ul class="nav-links">
+          <li><a href="#solucion">Producto</a></li>
+          <li><a href="#origen">Nosotros</a></li>
+          <li><a href="#gealmi-ai">GEALMI AI</a></li>
+          <li><a href="#planes">Planes</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <a class="nav-login" href="pages/login">Iniciar sesión</a>
+        <a class="btn btn-primary btn-sm" href="#contacto">Solicitar demostración</a>
+        <button class="nav-burger" id="burgerBtn" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menú">
+          <svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg>
+        </button>
+      </div>
     </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Menú móvil">
+      <a href="#solucion">Producto</a>
+      <a href="#origen">Nosotros</a>
+      <a href="#gealmi-ai">GEALMI AI</a>
+      <a href="#planes">Planes</a>
+      <a href="pages/login">Iniciar sesión</a>
+      <a class="btn btn-primary" href="#contacto">Solicitar demostración</a>
+    </nav>
   </div>
-  <nav class="mobile-menu container" id="mobileMenu" aria-label="Menú móvil">
-    <a href="#solucion">Producto</a>
-    <a href="#origen">Nosotros</a>
-    <a href="#gealmi-ai">GEALMI AI</a>
-    <a href="#planes">Planes</a>
-    <a href="pages/login">Iniciar sesión</a>
-    <a href="#contacto" class="btn btn-on-dark btn-sm" style="margin-top:8px; justify-content:center;">Solicitar demostración</a>
-  </nav>
 </header>
 
-<main id="main">
+<main id="main" tabindex="-1">
 
   <!-- ================= HERO ================= -->
-  <section class="hero band-dark" id="top">
-    <canvas id="dataCanvas" aria-hidden="true"></canvas>
+  <section class="hero band-dark on-dark" id="top" aria-labelledby="hero-title">
     <div class="container">
-      <div class="hero-inner">
-        <span class="eyebrow">Plataforma de gestión empresarial</span>
-        <h1>GEALMI</h1>
-        <p class="subhead">Un núcleo. Cualquier industria. Decide mejor.</p>
-        <p class="lede">Gestiona información, procesos y recursos desde una plataforma inteligente diseñada para impulsar la evolución de tu empresa.</p>
-        <div class="cta-row">
-          <a class="btn btn-on-dark" href="#contacto">Solicitar demostración</a>
-          <a class="btn btn-ghost-dark" href="#preview">Explorar plataforma</a>
+      <div class="hero-grid">
+        <div>
+          <span class="chip">Plataforma de gestión empresarial</span>
+          <h1 id="hero-title">Todo tu negocio en <em>un solo lugar</em></h1>
+          <p class="lede">Gestiona inventario, clientes, finanzas y más, de forma simple y eficiente.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#contacto">Solicitar demostración <svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-ghost-dark" href="#preview">Explorar plataforma</a>
+          </div>
+          <ul class="hero-points">
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Una venta descuenta stock y genera el movimiento financiero sola</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Cada empresa ve solo sus propios datos</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>GEALMI AI responde con la información real de tu negocio</li>
+          </ul>
+        </div>
+
+        <div class="hero-visual" role="img" aria-label="Ilustración del panel de GEALMI: resumen de productos, clientes y ventas, con ventas recientes y productos más vendidos">
+          <div class="app-window" aria-hidden="true">
+            <div class="app-side">
+              <div class="app-brand"><svg class="logo-mark"><use href="#gi-mark"/></svg>GEALMI</div>
+              <div class="app-nav is-active"><svg class="ico"><use href="#i-home"/></svg>Inicio</div>
+              <div class="app-nav"><svg class="ico"><use href="#i-package"/></svg>Inventario</div>
+              <div class="app-nav"><svg class="ico"><use href="#i-users"/></svg>Clientes</div>
+              <div class="app-nav"><svg class="ico"><use href="#i-card"/></svg>Finanzas</div>
+              <div class="app-nav"><svg class="ico"><use href="#i-file-chart"/></svg>Reportes</div>
+              <div class="app-nav"><svg class="ico"><use href="#i-gear"/></svg>Configuración</div>
+            </div>
+            <div class="app-main">
+              <div class="app-title">Resumen</div>
+              <div class="kpis">
+                <div class="kpi"><small>Productos</small><b>1,248</b><span class="delta">▲ +12%</span></div>
+                <div class="kpi"><small>Clientes</small><b>320</b><span class="delta">▲ +8%</span></div>
+                <div class="kpi"><small>Ventas</small><b>S/ 12,450</b><span class="delta">▲ +15%</span></div>
+              </div>
+              <div class="panels">
+                <div class="panel">
+                  <div class="panel-title">Ventas recientes</div>
+                  <div class="bars"><span style="--h:36%"></span><span style="--h:50%"></span><span style="--h:44%"></span><span style="--h:68%"></span><span style="--h:60%"></span><span style="--h:88%"></span></div>
+                  <div class="bar-labels"><span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span></div>
+                </div>
+                <div class="panel panel-top">
+                  <div class="panel-title">Productos más vendidos</div>
+                  <ul class="top-list">
+                    <li><i style="--c:#3CB892"></i>Producto A<b>120</b></li>
+                    <li><i style="--c:#A7D7C4"></i>Producto B<b>98</b></li>
+                    <li><i style="--c:#6B7280"></i>Producto C<b>76</b></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ================= PROBLEMA ================= -->
-  <section class="band-light section-pad" id="problema">
+  <section class="band-light section-pad" id="problema" aria-labelledby="problema-title">
     <div class="container">
       <div class="section-head reveal">
         <span class="eyebrow">El problema</span>
-        <h2>Cada empresa que crece enreda su propia información.</h2>
+        <h2 id="problema-title">Cada empresa que crece enreda su propia información.</h2>
         <p>Los síntomas se repiten en casi todas las empresas en expansión — y casi siempre a la vez.</p>
       </div>
       <div class="grid grid-5">
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-grid"/></svg></div>
           <h3>Información dispersa</h3>
           <p>Datos de ventas, clientes e inventario viven en hojas de cálculo distintas que nunca se hablan entre sí.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M11 6.5V11L14 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg></div>
           <h3>Procesos manuales</h3>
           <p>Tareas que deberían tomar minutos consumen horas de trabajo repetitivo y propenso a errores.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M3 19V13M9 19V8M15 19V4M21 19V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-bars"/></svg></div>
           <h3>Falta de análisis</h3>
           <p>Hay datos, pero nadie tiene tiempo de convertirlos en respuestas antes de que la decisión ya se tomó.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M11 7V11.6L13.8 13.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 4L2.5 2.5M18 4L19.5 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-timer"/></svg></div>
           <h3>Pérdida de tiempo</h3>
           <p>Cada reporte se arma desde cero, cada vez, con la información de la semana pasada.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M11 2L2 7V15L11 20L20 15V7L11 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M11 11V16M11 7V7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-compass"/></svg></div>
           <h3>Decisiones sin datos</h3>
           <p>Sin visibilidad en tiempo real, las decisiones importantes se toman con intuición, no con evidencia.</p>
         </div>
@@ -403,51 +503,51 @@
   </section>
 
   <!-- ================= SOLUCIÓN ================= -->
-  <section class="band-mist section-pad" id="solucion">
+  <section class="band-mist section-pad" id="solucion" aria-labelledby="solucion-title">
     <div class="container">
       <div class="section-head reveal">
         <span class="eyebrow">La solución</span>
-        <h2>Un ecosistema, no una colección de herramientas sueltas.</h2>
+        <h2 id="solucion-title">Un ecosistema, no una colección de herramientas sueltas.</h2>
         <p>GEALMI conecta cada área de tu empresa sobre una misma base de datos, en tiempo real.</p>
       </div>
       <div class="grid grid-4">
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><rect x="2" y="3" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 8H20" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-cart"/></svg></div>
           <h3>Ventas e inventario</h3>
           <p>Una venta descuenta stock y genera el movimiento financiero solo, sin doble digitación.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6"/><path d="M2.5 19C2.5 15.4 4.9 13.6 8 13.6C11.1 13.6 13.5 15.4 13.5 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M15 8.4C16.4 8.4 17.5 7.3 17.5 5.9M13.8 13.7C16.6 14 19.5 15.5 19.5 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg></div>
           <h3>Clientes</h3>
           <p>Historial completo de cada cliente, sin cambiar de pantalla ni de sistema.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><rect x="4" y="2" width="14" height="18" rx="1.6" stroke="currentColor" stroke-width="1.6"/><path d="M7.5 7H14.5M7.5 11H14.5M7.5 15H11.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-card"/></svg></div>
           <h3>Finanzas</h3>
           <p>Ingresos y egresos conectados a cada venta y compra, sin conciliar a mano.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M3 19C3 15 6.5 13 11 13C15.5 13 19 15 19 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></div>
           <h3>Usuarios y roles</h3>
           <p>Cada persona ve solo lo que le corresponde — con un rol distinto por empresa, si administra más de una.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M11 2C6 2 2 6 2 11C2 16 6 20 11 20C16 20 20 16 20 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M11 6V11L14.5 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg></div>
           <h3>Auditoría completa</h3>
           <p>Cada creación, edición o borrado queda registrado: quién, qué y cuándo.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M3 19V12M9 19V4M15 19V9M21 19V2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-file-chart"/></svg></div>
           <h3>Reportes</h3>
           <p>Reportes que se arman solos, con los datos del día, no de la semana pasada.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><rect x="2" y="4" width="18" height="12" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 19H15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="10" r="1.1" fill="currentColor"/><circle cx="14" cy="10" r="1.1" fill="currentColor"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-building"/></svg></div>
           <h3>Multiempresa real</h3>
           <p>Cada empresa ve solo sus propios datos, aunque todas compartan la misma plataforma.</p>
         </div>
         <div class="card reveal">
-          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M11 2V5.4M11 16.6V20M20 11H16.6M5.4 11H2M17.4 4.6L15 7M7 15L4.6 17.4M17.4 17.4L15 15M7 7L4.6 4.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-sparkles"/></svg></div>
           <h3>Inteligencia artificial</h3>
           <p>GEALMI AI responde preguntas de negocio en lenguaje natural, con tus datos reales.</p>
         </div>
@@ -456,87 +556,88 @@
   </section>
 
   <!-- ================= NUESTRO ORIGEN ================= -->
-  <section class="band-dark section-pad" id="origen">
+  <section class="band-dark on-dark section-pad" id="origen" aria-labelledby="origen-title">
     <div class="container">
-      <div class="origen-narrative">
-        <div class="reveal">
-          <span class="eyebrow" style="color:var(--cyan);">Nuestro origen</span>
-          <h2 style="margin-top:12px;">¿De dónde nace GEALMI?</h2>
-          <ul class="acronimo-list">
-            <li><strong>GE</strong> de Gestión.</li>
-            <li><strong>AL</strong> de Administración y Logística.</li>
-            <li><strong>MI</strong> de Mi empresa.</li>
-          </ul>
-          <p class="lede">Tres conceptos que representan lo esencial de cualquier negocio: gestionar, organizar y tener el control.</p>
-          <p class="lede">De esta unión nace GEALMI, una plataforma diseñada para convertirse en el núcleo operativo de cada empresa, conectando su información, sus procesos y sus necesidades en un solo lugar.</p>
-          <p class="lede">Porque no importa si tienes una tienda, un restaurante, un taller, una clínica o un gimnasio. Cada negocio tiene su propia forma de trabajar. GEALMI se adapta a ella.</p>
-          <p class="origen-tagline">Un núcleo. Cualquier industria.</p>
+      <div class="section-head reveal">
+        <span class="eyebrow">Nuestro origen</span>
+        <h2 id="origen-title">¿De dónde nace GEALMI?</h2>
+        <p>Tres conceptos que representan lo esencial de cualquier negocio: gestionar, organizar y tener el control.</p>
+      </div>
+
+      <div class="equation reveal" role="group" aria-label="GE más AL más MI es igual a GEALMI">
+        <div class="eq-card">
+          <div class="eq-top"><span class="eq-letters" aria-hidden="true">GE</span><span class="eq-chip"><svg class="ico" aria-hidden="true"><use href="#i-clipboard"/></svg></span></div>
+          <h3><span class="sr-only">GE de </span>Gestión</h3>
+          <p class="eq-verb">Gestionar</p>
         </div>
-        <div class="acro-board reveal" role="img" aria-label="Representación abstracta de tres pilares de GEALMI conectados como datos -- Gestión, Administración y Logística, y Mi empresa">
-          <div class="acro-group">
-            <div class="acro-bars">
-              <div class="cord" style="height:62%;"><span class="knot" style="top:20%; animation-delay:0s;"></span><span class="knot" style="top:70%; animation-delay:.3s;"></span></div>
-              <div class="cord" style="height:85%;"><span class="knot" style="top:35%; animation-delay:.6s;"></span></div>
-              <div class="cord" style="height:48%;"><span class="knot" style="top:15%; animation-delay:.2s;"></span><span class="knot" style="top:55%; animation-delay:.9s;"></span></div>
-            </div>
-            <span class="acro-label">GE</span>
-          </div>
-          <div class="acro-group">
-            <div class="acro-bars">
-              <div class="cord" style="height:96%;"><span class="knot" style="top:22%; animation-delay:1.1s;"></span><span class="knot" style="top:66%; animation-delay:.4s;"></span></div>
-              <div class="cord" style="height:70%;"><span class="knot" style="top:44%; animation-delay:.8s;"></span></div>
-            </div>
-            <span class="acro-label">AL</span>
-          </div>
-          <div class="acro-group">
-            <div class="acro-bars">
-              <div class="cord" style="height:58%;"><span class="knot" style="top:12%; animation-delay:1.6s;"></span><span class="knot" style="top:60%; animation-delay:.5s;"></span></div>
-              <div class="cord" style="height:80%;"><span class="knot" style="top:30%; animation-delay:1.2s;"></span><span class="knot" style="top:78%; animation-delay:.1s;"></span></div>
-            </div>
-            <span class="acro-label">MI</span>
-          </div>
+        <span class="eq-op" aria-hidden="true">+</span>
+        <div class="eq-card">
+          <div class="eq-top"><span class="eq-letters" aria-hidden="true">AL</span><span class="eq-chip"><svg class="ico" aria-hidden="true"><use href="#i-package"/></svg></span></div>
+          <h3><span class="sr-only">AL de </span>Administración y Logística</h3>
+          <p class="eq-verb">Organizar</p>
+        </div>
+        <span class="eq-op" aria-hidden="true">+</span>
+        <div class="eq-card">
+          <div class="eq-top"><span class="eq-letters" aria-hidden="true">MI</span><span class="eq-chip"><svg class="ico" aria-hidden="true"><use href="#i-building"/></svg></span></div>
+          <h3><span class="sr-only">MI de </span>Mi empresa</h3>
+          <p class="eq-verb">Tener el control</p>
+        </div>
+        <span class="eq-op" aria-hidden="true">=</span>
+        <div class="eq-result">
+          <span class="eq-sum" aria-hidden="true">GE + AL + MI</span>
+          <svg class="logo-mark eq-mark" aria-hidden="true"><use href="#gi-mark"/></svg>
+          <span class="eq-word">GEALMI</span>
         </div>
       </div>
+
+      <div class="origen-copy">
+        <p class="reveal">De esta unión nace GEALMI, una plataforma diseñada para convertirse en el núcleo operativo de cada empresa, conectando su información, sus procesos y sus necesidades en un solo lugar.</p>
+        <div class="reveal">
+          <p>Porque no importa si tienes una tienda, un restaurante, un taller, una clínica o un gimnasio. Cada negocio tiene su propia forma de trabajar. GEALMI se adapta a ella.</p>
+          <ul class="industries" aria-label="Algunos tipos de negocio">
+            <li>Tienda</li><li>Restaurante</li><li>Taller</li><li>Clínica</li><li>Gimnasio</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="tagline reveal">Un núcleo. <span>Cualquier industria.</span></p>
     </div>
   </section>
 
   <!-- ================= GEALMI AI ================= -->
-  <section class="band-light section-pad" id="gealmi-ai">
+  <section class="band-light section-pad" id="gealmi-ai" aria-labelledby="ai-title">
     <div class="container">
       <div class="section-head reveal">
         <span class="eyebrow">Inteligencia artificial — ya disponible</span>
-        <h2>GEALMI AI, tu asistente de negocio.</h2>
+        <h2 id="ai-title">GEALMI AI, tu asistente de negocio.</h2>
         <p>No es un roadmap — es un asistente que ya responde con la información real de tu empresa, activable desde el panel de administración.</p>
       </div>
       <div class="ai-layout">
-        <div class="grid grid-2" style="grid-template-columns:repeat(1,1fr); gap:var(--sp-3);">
+        <div class="ai-cards">
           <div class="card reveal">
-            <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M2 15L7 9L11 12L20 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 3H20V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-trend"/></svg></div>
             <h3>Ventas y tendencia</h3>
             <p>Resumen de ventas de cualquier rango de fechas, tendencia mes a mes y detección de días con ventas atípicas.</p>
           </div>
           <div class="card reveal">
-            <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M11 2L13 8L19 9L13 10L11 16L9 10L3 9L9 8L11 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+            <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-package"/></svg></div>
             <h3>Inventario a tiempo</h3>
             <p>Alertas de stock bajo mínimo, productos de baja rotación y ritmo de venta por producto.</p>
           </div>
           <div class="card reveal">
-            <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><rect x="3" y="3" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 8H15M7 11.5H15M7 15H11.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+            <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-file-chart"/></svg></div>
             <h3>Reportes al instante</h3>
             <p>Pide un resumen de ventas, finanzas o tus mejores clientes en español simple, sin armar una hoja de cálculo.</p>
           </div>
           <div class="card reveal">
-            <div class="card-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><rect x="2" y="4" width="18" height="12" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 19H15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="10" r="1.1" fill="currentColor"/><circle cx="14" cy="10" r="1.1" fill="currentColor"/></svg></div>
+            <div class="card-icon"><svg class="ico" aria-hidden="true"><use href="#i-message"/></svg></div>
             <h3>Asistente empresarial</h3>
             <p>Disponible en toda la plataforma, activable por empresa desde el panel de administración.</p>
           </div>
         </div>
 
-        <div class="chat-mock reveal">
-          <div class="chat-head">
-            <span class="dot" aria-hidden="true"></span>
-            <span>GEALMI AI · en vivo</span>
-          </div>
+        <div class="chat-mock on-dark reveal" role="img" aria-label="Ejemplo de conversación con GEALMI AI sobre productos por agotarse">
+          <div class="chat-head"><i aria-hidden="true"></i><span>GEALMI AI · en vivo</span></div>
           <div class="bubble bubble-user">¿Qué productos están por agotarse este mes?</div>
           <div class="bubble bubble-ai">Reviso tu inventario en tiempo real y calculo el ritmo de venta de los últimos 30 días de cada producto contra su stock actual — así sé cuáles llegan primero al mínimo, no solo cuáles ya están bajos hoy.</div>
         </div>
@@ -545,66 +646,58 @@
   </section>
 
   <!-- ================= PREVIEW SOFTWARE ================= -->
-  <section class="band-mist section-pad" id="preview">
+  <section class="band-mist section-pad" id="preview" aria-labelledby="preview-title">
     <div class="container">
       <div class="section-head reveal">
         <span class="eyebrow">La plataforma</span>
-        <h2>Diseñado para verse tan claro como se siente usarlo.</h2>
+        <h2 id="preview-title">Diseñado para verse tan claro como se siente usarlo.</h2>
         <p>Un panel, todos los números que importan.</p>
       </div>
 
-      <div class="browser-frame reveal">
-        <div class="browser-chrome">
-          <div class="dots"><span></span><span></span><span></span></div>
+      <div class="browser reveal" role="img" aria-label="Ilustración del panel de GEALMI con indicadores, gráfico de ventas con tendencia y una tabla de estados">
+        <div class="browser-bar" aria-hidden="true">
+          <div class="dots"><i></i><i></i><i></i></div>
           <div class="url">app.gealmi.com/inicio</div>
         </div>
-        <div class="dash-body">
+        <div class="dash" aria-hidden="true">
           <div class="dash-side">
-            <div class="side-icon active"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="2" y="2" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="2" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="10" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="10" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/></svg></div>
-            <div class="side-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 6L9 2L16 6L9 10L2 6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
-            <div class="side-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="6.5" cy="6.5" r="2.7" stroke="currentColor" stroke-width="1.5"/><path d="M2 16C2 12.6 4 11 6.5 11C9 11 11 12.6 11 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-            <div class="side-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 15V10M7 15V6M12 15V12M16 15V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <svg class="logo-mark"><use href="#gi-mark"/></svg>
+            <span class="is-active"><svg class="ico"><use href="#i-home"/></svg></span>
+            <span><svg class="ico"><use href="#i-package"/></svg></span>
+            <span><svg class="ico"><use href="#i-users"/></svg></span>
+            <span><svg class="ico"><use href="#i-file-chart"/></svg></span>
           </div>
           <div class="dash-main">
             <div class="kpi-row">
-              <div class="kpi-tile">
-                <div class="kpi-label">Ventas del mes</div>
-                <div class="kpi-value">S/ 84,210</div>
-                <div class="kpi-delta up">▲ 12.4%</div>
-              </div>
-              <div class="kpi-tile">
-                <div class="kpi-label">Clientes activos</div>
-                <div class="kpi-value">1,248</div>
-                <div class="kpi-delta up">▲ 6.1%</div>
-              </div>
-              <div class="kpi-tile">
-                <div class="kpi-label">Stock crítico</div>
-                <div class="kpi-value">7 SKU</div>
-                <div class="kpi-delta down">▼ 2</div>
-              </div>
-              <div class="kpi-tile">
-                <div class="kpi-label">Tickets abiertos</div>
-                <div class="kpi-value">14</div>
-                <div class="kpi-delta up">▲ 3</div>
-              </div>
+              <div class="kpi-tile"><small>Ventas del mes</small><b>S/ 84,210</b><span class="delta">▲ 12.4%</span></div>
+              <div class="kpi-tile"><small>Clientes activos</small><b>1,248</b><span class="delta">▲ 6.1%</span></div>
+              <div class="kpi-tile"><small>Stock crítico</small><b>7 SKU</b><span class="delta is-down">▼ 2</span></div>
+              <div class="kpi-tile"><small>Tickets abiertos</small><b>14</b><span class="delta">▲ 3</span></div>
             </div>
 
-            <div class="chart-wrap">
-              <div class="chart-legend">
-                <span class="lg"><span class="sw" style="background:var(--brand-2);"></span>Ventas</span>
-                <span class="lg"><span class="sw" style="background:var(--cyan);"></span>Tendencia (GEALMI AI)</span>
+            <div class="chart-box">
+              <div class="legend">
+                <span><i style="--c:#0F172A"></i>Ventas</span>
+                <span><i style="--c:#17795D"></i>Tendencia (GEALMI AI)</span>
               </div>
-              <canvas id="mockChart" height="140" role="img" aria-label="Gráfico de ventas mensuales con tendencia, en ascenso"></canvas>
+              <svg viewBox="0 0 600 180" preserveAspectRatio="xMidYMid meet" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <g stroke="#E2E8F0" stroke-width="1"><path d="M20 20H580M20 55H580M20 90H580M20 125H580M20 160H580"/></g>
+                <path d="M20 106.5 70.9 98.9 121.8 102.7 172.7 90 223.6 83.6 274.5 86.2 325.5 73.5 376.4 68.4 427.3 70.9 478.2 58.2 529.1 53.1 580 42.9" stroke="#0F172A" stroke-width="2.6"/>
+                <path d="M478.2 58.2 529.1 48 580 31.5" stroke="#17795D" stroke-width="2.6" stroke-dasharray="6 5"/>
+                <circle cx="580" cy="31.5" r="4.5" fill="#17795D"/>
+              </svg>
             </div>
 
-            <table class="mini-table">
-              <thead><tr><th>Cliente</th><th>Módulo</th><th>Estado</th></tr></thead>
-              <tbody>
-                <tr><td>Autopartes del Sur SAC</td><td>Inventario</td><td><span class="pill pill-ok">Sincronizado</span></td></tr>
-                <tr><td>Taller Vargas E.I.R.L.</td><td>Postventa</td><td><span class="pill pill-warn">Stock bajo</span></td></tr>
-                <tr><td>Repuestos Andina SRL</td><td>Finanzas</td><td><span class="pill pill-danger">Pago vencido</span></td></tr>
-              </tbody>
-            </table>
+            <div class="table-wrap">
+              <table class="mini-table">
+                <thead><tr><th>Cliente</th><th>Módulo</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <tr><td>Autopartes del Sur SAC</td><td>Inventario</td><td><span class="status status-ok">Sincronizado</span></td></tr>
+                  <tr><td>Taller Vargas E.I.R.L.</td><td>Postventa</td><td><span class="status status-warn">Stock bajo</span></td></tr>
+                  <tr><td>Repuestos Andina SRL</td><td>Finanzas</td><td><span class="status status-bad">Pago vencido</span></td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -612,86 +705,87 @@
   </section>
 
   <!-- ================= PLANES ================= -->
-  <section class="band-light section-pad" id="planes">
+  <section class="band-light section-pad" id="planes" aria-labelledby="planes-title">
     <div class="container">
       <div class="section-head reveal">
         <span class="eyebrow">Planes</span>
-        <h2>Un plan para cada etapa de tu negocio.</h2>
+        <h2 id="planes-title">Un plan para cada etapa de tu negocio.</h2>
         <p>Precios de referencia — se ajustan según el tamaño de tu equipo y los módulos que necesites.</p>
       </div>
 
-      <div class="grid grid-3">
+      <div class="grid plans">
         <div class="plan reveal">
           <div>
-            <span class="plan-badge">Básico</span>
-            <h3>S/ 149<span style="font-size:14px; font-weight:500; color:var(--text-2);">/mes</span></h3>
+            <span class="plan-tag">Básico</span>
+            <h3>S/ 149<small>/mes</small></h3>
           </div>
           <p class="plan-desc">Para un solo negocio que recién ordena su operación. Hasta 3 usuarios · 1 empresa.</p>
           <ul class="plan-list">
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Núcleo: Ventas, Inventario, Clientes, Finanzas</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Roles y permisos</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Auditoría de cambios</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Reportes básicos y dashboard</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Backups automáticos diarios</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>App web y móvil</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Actualizaciones incluidas</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Soporte por correo</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Núcleo: Ventas, Inventario, Clientes, Finanzas</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Roles y permisos</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Auditoría de cambios</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Reportes básicos y dashboard</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Backups automáticos diarios</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>App web y móvil</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Actualizaciones incluidas</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Soporte por correo</li>
           </ul>
-          <a class="btn btn-ghost-light btn-block" href="#contacto">Contáctanos</a>
+          <a class="btn btn-outline btn-block" href="#contacto">Contáctanos</a>
         </div>
 
         <div class="plan is-featured reveal">
+          <span class="plan-flag">Más elegido</span>
           <div>
-            <span class="plan-badge">Más elegido — Profesional</span>
-            <h3>S/ 349<span style="font-size:14px; font-weight:500; color:var(--text-2);">/mes</span></h3>
+            <span class="plan-tag">Profesional</span>
+            <h3>S/ 349<small>/mes</small></h3>
           </div>
           <p class="plan-desc">Para negocios con varias sucursales o más de una empresa. Hasta 15 usuarios · varias empresas.</p>
           <ul class="plan-list">
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Todo lo del plan Básico</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Multiempresa (login inteligente)</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Usuarios y roles ilimitados</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Reportes avanzados y analítica</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Recordatorios automáticos (SMS/WhatsApp)</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Personalización de marca en documentos</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Exportación de datos + API</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>GEALMI AI (créditos mensuales)</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Soporte prioritario</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Todo lo del plan Básico</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Multiempresa (login inteligente)</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Usuarios y roles ilimitados</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Reportes avanzados y analítica</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Recordatorios automáticos (SMS/WhatsApp)</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Personalización de marca en documentos</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Exportación de datos + API</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>GEALMI AI (créditos mensuales)</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Soporte prioritario</li>
           </ul>
           <a class="btn btn-primary btn-block" href="#contacto">Contáctanos</a>
         </div>
 
         <div class="plan reveal">
           <div>
-            <span class="plan-badge">Empresarial</span>
-            <h3 style="font-size:22px;">Cotización a medida</h3>
+            <span class="plan-tag">Empresarial</span>
+            <h3 class="is-custom">Cotización a medida</h3>
           </div>
           <p class="plan-desc">Para operaciones grandes o con necesidades a medida. Usuarios ilimitados · soporte dedicado.</p>
           <ul class="plan-list">
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Todo lo del plan Profesional</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Módulo especializado de tu industria</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>GEALMI AI ilimitado</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Panel multi-sucursal centralizado</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Seguridad avanzada (SSO, 2FA)</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Integraciones a medida</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Migración de datos asistida</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Gerente de cuenta dedicado</li>
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>SLA garantizado</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Todo lo del plan Profesional</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Módulo especializado de tu industria</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>GEALMI AI ilimitado</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Panel multi-sucursal centralizado</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Seguridad avanzada (SSO, 2FA)</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Integraciones a medida</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Migración de datos asistida</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Gerente de cuenta dedicado</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>SLA garantizado</li>
           </ul>
-          <a class="btn btn-ghost-light btn-block" href="#contacto">Hablemos</a>
+          <a class="btn btn-outline btn-block" href="#contacto">Hablemos</a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ================= CONTACTO ================= -->
-  <section class="band-dark section-pad cta-band" id="contacto">
+  <section class="band-dark on-dark section-pad cta-band" id="contacto" aria-labelledby="contacto-title">
     <div class="container reveal">
-      <span class="eyebrow" style="color:var(--cyan);">Empieza hoy</span>
-      <h2 style="margin-top:12px;">¿Conversamos sobre tu negocio?</h2>
-      <p class="lede" style="margin-inline:auto;">Cuéntanos qué procesos quieres ordenar y armamos el plan que le queda a tu empresa.</p>
+      <span class="eyebrow">Empieza hoy</span>
+      <h2 id="contacto-title">¿Conversamos sobre tu negocio?</h2>
+      <p class="lede">Cuéntanos qué procesos quieres ordenar y armamos el plan que le queda a tu empresa.</p>
       <div class="cta-row">
-        <a class="btn btn-on-dark" href="https://wa.me/51934568353" target="_blank" rel="noopener">WhatsApp</a>
-        <a class="btn btn-ghost-dark" href="mailto:markreynase@gmail.com">markreynase@gmail.com</a>
+        <a class="btn btn-primary" href="https://wa.me/51934568353" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-message"/></svg>WhatsApp</a>
+        <a class="btn btn-ghost-dark" href="mailto:markreynase@gmail.com"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>markreynase@gmail.com</a>
         <a class="btn btn-ghost-dark" href="pages/login">Ya soy cliente</a>
       </div>
     </div>
@@ -699,19 +793,19 @@
 
 </main>
 
-<footer class="band-dark">
+<footer class="on-dark">
   <div class="container">
     <div class="footer-top">
       <div class="footer-brand">
-        <img src="assets/logo-icon.png" alt="">
-        <div class="footer-brand-text">
-          <span class="logotype">GEALMI</span>
-          <p>Organizando información. Potenciando decisiones.</p>
-        </div>
+        <a class="brand" href="#top" aria-label="GEALMI, volver al inicio">
+          <svg class="logo-mark" aria-hidden="true"><use href="#gi-mark"/></svg>
+          <span class="wordmark">GEALMI</span>
+        </a>
+        <p>Organizando información. Potenciando decisiones.</p>
       </div>
       <div class="footer-cols">
         <div>
-          <h4>Producto</h4>
+          <h3>Producto</h3>
           <ul>
             <li><a href="#solucion">Solución</a></li>
             <li><a href="#gealmi-ai">GEALMI AI</a></li>
@@ -719,14 +813,14 @@
           </ul>
         </div>
         <div>
-          <h4>Empresa</h4>
+          <h3>Empresa</h3>
           <ul>
             <li><a href="#origen">Nosotros</a></li>
             <li><a href="mailto:markreynase@gmail.com">Contacto</a></li>
           </ul>
         </div>
         <div>
-          <h4>Legal</h4>
+          <h3>Legal</h3>
           <ul>
             <li><a href="pages/privacidad">Privacidad</a></li>
           </ul>
@@ -754,176 +848,44 @@
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---- Nav scrolled state ---- */
+  /* ---- Cabecera: sombra al desplazarse ---- */
   const nav = document.getElementById('siteNav');
-  function onScroll(){
-    if (window.scrollY > 12) nav.classList.add('is-scrolled');
-    else nav.classList.remove('is-scrolled');
-  }
+  const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 12);
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  /* ---- Mobile menu ---- */
+  /* ---- Menú móvil ---- */
   const burger = document.getElementById('burgerBtn');
   const menu = document.getElementById('mobileMenu');
-  burger.addEventListener('click', () => {
-    const open = menu.classList.toggle('is-open');
-    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-  menu.querySelectorAll('a').forEach((a) => {
-    a.addEventListener('click', () => { menu.classList.remove('is-open'); burger.setAttribute('aria-expanded','false'); });
+  const iconoBurger = burger.querySelector('use');
+  function abrirMenu(abierto) {
+    menu.classList.toggle('is-open', abierto);
+    burger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    burger.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú');
+    iconoBurger.setAttribute('href', abierto ? '#i-x' : '#i-menu');
+  }
+  burger.addEventListener('click', () => abrirMenu(!menu.classList.contains('is-open')));
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => abrirMenu(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu.classList.contains('is-open')) { abrirMenu(false); burger.focus(); }
   });
 
-  /* ---- Scroll reveal ---- */
+  /* ---- Aparición al desplazarse ---- */
   const revealEls = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window && !reduceMotion) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) { entry.target.classList.add('is-visible'); io.unobserve(entry.target); }
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+          // Terminada la aparición se suelta la clase: su transform/transition taparían el efecto hover de las tarjetas.
+          setTimeout(() => entry.target.classList.remove('reveal', 'is-visible'), 1000);
+        }
       });
-    }, { threshold: 0.14, rootMargin: '0px 0px -60px 0px' });
+    }, { threshold: 0.12, rootMargin: '0px 0px -48px 0px' });
     revealEls.forEach((el) => io.observe(el));
   } else {
     revealEls.forEach((el) => el.classList.add('is-visible'));
-  }
-
-  /* ---- Hero canvas: red de datos animada ---- */
-  const canvas = document.getElementById('dataCanvas');
-  const ctx = canvas.getContext('2d');
-  const heroSection = canvas.closest('section');
-  const CORDS = 9;
-  let nodes = [];
-  let running = false;
-  let raf = null;
-
-  function buildNodes(w, h){
-    nodes = [];
-    for (let c = 0; c < CORDS; c++){
-      const x = (w / (CORDS + 1)) * (c + 1);
-      const knots = 2 + (c % 3);
-      for (let k = 0; k < knots; k++){
-        nodes.push({
-          cx: x,
-          baseY: h * (0.14 + (k / knots) * 0.72) + (c % 2 ? 10 : -10),
-          amp: 8 + (c % 4) * 3,
-          speed: 0.0006 + (c % 5) * 0.0002,
-          phase: (c * 1.7 + k * 0.9)
-        });
-      }
-    }
-  }
-
-  function resize(){
-    const rect = heroSection.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    buildNodes(rect.width, rect.height);
-  }
-
-  function draw(t){
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    ctx.clearRect(0, 0, w, h);
-
-    const pts = nodes.map((n) => ({ x: n.cx, y: n.baseY + Math.sin(t * n.speed + n.phase) * n.amp }));
-
-    ctx.strokeStyle = 'rgba(46,226,206,0.14)';
-    ctx.lineWidth = 1.2;
-    const byCord = {};
-    nodes.forEach((n, i) => { (byCord[n.cx] = byCord[n.cx] || []).push(pts[i]); });
-    Object.keys(byCord).forEach((cx) => {
-      ctx.beginPath();
-      ctx.moveTo(parseFloat(cx), 0);
-      byCord[cx].forEach((p) => ctx.lineTo(p.x, p.y));
-      ctx.stroke();
-    });
-
-    ctx.strokeStyle = 'rgba(28,111,150,0.28)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < pts.length; i++){
-      for (let j = i + 1; j < pts.length; j++){
-        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
-        const d = Math.sqrt(dx*dx + dy*dy);
-        if (d < 130 && Math.abs(dx) > 20){
-          ctx.globalAlpha = Math.max(0, 1 - d / 130) * 0.55;
-          ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.stroke();
-        }
-      }
-    }
-    ctx.globalAlpha = 1;
-
-    pts.forEach((p, i) => {
-      const pulse = 0.72 + Math.sin(t * 0.0016 + i) * 0.28;
-      ctx.beginPath();
-      ctx.fillStyle = `rgba(46,226,206,${(0.55 * pulse).toFixed(3)})`;
-      ctx.arc(p.x, p.y, 3.4, 0, Math.PI * 2);
-      ctx.fill();
-    });
-  }
-
-  function loop(t){ draw(t); raf = requestAnimationFrame(loop); }
-  function start(){ if (!running){ running = true; raf = requestAnimationFrame(loop); } }
-  function stop(){ running = false; if (raf) cancelAnimationFrame(raf); }
-
-  resize();
-  if (reduceMotion){ draw(0); }
-  else {
-    const heroObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => (entry.isIntersecting ? start() : stop()));
-    }, { threshold: 0.01 });
-    heroObserver.observe(heroSection);
-  }
-  window.addEventListener('resize', () => { resize(); if (reduceMotion) draw(0); }, { passive: true });
-
-  /* ---- Mock sales chart on the dashboard preview ---- */
-  const mc = document.getElementById('mockChart');
-  if (mc) {
-    const mctx = mc.getContext('2d');
-    const dpr2 = Math.min(window.devicePixelRatio || 1, 2);
-    function drawMockChart(){
-      const w = mc.clientWidth, h = mc.clientHeight || 140;
-      mc.width = w * dpr2; mc.height = h * dpr2;
-      mctx.setTransform(dpr2, 0, 0, dpr2, 0, 0);
-      mctx.clearRect(0,0,w,h);
-
-      const sales   = [42,48,45,55,60,58,68,72,70,80,84,92];
-      const forecast= [null,null,null,null,null,null,null,null,null,80,88,101];
-      const max = 110, pad = 18, plotW = w - pad*2, plotH = h - pad*1.6;
-
-      mctx.strokeStyle = 'rgba(14,27,69,0.08)';
-      mctx.lineWidth = 1;
-      for (let g=0; g<=3; g++){
-        const gy = pad + (plotH/3)*g;
-        mctx.beginPath(); mctx.moveTo(pad, gy); mctx.lineTo(w-pad, gy); mctx.stroke();
-      }
-
-      function toXY(i, v){
-        const x = pad + (plotW/(sales.length-1)) * i;
-        const y = pad + plotH - (v/max)*plotH;
-        return [x,y];
-      }
-
-      mctx.strokeStyle = '#1C6F96'; mctx.lineWidth = 2.4; mctx.lineJoin='round'; mctx.lineCap='round';
-      mctx.beginPath();
-      sales.forEach((v,i) => { const xy = toXY(i,v); i===0?mctx.moveTo(xy[0],xy[1]):mctx.lineTo(xy[0],xy[1]); });
-      mctx.stroke();
-
-      mctx.strokeStyle = '#2EE2CE'; mctx.lineWidth = 2.4; mctx.setLineDash([5,4]);
-      mctx.beginPath();
-      let started = false;
-      forecast.forEach((v,i) => { if (v==null) return; const xy = toXY(i,v); if(!started){mctx.moveTo(xy[0],xy[1]); started=true;} else mctx.lineTo(xy[0],xy[1]); });
-      mctx.stroke();
-      mctx.setLineDash([]);
-
-      const last = toXY(sales.length-1, forecast[forecast.length-1]);
-      mctx.fillStyle = '#2EE2CE';
-      mctx.beginPath(); mctx.arc(last[0], last[1], 4, 0, Math.PI*2); mctx.fill();
-    }
-    drawMockChart();
-    window.addEventListener('resize', drawMockChart, { passive:true });
   }
 </script>
 </body>

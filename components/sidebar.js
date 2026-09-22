@@ -14,7 +14,7 @@
 import { modulosHabilitados, buscarModulo } from '../js/config.js';
 import { tienePermiso, tieneAlgunPermiso, haySesionActiva } from '../js/sesion.js';
 import { escapeHtml, urlLimpia } from '../js/utils.js';
-import { ICONO_SPARK, ICONO_HOME, ICONO_BELL, ICONO_CLOCK, ICONO_USER, ICONO_BUILDING, ICONO_RECEIPT, ICONO_KEY, ICONO_SHIELD, ICONO_LOCK, ICONO_MENU } from '../js/iconos.js';
+import { ICONO_SPARK, ICONO_HOME, ICONO_BELL, ICONO_CLOCK, ICONO_USER, ICONO_BUILDING, ICONO_RECEIPT, ICONO_KEY, ICONO_SHIELD, ICONO_LOCK, ICONO_MENU, ICONO_X } from '../js/iconos.js';
 
 // Grupo de sidebar por id de módulo (Rediseño v3). Client-side a propósito:
 // la tabla `modulos` no tiene columna de categoría y no vale la pena una
@@ -149,6 +149,7 @@ export function renderSidebar(config, paginaActualId) {
           <div class="sidebar-subtitle" id="sidebarSubtitle"></div>
         </div>
         <button type="button" class="sidebar-collapse-btn" id="btnColapsarSidebar" title="Contraer menú" aria-label="Contraer menú">${ICONO_CHEVRON}</button>
+        <button type="button" class="sidebar-close-btn" id="btnCerrarSidebarMovil" aria-label="Cerrar menú">${ICONO_X}</button>
       </div>
       <nav class="sidebar-nav">
         ${!sinSesion ? `
@@ -248,12 +249,31 @@ function asegurarControlesMovil() {
     }
   }
 
+  // Botón "X" dentro del cajón (junto a la marca, ver la maqueta del menú
+  // móvil): antes solo se podía cerrar tocando fuera (el overlay). renderSidebar()
+  // vuelve a crear este botón en cada llamada -- se conecta una sola vez, no una
+  // por llamada, para no apilar listeners si algo re-renderiza el sidebar.
+  const btnCerrar = document.getElementById('btnCerrarSidebarMovil');
+  if (btnCerrar && !btnCerrar.dataset.conectado) {
+    btnCerrar.dataset.conectado = '1';
+    btnCerrar.addEventListener('click', () => toggleSidebarMovil(false));
+  }
+
   if (!document.getElementById('sidebarOverlayMovil')) {
     const overlay = document.createElement('div');
     overlay.id = 'sidebarOverlayMovil';
     overlay.className = 'sidebar-overlay-movil';
     overlay.addEventListener('click', () => toggleSidebarMovil(false));
     document.body.appendChild(overlay);
+  }
+
+  // Escape cierra el cajón desde cualquier parte -- un solo listener por página
+  // (document.body no se vuelve a crear entre llamadas, por eso el dataset acá).
+  if (!document.body.dataset.escCajonMovil) {
+    document.body.dataset.escCajonMovil = '1';
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('sidebar')?.classList.contains('abierto')) toggleSidebarMovil(false);
+    });
   }
 }
 
@@ -264,6 +284,10 @@ function toggleSidebarMovil(abrir) {
   sidebar.classList.toggle('abierto', abrir);
   overlay.classList.toggle('activo', abrir);
   document.body.classList.toggle('sidebar-movil-abierto', abrir);
+  // El foco sigue a la acción: entra al botón de cerrar al abrir, vuelve al
+  // botón hamburguesa al cerrar -- así quien navega con teclado nunca lo pierde
+  // detrás del cajón (cerrado) ni fuera de él (abierto).
+  (abrir ? document.getElementById('btnCerrarSidebarMovil') : document.getElementById('btnMenuMovil'))?.focus();
 }
 
 // Pie del sidebar: solo la marca (Recambio de diseño, 2026-09-21). Antes

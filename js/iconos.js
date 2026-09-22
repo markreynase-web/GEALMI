@@ -28,6 +28,7 @@ export const ICONO_LOCK = wrap('0 0 24 24', '<rect x="4.5" y="10.5" width="15" h
 export const ICONO_SEARCH = wrap('0 0 24 24', '<circle cx="10.5" cy="10.5" r="7"/><path d="m20 20-4.4-4.4"/>');
 export const ICONO_CHEVRON_DOWN = wrap('0 0 24 24', '<path d="M6 9.5 12 15.5 18 9.5"/>');
 export const ICONO_MENU = wrap('0 0 24 24', '<path d="M4 7h16M4 12h16M4 17h16"/>');
+export const ICONO_X = wrap('0 0 24 24', '<path d="M6 6l12 12M18 6 6 18"/>');
 
 // Un ícono por tipo de notificación (js/notificaciones.js TIPOS) -- comparten
 // esta misma retícula/trazo para que la campana, el aviso fijo y la página

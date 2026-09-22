@@ -39,6 +39,14 @@
 }
 .sidebar-collapse-btn:hover{ background:rgba(255,255,255,0.12); color:#fff; }
 .sidebar-collapse-btn svg{ transition:transform 0.18s ease; }
+/* Botón "X" del cajón en celular (ver el @media 640px más abajo) -- mismo
+   trato visual que el de contraer, oculto en escritorio/tablet. */
+.sidebar-close-btn{
+  display:none; flex-shrink:0; width:30px; height:30px; border-radius:50%; border:none; cursor:pointer;
+  background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.75); align-items:center; justify-content:center;
+}
+.sidebar-close-btn:hover{ background:rgba(255,255,255,0.12); color:#fff; }
+.sidebar-close-btn svg{ width:16px; height:16px; }
 
 /* Scrollbar delgada y del tema oscuro -- el scrollbar gris nativo del SO
    (grueso, con flechas) se veía fuera de lugar contra el sidebar navy. */
@@ -395,6 +403,7 @@ main{ max-width:1180px; margin:0 auto; padding:28px 32px; }
   }
   .sidebar.abierto{ transform:translateX(0); }
   .sidebar-brand{ border-right:none; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .sidebar-close-btn{ display:flex; }
   .sidebar-nav{ display:block; padding:16px 12px; overflow-x:visible; }
   .sidebar-group{ display:block; white-space:normal; gap:0; margin-bottom:20px; }
   .sidebar-group-label{ display:block; }

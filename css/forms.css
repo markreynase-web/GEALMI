@@ -2,10 +2,12 @@
    en config/company.json, y solo una vez que se confirma conexión con el backend. */
 .vista-tabs{ display:flex; gap:6px; }
 .vista-tab{
+  display:inline-flex; align-items:center; gap:7px;
   font-family:'Inter', sans-serif; font-size:13px; font-weight:600; color:var(--muted);
   background:transparent; border:none; border-bottom:2px solid transparent;
   padding:7px 14px; cursor:pointer;
 }
+.vista-tab svg{ width:15px; height:15px; flex-shrink:0; }
 .vista-tab:hover{ color:var(--ink); }
 .vista-tab.activo{ color:var(--ink); border-bottom-color:var(--ochre-deep); }
 

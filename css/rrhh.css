@@ -81,7 +81,9 @@ button.rrhh-aviso:hover{ filter:brightness(0.97); }
 .rrhh-seccion .tabla-registros td.acc{ text-align:right; }
 .rrhh-seccion .evento-badge{ display:inline-block; white-space:nowrap; }
 .rrhh-sub{ display:block; font-size:11.5px; color:var(--muted); }
-.rrhh-alerta-texto{ color:var(--coral-deep); font-weight:600; }
+.rrhh-sub svg{ width:12px; height:12px; vertical-align:-2px; margin-right:3px; }
+.rrhh-alerta-texto{ display:inline-flex; align-items:center; gap:5px; color:var(--coral-deep); font-weight:600; }
+.rrhh-alerta-texto svg{ width:13px; height:13px; flex-shrink:0; }
 .rrhh-enlace{ color:var(--blue); font-weight:600; text-decoration:none; }
 .rrhh-enlace:hover{ text-decoration:underline; }
 .rrhh-check{ flex-direction:row !important; align-items:center; justify-content:flex-start !important; gap:8px !important; text-transform:none !important; letter-spacing:normal !important; font-size:13px !important; color:var(--ink) !important; font-weight:500 !important; }

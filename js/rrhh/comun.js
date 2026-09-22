@@ -8,6 +8,7 @@ import { API_BASE_URL } from '../apiConfig.js';
 import { obtenerSesion, tienePermiso } from '../sesion.js';
 import { escapeHtml } from '../utils.js';
 import { abrirPanelLateral, cerrarPanelLateral } from '../../components/panelLateral.js';
+import { ICONO_USERS } from '../iconos.js';
 
 export const esc = escapeHtml;
 export const puede = tienePermiso;
@@ -172,7 +173,7 @@ export function montarFormulario(contenedor, { campos, textoGuardar = 'Guardar',
   return form;
 }
 
-export function modal({ titulo, icono = '👥', ancho = 'amplio', montar }) {
+export function modal({ titulo, icono = ICONO_USERS, ancho = 'amplio', montar }) {
   abrirPanelLateral({ titulo, icono, ancho, montar });
 }
 

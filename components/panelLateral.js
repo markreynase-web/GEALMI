@@ -87,7 +87,14 @@ function asegurarDom() {
 export function abrirPanelLateral({ titulo = '', icono = '📝', ancho = 'normal', montar, onCerrar } = {}) {
   asegurarDom();
   document.getElementById('panelLateralTitulo').textContent = titulo;
-  document.getElementById('panelLateralIcono').textContent = icono;
+  // Recambio de diseño (2026-09-21): icono puede ser un SVG de confianza
+  // (js/iconos.js, así llegan los de RRHH) o un emoji suelto (el resto de
+  // módulos, todavía sin convertir) -- mismo criterio que itemHtml() en
+  // components/sidebar.js. Todo lo que llama a esto pasa una constante fija
+  // desde su propio código, nunca algo escrito por quien usa la app.
+  const elIcono = document.getElementById('panelLateralIcono');
+  if (typeof icono === 'string' && icono.startsWith('<svg')) elIcono.innerHTML = icono;
+  else elIcono.textContent = icono;
   elPanel.classList.toggle('panel-lateral--amplio', ancho === 'amplio');
 
   // Si ya había un modal abierto (un panel que abre otro encima), se conserva

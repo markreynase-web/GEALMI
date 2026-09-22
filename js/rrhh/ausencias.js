@@ -11,6 +11,7 @@ import {
 } from './comun.js';
 import { kpiCard } from '../kpiCard.js';
 import { fmtNum } from '../utils.js';
+import { ICONO_INBOX, ICONO_UMBRELLA, ICONO_CALENDAR, ICONO_LOCK, ICONO_EDIT } from '../iconos.js';
 
 const TIPOS = Object.entries(ETIQUETA_AUSENCIA).map(([value, label]) => ({ value, label }));
 
@@ -53,9 +54,9 @@ export async function montar(zona) {
     const hoyAusentes = filas.filter(f => f.estado === 'aprobada' && f.fecha_inicio <= hoy && f.fecha_fin >= hoy).length;
     const proximas = filas.filter(f => f.estado === 'aprobada' && f.fecha_inicio > hoy && f.fecha_inicio <= en30).length;
     $('#auKpis').innerHTML = [
-      kpiCard({ acento: pendientes ? 'orange' : 'teal', icono: '📥', label: 'Por resolver', value: fmtNum(pendientes), sub: 'solicitudes pendientes' }),
-      kpiCard({ acento: 'blue', icono: '🏖️', label: 'Ausentes hoy', value: fmtNum(hoyAusentes), sub: 'con ausencia aprobada' }),
-      kpiCard({ acento: 'purple', icono: '📅', label: 'Próximos 30 días', value: fmtNum(proximas), sub: 'ausencias aprobadas por empezar' })
+      kpiCard({ acento: pendientes ? 'orange' : 'teal', icono: ICONO_INBOX, label: 'Por resolver', value: fmtNum(pendientes), sub: 'solicitudes pendientes' }),
+      kpiCard({ acento: 'blue', icono: ICONO_UMBRELLA, label: 'Ausentes hoy', value: fmtNum(hoyAusentes), sub: 'con ausencia aprobada' }),
+      kpiCard({ acento: 'purple', icono: ICONO_CALENDAR, label: 'Próximos 30 días', value: fmtNum(proximas), sub: 'ausencias aprobadas por empezar' })
     ].join('');
 
     const puedeEditar = puede('rrhh.editar'), puedeBorrar = puede('rrhh.eliminar');
@@ -70,7 +71,7 @@ export async function montar(zona) {
         const [texto, color] = ETIQUETA_ESTADO_AUSENCIA[f.estado] || [f.estado, 'muted'];
         return `${badge(texto, color)}${f.comentario_resolucion ? `<span class="rrhh-sub">${esc(f.comentario_resolucion)}</span>` : ''}`;
       } },
-      { titulo: 'Motivo', celda: f => `${esc(f.motivo || '')}${f.detalle_medico ? `<span class="rrhh-sub">🔒 ${esc(f.detalle_medico)}</span>` : ''}` },
+      { titulo: 'Motivo', celda: f => `${esc(f.motivo || '')}${f.detalle_medico ? `<span class="rrhh-sub">${ICONO_LOCK} ${esc(f.detalle_medico)}</span>` : ''}` },
       { titulo: '', clase: 'acc', celda: f => botonesFila(f.id, [
         ...(puedeEditar && f.estado === 'pendiente' ? [{ accion: 'aprobar', texto: 'Aprobar' }, { accion: 'rechazar', texto: 'Rechazar', peligro: true }] : []),
         ...(puedeEditar && ['pendiente', 'aprobada'].includes(f.estado) ? [{ accion: 'editar', texto: 'Editar' }] : []),
@@ -82,7 +83,7 @@ export async function montar(zona) {
 
   function abrirFormulario(fila = null) {
     modal({
-      titulo: fila ? 'Editar ausencia' : 'Registrar ausencia', icono: '🏖️', ancho: 'normal',
+      titulo: fila ? 'Editar ausencia' : 'Registrar ausencia', icono: ICONO_UMBRELLA, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<div id="auForm"></div>';
         montarFormulario(cuerpo.querySelector('#auForm'), {
@@ -120,7 +121,7 @@ export async function montar(zona) {
   function abrirResolucion(fila, estado) {
     const verbo = { aprobada: 'Aprobar', rechazada: 'Rechazar', cancelada: 'Cancelar' }[estado];
     modal({
-      titulo: `${verbo} ausencia`, icono: '📝', ancho: 'normal',
+      titulo: `${verbo} ausencia`, icono: ICONO_EDIT, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = `<p style="margin:0 0 12px;font-size:13.5px;"><b>${esc(fila.empleado_nombre)}</b> · ${esc(ETIQUETA_AUSENCIA[fila.tipo])} del ${fechaCorta(fila.fecha_inicio)} al ${fechaCorta(fila.fecha_fin)} (${fila.dias} día${fila.dias === 1 ? '' : 's'})</p><div id="resForm"></div>`;
         montarFormulario(cuerpo.querySelector('#resForm'), {

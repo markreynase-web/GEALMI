@@ -10,6 +10,7 @@ import {
 } from './comun.js';
 import { kpiCard } from '../kpiCard.js';
 import { fmtNum } from '../utils.js';
+import { ICONO_MEGAPHONE, ICONO_USER, ICONO_USER_CHECK } from '../iconos.js';
 
 const ETAPAS = [
   ['postulado', 'Postulados'], ['entrevista', 'Entrevista'], ['prueba', 'Prueba'],
@@ -54,9 +55,9 @@ export async function montar(zona) {
   function dibujarVacantes() {
     const abiertas = vacantes.filter(v => v.estado === 'abierta');
     $('#rcKpis').innerHTML = [
-      kpiCard({ acento: 'teal', icono: '📢', label: 'Vacantes abiertas', value: fmtNum(abiertas.length), sub: `${fmtNum(abiertas.reduce((s, v) => s + Math.max(0, v.cantidad - v.contratados), 0))} plaza(s) por cubrir` }),
-      kpiCard({ acento: 'blue', icono: '👤', label: 'Candidatos', value: fmtNum(vacantes.reduce((s, v) => s + v.candidatos, 0)), sub: `${fmtNum(vacantes.reduce((s, v) => s + v.en_proceso, 0))} en proceso` }),
-      kpiCard({ acento: 'purple', icono: '🤝', label: 'Contratados', value: fmtNum(vacantes.reduce((s, v) => s + v.contratados, 0)), sub: 'desde el reclutamiento' })
+      kpiCard({ acento: 'teal', icono: ICONO_MEGAPHONE, label: 'Vacantes abiertas', value: fmtNum(abiertas.length), sub: `${fmtNum(abiertas.reduce((s, v) => s + Math.max(0, v.cantidad - v.contratados), 0))} plaza(s) por cubrir` }),
+      kpiCard({ acento: 'blue', icono: ICONO_USER, label: 'Candidatos', value: fmtNum(vacantes.reduce((s, v) => s + v.candidatos, 0)), sub: `${fmtNum(vacantes.reduce((s, v) => s + v.en_proceso, 0))} en proceso` }),
+      kpiCard({ acento: 'purple', icono: ICONO_USER_CHECK, label: 'Contratados', value: fmtNum(vacantes.reduce((s, v) => s + v.contratados, 0)), sub: 'desde el reclutamiento' })
     ].join('');
     const puedeEditar = puede('rrhh.editar'), puedeBorrar = puede('rrhh.eliminar');
     $('#rcVacantes').innerHTML = `<h3>Vacantes</h3>${tabla([
@@ -104,7 +105,7 @@ export async function montar(zona) {
 
   function formularioVacante(v = null) {
     modal({
-      titulo: v ? 'Editar vacante' : 'Nueva vacante', icono: '📢', ancho: 'normal',
+      titulo: v ? 'Editar vacante' : 'Nueva vacante', icono: ICONO_MEGAPHONE, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<div id="vaForm"></div>';
         montarFormulario(cuerpo.querySelector('#vaForm'), {
@@ -130,7 +131,7 @@ export async function montar(zona) {
 
   function formularioCandidato(c = null) {
     modal({
-      titulo: c ? 'Editar candidato' : 'Agregar candidato', icono: '👤', ancho: 'normal',
+      titulo: c ? 'Editar candidato' : 'Agregar candidato', icono: ICONO_USER, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<div id="caForm"></div>';
         montarFormulario(cuerpo.querySelector('#caForm'), {
@@ -160,7 +161,7 @@ export async function montar(zona) {
   function formularioContratar(c) {
     const vac = vacantes.find(v => v.id === seleccionada);
     modal({
-      titulo: `Contratar a ${c.nombre}`, icono: '🤝', ancho: 'normal',
+      titulo: `Contratar a ${c.nombre}`, icono: ICONO_USER_CHECK, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<p class="rrhh-legal">Se creará su ficha de trabajador con estos datos. Después completas el resto (jornada, contrato, usuario de GEALMI…) desde "Equipo".</p><div id="ctForm"></div>';
         montarFormulario(cuerpo.querySelector('#ctForm'), {

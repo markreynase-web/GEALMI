@@ -8,6 +8,7 @@ import {
 } from './comun.js';
 import { kpiCard } from '../kpiCard.js';
 import { fmtNum } from '../utils.js';
+import { ICONO_EDIT, ICONO_STAR, ICONO_GRADUATION, ICONO_CLOCK, ICONO_DOLLAR } from '../iconos.js';
 
 const CRITERIOS = [
   ['puntualidad', 'Puntualidad'], ['calidad_trabajo', 'Calidad del trabajo'], ['trabajo_equipo', 'Trabajo en equipo'],
@@ -71,8 +72,8 @@ async function montarEvaluaciones(zona, empleados) {
     limpiarError($('#evAviso'));
     const prom = filas.length ? filas.reduce((s, f) => s + f.promedio, 0) / filas.length : 0;
     $('#evKpis').innerHTML = [
-      kpiCard({ acento: 'blue', icono: '📝', label: 'Evaluaciones', value: fmtNum(filas.length), sub: 'en la vista actual' }),
-      kpiCard({ acento: 'teal', icono: '⭐', label: 'Promedio general', value: filas.length ? prom.toFixed(2) : '—', sub: 'de 5 puntos' })
+      kpiCard({ acento: 'blue', icono: ICONO_EDIT, label: 'Evaluaciones', value: fmtNum(filas.length), sub: 'en la vista actual' }),
+      kpiCard({ acento: 'teal', icono: ICONO_STAR, label: 'Promedio general', value: filas.length ? prom.toFixed(2) : '—', sub: 'de 5 puntos' })
     ].join('');
     const puedeEditar = puede('rrhh.editar'), puedeBorrar = puede('rrhh.eliminar');
     $('#evTabla').innerHTML = tabla([
@@ -88,7 +89,7 @@ async function montarEvaluaciones(zona, empleados) {
 
   function abrirFormulario(fila = null) {
     modal({
-      titulo: fila ? 'Editar evaluación' : 'Nueva evaluación', icono: '⭐', ancho: 'normal',
+      titulo: fila ? 'Editar evaluación' : 'Nueva evaluación', icono: ICONO_STAR, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<div id="evForm"></div>';
         montarFormulario(cuerpo.querySelector('#evForm'), {
@@ -151,9 +152,9 @@ async function montarCapacitaciones(zona, empleados) {
     const horas = filas.reduce((s, f) => s + f.horas, 0);
     const costo = filas.reduce((s, f) => s + Number(f.costo), 0);
     $('#caKpis').innerHTML = [
-      kpiCard({ acento: 'blue', icono: '🎓', label: 'Capacitaciones', value: fmtNum(filas.length), sub: `${fmtNum(filas.filter(f => f.obligatoria).length)} obligatoria(s)` }),
-      kpiCard({ acento: 'teal', icono: '⏱️', label: 'Horas', value: horas.toFixed(1), sub: 'de formación registradas' }),
-      kpiCard({ acento: 'purple', icono: '💵', label: 'Inversión', value: soles(costo), sub: 'costo de las capacitaciones' })
+      kpiCard({ acento: 'blue', icono: ICONO_GRADUATION, label: 'Capacitaciones', value: fmtNum(filas.length), sub: `${fmtNum(filas.filter(f => f.obligatoria).length)} obligatoria(s)` }),
+      kpiCard({ acento: 'teal', icono: ICONO_CLOCK, label: 'Horas', value: horas.toFixed(1), sub: 'de formación registradas' }),
+      kpiCard({ acento: 'purple', icono: ICONO_DOLLAR, label: 'Inversión', value: soles(costo), sub: 'costo de las capacitaciones' })
     ].join('');
     const puedeEditar = puede('rrhh.editar'), puedeBorrar = puede('rrhh.eliminar');
     $('#caTabla').innerHTML = tabla([
@@ -185,7 +186,7 @@ async function montarCapacitaciones(zona, empleados) {
         </tbody></table>` : '<p class="tabla-vacia">No hay trabajadores registrados.</p>'}
       </div></div>`;
     modal({
-      titulo: fila ? 'Editar capacitación' : 'Nueva capacitación', icono: '🎓', ancho: 'amplio',
+      titulo: fila ? 'Editar capacitación' : 'Nueva capacitación', icono: ICONO_GRADUATION, ancho: 'amplio',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<div id="caForm"></div>';
         montarFormulario(cuerpo.querySelector('#caForm'), {

@@ -39,3 +39,27 @@ export const ICONO_ALARM = wrap('0 0 24 24', '<circle cx="12" cy="13.5" r="7.5"/
 export const ICONO_CALENDAR = wrap('0 0 24 24', '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>');
 export const ICONO_USERS = wrap('0 0 24 24', '<circle cx="9" cy="8.2" r="3.4"/><path d="M2.8 19.8c0-3.5 2.8-5.6 6.2-5.6s6.2 2.1 6.2 5.6"/><path d="M15.4 4.9a3.4 3.4 0 0 1 0 6.6M18.2 14.6c2 .6 3.2 2.4 3.2 5.2"/>');
 export const ICONO_GRID = wrap('0 0 24 24', '<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>');
+
+// Íconos de RRHH (Recambio de diseño, 2026-09-21): reemplazan los emoji que
+// pages/rrhh.html y js/rrhh/*.js tenían escritos a mano (KPIs, botones de los
+// modales, "Vista Ejecutiva/Operativa"). Las flechas de texto sueltas (→) y el
+// check simple (✓) NO se tocan -- son glifos tipográficos, no pictogramas de
+// color, y ya es el patrón que usa el resto de la app (ej. "Ver →" de Inicio).
+export const ICONO_CHART_BAR = wrap('0 0 24 24', '<path d="M4 20V11M10 20V4M16 20v-7M22 20V8"/>');
+export const ICONO_ARCHIVE = wrap('0 0 24 24', '<rect x="3" y="4.5" width="18" height="4.5" rx="1.2"/><path d="M4.5 9v9a1.5 1.5 0 0 0 1.5 1.5h12A1.5 1.5 0 0 0 19.5 18V9"/><path d="M10 13.5h4"/>');
+export const ICONO_TRENDING_UP = wrap('0 0 24 24', '<path d="m3.5 17 5.8-5.8 4 4L20.5 8"/><path d="M15 8h5.5v5.5"/>');
+export const ICONO_DOOR = wrap('0 0 24 24', '<path d="M6 3.5h9v17H6z"/><path d="M15 3.5 19 5v14l-4 1.5M11.5 12v.01"/>');
+export const ICONO_ALERT_TRIANGLE = wrap('0 0 24 24', '<path d="M12 3.5 22 20.5H2z"/><path d="M12 9.5v5M12 17.5h.01"/>');
+export const ICONO_INBOX = wrap('0 0 24 24', '<path d="M4 12h4.2l1.4 2.8h4.8l1.4-2.8H20"/><path d="M5 5h14l1.5 7v7a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19v-7z"/>');
+export const ICONO_BRIEFCASE = wrap('0 0 24 24', '<rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5M3 12.5h18"/>');
+export const ICONO_EDIT = wrap('0 0 24 24', '<path d="M4 20h4.2L19 9.2a2 2 0 0 0 0-2.8l-1.4-1.4a2 2 0 0 0-2.8 0L4 15.8z"/><path d="m13 6 3.5 3.5"/>');
+export const ICONO_STAR = wrap('0 0 24 24', '<path d="m12 3.5 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>');
+export const ICONO_GRADUATION = wrap('0 0 24 24', '<path d="m2 8 10-4 10 4-10 4z"/><path d="M6 10.5V16c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-5.5M22 8v6.5"/>');
+export const ICONO_DOLLAR = wrap('0 0 24 24', '<circle cx="12" cy="12" r="8.5"/><path d="M12 6.5v11M15 9a3 3 0 0 0-3-1.5c-1.8 0-3 1-3 2.3 0 3 6 1.4 6 4.3 0 1.4-1.4 2.4-3 2.4a3.4 3.4 0 0 1-3-1.6"/>');
+export const ICONO_EXTERNAL_LINK = wrap('0 0 24 24', '<path d="M9.5 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5"/><path d="M14 4h6v6M20 4l-9.5 9.5"/>');
+export const ICONO_MEGAPHONE = wrap('0 0 24 24', '<path d="M3 10v4a1 1 0 0 0 1 1h2l7 4V5L6 9H4a1 1 0 0 0-1 1Z"/><path d="M18 8.5a5 5 0 0 1 0 7M21 6a8.5 8.5 0 0 1 0 12"/>');
+export const ICONO_USER_CHECK = wrap('0 0 24 24', '<circle cx="9" cy="8.2" r="3.4"/><path d="M2.8 19.8c0-3.5 2.8-5.6 6.2-5.6s6.2 2.1 6.2 5.6"/><path d="m15.5 12.5 2 2 3.5-4"/>');
+export const ICONO_CHECK_FILLED = wrap('0 0 24 24', '<circle cx="12" cy="12" r="8.5"/><path d="m8.2 12.3 2.6 2.6 5-5.4"/>');
+export const ICONO_FOLDER = wrap('0 0 24 24', '<path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h4.5l2 2.5H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19.5H5A1.5 1.5 0 0 1 3.5 18Z"/>');
+export const ICONO_UMBRELLA = wrap('0 0 24 24', '<path d="M12 3v2"/><path d="M3 13c0-5 4-9 9-9s9 4 9 9"/><path d="M12 13v8"/><path d="M9 21h6"/><path d="M5 17c1.5-1.2 3-1.8 4-1.8"/>');
+export const ICONO_HOURGLASS = wrap('0 0 24 24', '<path d="M6 3.5h12M6 20.5h12"/><path d="M7 3.5v3.2c0 2 1.8 3.3 5 5.3 3.2 2 5 3.3 5 5.3v3.2M17 3.5v3.2c0 2-1.8 3.3-5 5.3-3.2 2-5 3.3-5 5.3v3.2"/>');

@@ -10,6 +10,7 @@ import {
 } from './comun.js';
 import { kpiCard } from '../kpiCard.js';
 import { fmtNum } from '../utils.js';
+import { ICONO_FOLDER, ICONO_ALERT_TRIANGLE } from '../iconos.js';
 
 const TIPOS = [
   { value: 'contrato', label: 'Contrato' }, { value: 'dni', label: 'DNI / identidad' }, { value: 'cv', label: 'CV' },
@@ -63,8 +64,8 @@ export async function montar(zona) {
     const visibles = filtros.tipo ? filas.filter(f => f.tipo === filtros.tipo) : filas;
     const vencidos = visibles.filter(f => f.vencido).length;
     $('#doKpis').innerHTML = [
-      kpiCard({ acento: 'blue', icono: '📁', label: 'Documentos', value: fmtNum(visibles.length), sub: 'en la vista actual' }),
-      kpiCard({ acento: vencidos ? 'orange' : 'teal', icono: '⚠️', label: 'Vencidos', value: fmtNum(vencidos), sub: 'requieren renovación' })
+      kpiCard({ acento: 'blue', icono: ICONO_FOLDER, label: 'Documentos', value: fmtNum(visibles.length), sub: 'en la vista actual' }),
+      kpiCard({ acento: vencidos ? 'orange' : 'teal', icono: ICONO_ALERT_TRIANGLE, label: 'Vencidos', value: fmtNum(vencidos), sub: 'requieren renovación' })
     ].join('');
     const puedeEditar = puede('rrhh.editar'), puedeBorrar = puede('rrhh.eliminar');
     $('#doTabla').innerHTML = tabla([
@@ -81,7 +82,7 @@ export async function montar(zona) {
 
   function abrirFormulario(fila = null) {
     modal({
-      titulo: fila ? 'Editar documento' : 'Agregar documento', icono: '📁', ancho: 'normal',
+      titulo: fila ? 'Editar documento' : 'Agregar documento', icono: ICONO_FOLDER, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<div id="doForm"></div>';
         montarFormulario(cuerpo.querySelector('#doForm'), {

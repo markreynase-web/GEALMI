@@ -8,6 +8,7 @@ import {
   api, esc, modal, cerrarPanelLateral, montarFormulario, fechaCorta, horaLima, duracion, hoyLima, primerDiaDelMes,
   badge, tabla, botonesFila, alHacerClic, avisar, ETIQUETA_AUSENCIA, ETIQUETA_ESTADO_AUSENCIA
 } from './comun.js';
+import { ICONO_UMBRELLA } from '../iconos.js';
 
 // Cómo se nombra cada marca en el aviso de confirmación ("Entrada registrada a las 08:02.").
 const NOMBRE_MARCA = { entrada: 'Entrada', salida_refrigerio: 'Salida a refrigerio', retorno_refrigerio: 'Regreso del refrigerio', salida: 'Salida' };
@@ -159,7 +160,7 @@ export async function montar(cont) {
 
   $('#miSolicitar').addEventListener('click', () => {
     modal({
-      titulo: 'Solicitar ausencia', icono: '🏖️', ancho: 'normal',
+      titulo: 'Solicitar ausencia', icono: ICONO_UMBRELLA, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<p class="rrhh-legal">Tu solicitud le llega a RRHH y queda pendiente hasta que la aprueben. No escribas diagnósticos en el motivo.</p><div id="soForm"></div>';
         montarFormulario(cuerpo.querySelector('#soForm'), {

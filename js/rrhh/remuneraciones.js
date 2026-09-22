@@ -10,6 +10,7 @@ import {
 } from './comun.js';
 import { kpiCard } from '../kpiCard.js';
 import { fmtNum } from '../utils.js';
+import { ICONO_DOLLAR, ICONO_CHECK_FILLED, ICONO_HOURGLASS } from '../iconos.js';
 
 export async function montar(zona) {
   const empleados = await listarEmpleados({ recargar: true });
@@ -55,9 +56,9 @@ export async function montar(zona) {
     const pendientes = filas.filter(f => f.estado === 'pendiente');
     const suma = (lista) => lista.reduce((s, f) => s + Number(f.neto), 0);
     $('#reKpis').innerHTML = [
-      kpiCard({ acento: 'purple', icono: '💰', label: 'Neto del mes', value: soles(total), sub: `${filas.length} pago(s)` }),
-      kpiCard({ acento: 'teal', icono: '✅', label: 'Pagado', value: soles(suma(pagadas)), sub: `${pagadas.length} pago(s)` }),
-      kpiCard({ acento: pendientes.length ? 'orange' : 'teal', icono: '⏳', label: 'Pendiente', value: soles(suma(pendientes)), sub: `${pendientes.length} pago(s)` })
+      kpiCard({ acento: 'purple', icono: ICONO_DOLLAR, label: 'Neto del mes', value: soles(total), sub: `${filas.length} pago(s)` }),
+      kpiCard({ acento: 'teal', icono: ICONO_CHECK_FILLED, label: 'Pagado', value: soles(suma(pagadas)), sub: `${pagadas.length} pago(s)` }),
+      kpiCard({ acento: pendientes.length ? 'orange' : 'teal', icono: ICONO_HOURGLASS, label: 'Pendiente', value: soles(suma(pendientes)), sub: `${pendientes.length} pago(s)` })
     ].join('');
     const puedeEditar = puede('rrhh.editar'), puedeBorrar = puede('rrhh.eliminar');
     $('#reTabla').innerHTML = tabla([
@@ -77,7 +78,7 @@ export async function montar(zona) {
 
   function abrirFormulario(fila = null) {
     modal({
-      titulo: fila ? 'Editar pago' : 'Registrar pago', icono: '💰', ancho: 'normal',
+      titulo: fila ? 'Editar pago' : 'Registrar pago', icono: ICONO_DOLLAR, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<div id="reForm"></div>';
         montarFormulario(cuerpo.querySelector('#reForm'), {

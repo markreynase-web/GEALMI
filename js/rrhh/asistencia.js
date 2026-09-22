@@ -11,6 +11,7 @@ import {
 import { kpiCard } from '../kpiCard.js';
 import { fmtNum } from '../utils.js';
 import { cargarLibreriasPDF, limpiarTextoPDF } from '../exportarPDF.js';
+import { ICONO_CALENDAR, ICONO_CLOCK, ICONO_TRENDING_UP, ICONO_ALARM, ICONO_DOOR, ICONO_ALERT_TRIANGLE, ICONO_BUILDING } from '../iconos.js';
 
 const hhmm = (iso) => (iso ? horaLima(iso) : '');
 const semanaTexto = (s) => `${s.semana.replace('-S', ' · sem. ')}: ${Math.round(s.minutos / 6) / 10} h`;
@@ -66,11 +67,11 @@ export async function montar(zona) {
     const tardanzas = filas.filter(f => f.minutos_tardanza > 0).length;
     const sinSalida = filas.filter(f => !f.completo).length;
     $('#asKpis').innerHTML = [
-      kpiCard({ acento: 'blue', icono: '🗓️', label: 'Jornadas registradas', value: fmtNum(filas.length), sub: `${resumen.length} trabajador(es)` }),
-      kpiCard({ acento: 'teal', icono: '⏱️', label: 'Horas trabajadas', value: duracion(horas), sub: 'sin contar refrigerio' }),
-      kpiCard({ acento: 'purple', icono: '➕', label: 'Sobretiempo', value: duracion(extra), sub: 'sobre la jornada pactada' }),
-      kpiCard({ acento: tardanzas ? 'orange' : 'teal', icono: '⏰', label: 'Tardanzas', value: fmtNum(tardanzas), sub: 'llegadas después de la hora pactada' }),
-      kpiCard({ acento: sinSalida ? 'orange' : 'teal', icono: '🚪', label: 'Sin salida marcada', value: fmtNum(sinSalida), sub: 'jornadas por completar' })
+      kpiCard({ acento: 'blue', icono: ICONO_CALENDAR, label: 'Jornadas registradas', value: fmtNum(filas.length), sub: `${resumen.length} trabajador(es)` }),
+      kpiCard({ acento: 'teal', icono: ICONO_CLOCK, label: 'Horas trabajadas', value: duracion(horas), sub: 'sin contar refrigerio' }),
+      kpiCard({ acento: 'purple', icono: ICONO_TRENDING_UP, label: 'Sobretiempo', value: duracion(extra), sub: 'sobre la jornada pactada' }),
+      kpiCard({ acento: tardanzas ? 'orange' : 'teal', icono: ICONO_ALARM, label: 'Tardanzas', value: fmtNum(tardanzas), sub: 'llegadas después de la hora pactada' }),
+      kpiCard({ acento: sinSalida ? 'orange' : 'teal', icono: ICONO_DOOR, label: 'Sin salida marcada', value: fmtNum(sinSalida), sub: 'jornadas por completar' })
     ].join('');
 
     $('#asResumen').innerHTML = `<div class="rrhh-panel"><h3>Resumen por trabajador</h3>${tabla([
@@ -81,7 +82,7 @@ export async function montar(zona) {
       { titulo: 'Tardanzas', clase: 'num', celda: r => (r.tardanzas ? `${r.tardanzas} (${duracion(r.minutos_tardanza)})` : '—') },
       { titulo: 'Sin salida', clase: 'num', celda: r => r.sin_salida || '—' },
       { titulo: 'Semanas sobre 48 h', celda: r => (r.semanas_sobre_el_limite.length
-        ? `<span class="rrhh-alerta-texto">⚠ ${esc(r.semanas_sobre_el_limite.map(semanaTexto).join(' · '))}</span>` : '—') }
+        ? `<span class="rrhh-alerta-texto">${ICONO_ALERT_TRIANGLE} ${esc(r.semanas_sobre_el_limite.map(semanaTexto).join(' · '))}</span>` : '—') }
     ], resumen, { vacio: 'Sin asistencia registrada en este rango.' })}
       <p class="campo-ayuda" style="margin-top:8px;">La jornada máxima es de 8 horas diarias o 48 semanales. Si el rango corta una semana por la mitad, esa semana se mide solo con los días incluidos.</p></div>`;
 
@@ -139,7 +140,7 @@ export async function montar(zona) {
     try { e = await api('/empleador'); } catch (err) { avisar($('#asAviso'), err.message, 'error'); return; }
     const editable = puede('rrhh.editar');
     modal({
-      titulo: 'Datos del empleador', icono: '🏢', ancho: 'normal',
+      titulo: 'Datos del empleador', icono: ICONO_BUILDING, ancho: 'normal',
       montar: (cuerpo) => {
         cuerpo.innerHTML = '<p class="rrhh-legal">Se imprimen en el registro de asistencia. El RUC se valida (11 dígitos y dígito verificador).</p><div id="empForm"></div>';
         const form = montarFormulario(cuerpo.querySelector('#empForm'), {

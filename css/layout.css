@@ -59,9 +59,10 @@
   transition:background 0.14s ease, color 0.14s ease;
 }
 .sidebar-item:hover{ background:rgba(255,255,255,0.06); color:#fff; }
-.sidebar-item.active{ background:var(--teal-strong); color:#fff; box-shadow:0 4px 14px -4px rgba(11,124,117,0.55); }
+.sidebar-item.active{ background:var(--teal-strong); color:#fff; box-shadow:0 4px 14px -4px rgba(20,111,86,0.55); }
 .sidebar-item.active .sidebar-icon{ color:#fff; }
-.sidebar-icon{ font-size:15px; line-height:1; width:18px; text-align:center; flex-shrink:0; }
+.sidebar-icon{ display:flex; align-items:center; justify-content:center; font-size:15px; line-height:1; width:18px; flex-shrink:0; }
+.sidebar-icon svg{ width:18px; height:18px; }
 /* Contador de notificaciones sin leer junto a "Notificaciones" (components/topbar.js lo actualiza). */
 .sidebar-badge{
   margin-left:auto; background:var(--coral); color:#fff; font-size:10.5px; font-weight:700; line-height:1;
@@ -69,29 +70,18 @@
 }
 .sidebar-badge[hidden]{ display:none; }
 
-.sidebar-footer{ border-top:1px solid rgba(255,255,255,0.08); padding:14px 16px; display:flex; flex-direction:column; align-items:stretch; gap:12px; }
-.sidebar-footer-usuario{ display:flex; align-items:center; gap:10px; min-width:0; }
-.sidebar-avatar{
-  width:32px; height:32px; border-radius:50%; background:var(--teal); color:var(--ink);
-  display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'Inter', sans-serif;
-  flex-shrink:0; font-size:13px;
-}
+/* Pie del sidebar: solo la marca (ver components/sidebar.js renderSidebarFooter
+   -- la identidad del usuario y "Cerrar sesión" viven únicamente en la topbar,
+   ver css/layout.css .topbar-usuario-*). */
+.sidebar-footer{ border-top:1px solid rgba(255,255,255,0.08); padding:16px; }
+.sidebar-tagline{ font-family:var(--font-display); font-size:12px; font-weight:600; line-height:1.4; color:rgba(255,255,255,0.55); }
+.sidebar-tagline span{ display:block; color:#fff; }
+/* .sidebar-footer-info/-nombre/-rol: los sigue usando la entrada de GEALMI AI
+   (ver gealmiAiEntradaHtml() en components/sidebar.js), no son exclusivos
+   del pie de usuario que se quitó de acá. */
 .sidebar-footer-info{ min-width:0; flex:1; }
 .sidebar-footer-nombre{ font-size:12.5px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .sidebar-footer-rol{ font-size:9.5px; text-transform:uppercase; letter-spacing:0.04em; color:rgba(255,255,255,0.65); }
-/* Cerrar sesión: antes era un "⎋" de 15px al 60% de blanco que no se veía. Ahora
-   es un botón con texto, de ancho completo y color propio (coral). */
-.sidebar-logout{
-  display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
-  padding:10px 12px; border:none; border-radius:10px; cursor:pointer;
-  background:var(--coral); color:#fff;
-  font-family:'Inter', sans-serif; font-size:13px; font-weight:600; line-height:1;
-  transition:background 0.15s ease;
-}
-.sidebar-logout:hover{ background:var(--coral-deep); }
-.sidebar-logout:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
-.sidebar-logout-icono{ flex-shrink:0; }
-.sidebar-login-link{ font-size:13px; color:#fff; text-decoration:none; font-weight:600; }
 
 /* Entrada fija de GEALMI AI (Rediseño v3, ver components/sidebar.js
    gealmiAiEntradaHtml()) -- mismo bloque visual que .sidebar-footer, pero es un
@@ -134,16 +124,11 @@
   .sidebar.colapsado .sidebar-group-label,
   .sidebar.colapsado .sidebar-item span:not(.sidebar-icon),
   .sidebar.colapsado .sidebar-footer-info,
-  .sidebar.colapsado .sidebar-logout-texto,
+  .sidebar.colapsado .sidebar-tagline,
   .sidebar.colapsado .sidebar-gealmi-ai-chevron{ display:none; }
   .sidebar.colapsado .sidebar-collapse-btn{ position:absolute; top:14px; right:-10px; background:var(--ink); border:1px solid rgba(255,255,255,0.14); }
   .sidebar.colapsado .sidebar-collapse-btn svg{ transform:rotate(180deg); }
   .sidebar.colapsado .sidebar-item{ justify-content:center; padding-left:8px; padding-right:8px; }
-  /* Colapsado: solo el avatar y el ícono de cerrar sesión (el botón se queda
-     visible, sin texto). Al pasar el mouse vuelve a mostrarse completo. */
-  .sidebar.colapsado .sidebar-footer{ align-items:center; }
-  .sidebar.colapsado .sidebar-footer-usuario{ justify-content:center; }
-  .sidebar.colapsado .sidebar-logout{ width:40px; padding:10px 0; }
   .sidebar.colapsado .sidebar-gealmi-ai{ justify-content:center; padding-left:8px; padding-right:8px; }
 
   /* Al pasar el mouse, el flyout se ve exactamente como el sidebar expandido
@@ -154,15 +139,12 @@
   .sidebar.colapsado:hover .sidebar-group-label{ display:block; }
   .sidebar.colapsado:hover .sidebar-item span:not(.sidebar-icon){ display:inline; }
   .sidebar.colapsado:hover .sidebar-footer-info{ display:block; }
-  .sidebar.colapsado:hover .sidebar-logout-texto{ display:inline; }
-  .sidebar.colapsado:hover .sidebar-logout{ width:100%; padding:10px 12px; }
+  .sidebar.colapsado:hover .sidebar-tagline{ display:block; }
   .sidebar.colapsado:hover .sidebar-gealmi-ai-chevron{ display:inline; }
   /* El chevron se queda apuntando "expandir" durante el hover a propósito:
      el clic todavía fija el sidebar expandido (el hover es solo una vista
      previa temporal), así que el ícono debe seguir prometiendo esa acción. */
   .sidebar.colapsado:hover .sidebar-item{ justify-content:flex-start; padding-left:12px; padding-right:12px; }
-  .sidebar.colapsado:hover .sidebar-footer{ align-items:stretch; }
-  .sidebar.colapsado:hover .sidebar-footer-usuario{ justify-content:flex-start; }
   .sidebar.colapsado:hover .sidebar-gealmi-ai{ justify-content:flex-start; padding-left:16px; padding-right:16px; }
 }
 
@@ -177,6 +159,8 @@
   text-align:center;
 }
 .banner-impersonacion b{ font-weight:800; }
+.banner-impersonacion-icono{ display:flex; }
+.banner-impersonacion-icono svg{ width:15px; height:15px; }
 .banner-impersonacion button{
   font-family:'Inter', sans-serif; font-size:11.5px; font-weight:700; color:#3D1F00; background:#fff;
   border:none; border-radius:20px; padding:4px 14px; cursor:pointer; flex-shrink:0;
@@ -191,7 +175,8 @@
   background:#FFF4E5; color:#5A2E00; border-bottom:2px solid #E0A458; padding:10px 32px;
   font-family:'Inter', sans-serif; font-size:13px;
 }
-.banner-avisos-icono{ font-size:20px; flex-shrink:0; }
+.banner-avisos-icono{ font-size:20px; flex-shrink:0; display:flex; }
+.banner-avisos-icono svg{ width:20px; height:20px; }
 .banner-avisos-texto{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
 .banner-avisos-texto b{ font-weight:700; }
 .banner-avisos-texto span{
@@ -223,11 +208,12 @@
    cluster de usuario. */
 .topbar-search{ position:relative; flex:1; max-width:420px; min-width:180px; }
 .topbar-search input{
-  width:100%; font-family:'Inter', sans-serif; font-size:13px; padding:7px 12px 7px 34px;
-  border:1px solid var(--paper-line); border-radius:10px; background:var(--paper); color:var(--ink);
+  width:100%; font-family:'Inter', sans-serif; font-size:13px; padding:9px 14px 9px 36px;
+  border:1px solid var(--paper-line); border-radius:999px; background:var(--paper); color:var(--ink);
 }
 .topbar-search input:focus{ outline:none; border-color:var(--ochre-deep); background:#fff; }
-.topbar-search .ico{ position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--muted); pointer-events:none; }
+.topbar-search .ico{ position:absolute; left:12px; top:50%; transform:translateY(-50%); display:flex; color:var(--muted); pointer-events:none; }
+.topbar-search .ico svg{ width:15px; height:15px; }
 .topbar-search-resultados{
   display:none; position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:30;
   background:#fff; border:1px solid var(--paper-line); border-radius:10px; box-shadow:var(--card-shadow);
@@ -247,8 +233,9 @@
    solo-lectura duplicado en cada página. */
 .topbar-user{ display:flex; align-items:center; gap:14px; }
 .topbar-notif{ position:relative; }
-.topbar-notif-btn{ background:none; border:none; font-size:17px; cursor:pointer; color:var(--muted); padding:4px; line-height:1; position:relative; }
+.topbar-notif-btn{ display:flex; background:none; border:none; cursor:pointer; color:var(--muted); padding:4px; line-height:1; position:relative; }
 .topbar-notif-btn:hover{ color:var(--ink); }
+.topbar-notif-btn svg{ width:19px; height:19px; }
 .topbar-notif-badge{
   position:absolute; top:-2px; right:-4px; background:var(--coral); color:#fff; font-size:10px; font-weight:700;
   min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 3px;
@@ -265,6 +252,7 @@
   width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center;
   font-size:13px; flex-shrink:0;
 }
+.topbar-notif-icono svg{ width:15px; height:15px; }
 .topbar-notif-texto{ font-size:12.5px; color:var(--ink); line-height:1.4; }
 .topbar-notif-hora{ font-size:10.5px; color:var(--muted); margin-top:1px; }
 .topbar-notif-vacio{ padding:16px 8px; font-size:12.5px; color:var(--muted); text-align:center; }
@@ -307,7 +295,8 @@
 .topbar-usuario-info{ text-align:left; line-height:1.25; }
 .topbar-usuario-nombre{ font-size:12.5px; font-weight:600; color:var(--ink); }
 .topbar-usuario-rol{ font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
-.topbar-usuario-chevron{ font-size:10px; color:var(--muted); }
+.topbar-usuario-chevron{ display:flex; color:var(--muted); }
+.topbar-usuario-chevron svg{ width:14px; height:14px; }
 .topbar-usuario-panel{
   display:none; position:absolute; right:0; top:calc(100% + 10px); z-index:30; min-width:180px;
   background:#fff; border:1px solid var(--paper-line); border-radius:10px; box-shadow:var(--card-shadow); padding:6px;
@@ -354,9 +343,10 @@ main{ max-width:1180px; margin:0 auto; padding:28px 32px; }
 /* Botón hamburguesa (components/sidebar.js lo agrega al topbar en runtime):
    oculto salvo en celular, donde reemplaza a la barra horizontal de tablet. */
 .sidebar-toggle-movil{
-  display:none; background:none; border:none; font-size:20px; color:var(--ink);
+  display:none; align-items:center; background:none; border:none; color:var(--ink);
   cursor:pointer; padding:4px 10px 4px 0; line-height:1; flex-shrink:0;
 }
+.sidebar-toggle-movil svg{ width:22px; height:22px; }
 
 @media (max-width: 900px){
   /* En columna, align-items:flex-start (el de escritorio) deja a .main-area con

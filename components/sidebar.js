@@ -12,9 +12,9 @@
 // algo real detrás, para no dejar un link muerto en el menú.
 
 import { modulosHabilitados, buscarModulo } from '../js/config.js';
-import { tienePermiso, tieneAlgunPermiso, haySesionActiva, obtenerSesion, cerrarSesion } from '../js/sesion.js';
+import { tienePermiso, tieneAlgunPermiso, haySesionActiva } from '../js/sesion.js';
 import { escapeHtml, urlLimpia } from '../js/utils.js';
-import { ICONO_SPARK } from '../js/iconos.js';
+import { ICONO_SPARK, ICONO_HOME, ICONO_BELL, ICONO_CLOCK, ICONO_USER, ICONO_BUILDING, ICONO_RECEIPT, ICONO_KEY, ICONO_SHIELD, ICONO_LOCK, ICONO_MENU } from '../js/iconos.js';
 
 // Grupo de sidebar por id de módulo (Rediseño v3). Client-side a propósito:
 // la tabla `modulos` no tiene columna de categoría y no vale la pena una
@@ -32,6 +32,26 @@ const GRUPOS_ORDEN = [
   { id: 'recursos', label: 'Recursos' }
 ];
 
+// Orden dentro de cada grupo (Recambio de diseño, 2026-09-21): antes salían
+// en el orden que devolviera /api/empresa/actual (alfabético por id de
+// módulo -- "Clientes" antes que "Ventas"). El núcleo del negocio
+// (Ventas -> Inventario -> Clientes -> Finanzas, el mismo orden que ya usa
+// la landing) va primero; un módulo que no aparezca acá se queda al final,
+// en el orden en que llegó.
+const ORDEN_DENTRO_DEL_GRUPO = ['ventas', 'inventario', 'clientes', 'finanzas', 'rrhh'];
+function ordenarModulos(modulos) {
+  return modulos
+    .map((m, i) => ({ m, i }))
+    .sort((a, b) => {
+      const pa = ORDEN_DENTRO_DEL_GRUPO.indexOf(a.m.id), pb = ORDEN_DENTRO_DEL_GRUPO.indexOf(b.m.id);
+      if (pa === -1 && pb === -1) return a.i - b.i; // ninguno tiene prioridad: se queda el orden original
+      if (pa === -1) return 1;
+      if (pb === -1) return -1;
+      return pa - pb;
+    })
+    .map(({ m }) => m);
+}
+
 const CLAVE_COLAPSADO = 'gealmi_sidebar_colapsado';
 
 // Chevron del botón de colapsar -- apunta a la izquierda ("contraer") por
@@ -39,10 +59,15 @@ const CLAVE_COLAPSADO = 'gealmi_sidebar_colapsado';
 // vez de cambiar el ícono a mano en cada toggle.
 const ICONO_CHEVRON = '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M9 2.5L4.5 7L9 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
+// m.icon puede ser un SVG de confianza (los ítems fijos de este archivo, ver
+// js/iconos.js) o un emoji suelto (los módulos del catálogo, tabla `modulos`
+// en la base de datos -- ver la nota al inicio del archivo): un SVG entra tal
+// cual, cualquier otra cosa se trata como texto y se escapa.
 function itemHtml(m, activo) {
+  const icono = typeof m.icon === 'string' && m.icon.startsWith('<svg') ? m.icon : escapeHtml(m.icon || '•');
   return `
     <a class="sidebar-item${activo ? ' active' : ''}" href="${m.href}" title="${escapeHtml(m.label)}">
-      <span class="sidebar-icon">${m.icon || '•'}</span>
+      <span class="sidebar-icon">${icono}</span>
       <span>${m.label}</span>
       ${m.badgeId ? `<span class="sidebar-badge" id="${m.badgeId}" hidden></span>` : ''}
     </a>`;
@@ -71,31 +96,31 @@ export function renderSidebar(config, paginaActualId) {
 
   const seccionAdmin = [];
   if (sinSesion || tieneAlgunPermiso('usuarios')) {
-    seccionAdmin.push({ id: 'usuarios', label: 'Usuarios', icon: '👤', href: 'usuarios' });
+    seccionAdmin.push({ id: 'usuarios', label: 'Usuarios', icon: ICONO_USER, href: 'usuarios' });
   }
   // Sub-fase F: Sucursales y Cajas, mismo criterio que Usuarios/Auditoría --
   // no dependen de un módulo contratado (empresa_modulos), son transversales
   // y se gatean solo por permiso (ver backend/src/routes/sucursales.js y
   // cajas.js, que a propósito no usan requireModulo()).
   if (sinSesion || tieneAlgunPermiso('sucursales')) {
-    seccionAdmin.push({ id: 'sucursales', label: 'Sucursales', icon: '🏢', href: 'sucursales' });
+    seccionAdmin.push({ id: 'sucursales', label: 'Sucursales', icon: ICONO_BUILDING, href: 'sucursales' });
   }
   if (sinSesion || tieneAlgunPermiso('cajas')) {
-    seccionAdmin.push({ id: 'cajas', label: 'Cajas', icon: '🧾', href: 'cajas' });
+    seccionAdmin.push({ id: 'cajas', label: 'Cajas', icon: ICONO_RECEIPT, href: 'cajas' });
   }
   // API pública (Nivel 3): también transversal, gateada por permiso -- el
   // acceso real lo decide el plan de la empresa (planes.acceso_api), que el
   // backend revalida en cada request (ver backend/src/routes/apiKeys.js).
   if (sinSesion || tieneAlgunPermiso('api_keys')) {
-    seccionAdmin.push({ id: 'api-keys', label: 'API pública', icon: '🔑', href: 'api-keys' });
+    seccionAdmin.push({ id: 'api-keys', label: 'API pública', icon: ICONO_KEY, href: 'api-keys' });
   }
   if (sinSesion || tieneAlgunPermiso('auditoria')) {
-    seccionAdmin.push({ id: 'auditoria', label: 'Auditoría', icon: '🛡️', href: 'auditoria' });
+    seccionAdmin.push({ id: 'auditoria', label: 'Auditoría', icon: ICONO_SHIELD, href: 'auditoria' });
   }
   // Seguridad de la PROPIA cuenta (verificación en dos pasos): para cualquier
   // persona con sesión, sin permiso de rol -- la pantalla misma explica si su
   // plan lo incluye.
-  seccionAdmin.push({ id: 'seguridad', label: 'Seguridad', icon: '🔐', href: 'seguridad' });
+  seccionAdmin.push({ id: 'seguridad', label: 'Seguridad', icon: ICONO_LOCK, href: 'seguridad' });
 
   // Agrupa los módulos habilitados según GRUPO_POR_MODULO, preservando el
   // orden de GRUPOS_ORDEN -- un grupo sin módulos simplemente no se pinta.
@@ -109,7 +134,7 @@ export function renderSidebar(config, paginaActualId) {
     .map(g => `
       <div class="sidebar-group">
         <div class="sidebar-group-label">${g.label}</div>
-        ${modulosPorGrupo.get(g.id).map(m => itemHtml({ ...m, href: urlLimpia(m.page) }, m.id === paginaActualId)).join('')}
+        ${ordenarModulos(modulosPorGrupo.get(g.id)).map(m => itemHtml({ ...m, href: urlLimpia(m.page) }, m.id === paginaActualId)).join('')}
       </div>`)
     .join('');
 
@@ -118,7 +143,7 @@ export function renderSidebar(config, paginaActualId) {
   cont.innerHTML = `
     <div class="sidebar-inner">
       <div class="sidebar-brand">
-        <a href="../" title="Ir a la página principal"><img class="mark" src="../assets/logo-icon.png" alt="GEALMI"></a>
+        <a href="../" title="Ir a la página principal"><img class="mark" src="../assets/brand/gealmi-mark-white.svg" alt="GEALMI"></a>
         <div class="sidebar-brand-text">
           <input class="biz-name" id="bizName" value="${escapeHtml(config.bizName || 'Gestor de Datos Empresariales')}" />
           <div class="sidebar-subtitle" id="sidebarSubtitle"></div>
@@ -129,9 +154,9 @@ export function renderSidebar(config, paginaActualId) {
         ${!sinSesion ? `
           <div class="sidebar-group">
             <div class="sidebar-group-label">Principal</div>
-            ${itemHtml({ id: 'inicio', label: 'Inicio', icon: '🏠', href: 'inicio' }, paginaActualId === 'inicio')}
-            ${itemHtml({ id: 'notificaciones', label: 'Notificaciones', icon: '🔔', href: 'notificaciones', badgeId: 'badgeMenuNotif' }, paginaActualId === 'notificaciones')}
-            ${conRrhh ? itemHtml({ id: 'mi-asistencia', label: 'Mi asistencia', icon: '⏱️', href: 'mi-asistencia' }, paginaActualId === 'mi-asistencia') : ''}
+            ${itemHtml({ id: 'inicio', label: 'Inicio', icon: ICONO_HOME, href: 'inicio' }, paginaActualId === 'inicio')}
+            ${itemHtml({ id: 'notificaciones', label: 'Notificaciones', icon: ICONO_BELL, href: 'notificaciones', badgeId: 'badgeMenuNotif' }, paginaActualId === 'notificaciones')}
+            ${conRrhh ? itemHtml({ id: 'mi-asistencia', label: 'Mi asistencia', icon: ICONO_CLOCK, href: 'mi-asistencia' }, paginaActualId === 'mi-asistencia') : ''}
           </div>` : ''}
         ${gruposHtml}
         ${seccionAdmin.length ? `
@@ -140,8 +165,8 @@ export function renderSidebar(config, paginaActualId) {
             ${seccionAdmin.map(m => itemHtml(m, m.id === paginaActualId)).join('')}
           </div>` : ''}
       </nav>
-      <div class="sidebar-footer" id="sidebarFooter"></div>
       ${gealmiAiEntradaHtml(config, paginaActualId)}
+      <div class="sidebar-footer" id="sidebarFooter"></div>
     </div>
   `;
 
@@ -199,7 +224,8 @@ function asegurarFavicon() {
   if (document.querySelector('link[rel="icon"]')) return;
   const link = document.createElement('link');
   link.rel = 'icon';
-  link.href = '../assets/logo-icon.png';
+  link.href = '../assets/brand/gealmi-icon.svg';
+  link.type = 'image/svg+xml';
   document.head.appendChild(link);
 }
 
@@ -216,7 +242,7 @@ function asegurarControlesMovil() {
       btn.id = 'btnMenuMovil';
       btn.className = 'sidebar-toggle-movil';
       btn.setAttribute('aria-label', 'Abrir menú');
-      btn.textContent = '☰';
+      btn.innerHTML = ICONO_MENU;
       topbar.prepend(btn);
       btn.addEventListener('click', () => toggleSidebarMovil(true));
     }
@@ -240,37 +266,16 @@ function toggleSidebarMovil(abrir) {
   document.body.classList.toggle('sidebar-movil-abierto', abrir);
 }
 
+// Pie del sidebar: solo la marca (Recambio de diseño, 2026-09-21). Antes
+// repetía acá la identidad del usuario + "Cerrar sesión" -- ya duplicado en
+// el chip de la topbar (components/topbar.js, en TODAS las páginas, con
+// sesión o sin ella: "Iniciar sesión" sin sesión, avatar+rol+"Cerrar sesión"
+// con ella) -- dos botones de salir en dos sitios distintos de la misma
+// pantalla no suma claridad. Nada más en el proyecto lee #sidebarFooter/
+// #btnCerrarSesionSidebar (se verificó antes de este cambio), así que no
+// rompe nada quitar ese contenido de acá.
 function renderSidebarFooter() {
   const cont = document.getElementById('sidebarFooter');
   if (!cont) return;
-  const sesion = obtenerSesion();
-
-  if (!sesion || !sesion.usuario) {
-    cont.innerHTML = `<a class="sidebar-login-link" href="login">Iniciar sesión</a>`;
-    return;
-  }
-
-  const inicial = escapeHtml((sesion.usuario.nombre || '?').trim().charAt(0).toUpperCase());
-  // empresa_nombre solo existe desde Fase A -- sesiones viejas (si alguien
-  // no cerró sesión antes del deploy) no lo tienen, por eso el guard.
-  const empresaHtml = sesion.usuario.empresa_nombre
-    ? `<div class="sidebar-footer-rol" title="Empresa activa">${escapeHtml(sesion.usuario.rol)} · ${escapeHtml(sesion.usuario.empresa_nombre)}</div>`
-    : `<div class="sidebar-footer-rol">${escapeHtml(sesion.usuario.rol)}</div>`;
-  cont.innerHTML = `
-    <div class="sidebar-footer-usuario">
-      <div class="sidebar-avatar">${inicial}</div>
-      <div class="sidebar-footer-info">
-        <div class="sidebar-footer-nombre">${escapeHtml(sesion.usuario.nombre)}</div>
-        ${empresaHtml}
-      </div>
-    </div>
-    <button type="button" class="sidebar-logout" id="btnCerrarSesionSidebar" title="Cerrar sesión">
-      <svg class="sidebar-logout-icono" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      <span class="sidebar-logout-texto">Cerrar sesión</span>
-    </button>
-  `;
-  document.getElementById('btnCerrarSesionSidebar').addEventListener('click', () => {
-    cerrarSesion();
-    location.reload();
-  });
+  cont.innerHTML = `<div class="sidebar-tagline">Tu negocio, <span>en un solo lugar</span></div>`;
 }

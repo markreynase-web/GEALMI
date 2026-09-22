@@ -1,28 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
 /* Estas variables son el "tema". En la Fase de temas, cada archivo en
    css/themes/*.css redefine este mismo set de variables.
-   Rediseño (UI/UX v3): migra la paleta "dashboard SaaS" de antes al mismo
-   sistema navy/cyan ya usado en index.html (landing) y pages/login.html --
-   se mantienen los MISMOS nombres de variable (para no tocar cada archivo
-   que ya las consume) pero los valores ahora salen de ese sistema, no se
-   inventan. Ver el detalle de cada reasignación en el plan de esta fase.
-   --paper es la única excepción deliberada: en la landing significa
-   "superficie blanca pura", pero acá significa "fondo hundido/gris" (bg de
-   inputs, hover de filas) -- ponerlo blanco puro haría esos estados
-   invisibles contra las tarjetas blancas, así que usa un gris muy sutil ya
-   aprobado en la landing (.browser-chrome) en vez del --paper de ahí. */
+   Recambio de diseño (2026-09-21): migra la paleta navy/cyan del rediseño
+   anterior a la identidad nueva de GEALMI (tablero de marca: azul oscuro,
+   verde, verde claro, gris, blanco -- mismos tokens que css/auth.css y la
+   landing). Se mantienen los MISMOS nombres de variable a propósito (para no
+   tocar cada uno de los ~50 archivos que ya las consume) -- solo cambian los
+   valores. Detalle de cada reasignación:
+     --ink            azul oscuro de marca (antes navy/cyan del rediseño v3)
+     --ochre/-deep     el "acento primario" de la app (bordes de foco, links,
+                       pestaña activa) -- pasa de cian a VERDE de marca. Es
+                       también lo que un color de empresa personalizado
+                       sobreescribe (ver aplicarTema() en js/config.js).
+     --teal family     mismo verde que --ochre, con dos matices: --teal (claro,
+                       relleno/decorativo) y --teal-deep/--teal-strong (oscuro,
+                       AA-seguro como texto o como fondo con texto blanco).
+     --coral/-deep     SOLO "peligro/negativo" (eliminar, egresos, KPI en rojo)
+                       -- ya NO es también el botón primario (ver el arreglo
+                       de --brand abajo), así que se queda en rojo siempre,
+                       sin importar el color de marca que elija una empresa.
+     --brand/-deep     nuevo: el botón primario real (.btn-ochre lo usa desde
+                       acá, no desde --coral -- esa mezcla era un bug ya
+                       anotado en el código: "el nombre de la clase quedó de
+                       un diseño anterior", ver aplicarTema()).
+   --blue/--orange/--purple/--green (más sus "-soft") son categóricos, no de
+   marca (tipos de notificación, acentos de KPI) -- se quedan como estaban.
+   --paper sigue siendo la excepción deliberada: acá es "fondo hundido/gris"
+   (bg de inputs, hover de filas), no la superficie blanca pura de la landing. */
 :root{
-  --ink:#0E1B45;
-  --paper:#F4F7FB;
-  --paper-line:#E1E7F0;
-  --ochre:#2EE2CE;
-  --ochre-deep:#1C6F96;
-  --teal:#0FA69C;
-  --teal-deep:#1C6F96;
-  --teal-soft:#E3FBF6;
-  --teal-strong:#0B7C75; /* teal para TEXTO y para fondos con texto blanco (AA); --teal queda para rellenos */
-  --placeholder:#66708C;
+  --ink:#0F172A;
+  --paper:#F1F5F9;
+  --paper-line:#E2E8F0;
+  --ochre:#3CB892;
+  --ochre-deep:#146F56;
+  --brand:#3CB892;
+  --brand-deep:#146F56;
+  --teal:#3CB892;
+  --teal-deep:#146F56;
+  --teal-soft:#EAF6F1;
+  --teal-strong:#146F56; /* teal para TEXTO y para fondos con texto blanco (AA); --teal queda para rellenos */
+  --placeholder:#6B7280;
   --coral:#AF4B43;
   --coral-deep:#8A3A34;
   --blue:#1C6F96;
@@ -33,12 +51,12 @@
   --orange-soft:#F8EAD4;
   --purple:#5B4FE0;
   --purple-soft:#EDEBFB;
-  --muted:#4E5A78;
-  --card-shadow: 0 1px 2px rgba(14,27,69,0.04), 0 8px 24px -12px rgba(14,27,69,0.18);
+  --muted:#4B5563;
+  --card-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -12px rgba(15,23,42,0.18);
 
-  --cyan:#2EE2CE;
+  --cyan:#3CB892;
   --danger:#AF4B43;
-  --font-display:'Bricolage Grotesque','Inter',sans-serif;
+  --font-display:'Poppins','Inter',sans-serif;
   --font-body:'Inter','Segoe UI',sans-serif;
   --font-mono:'IBM Plex Mono', ui-monospace, monospace;
 }
@@ -50,14 +68,20 @@ body{
 h1,h2,h3,h4{ font-family:var(--font-display); }
 .num{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
 
-/* Ícono de marca (assets/logo-icon.png). Lo usan el sidebar
-   (components/sidebar.js, ver css/layout.css para el tamaño específico ahí),
-   la columna de marketing de pages/login.html y pages/privacidad.html. */
-.mark{ width:38px; height:38px; flex-shrink:0; object-fit:contain; border-radius:8px; display:block; }
+/* Ícono de marca (assets/brand/gealmi-*.svg). Lo usan el sidebar
+   (components/sidebar.js, ver css/layout.css para el tamaño específico ahí)
+   y pages/privacidad.html. */
+.mark{ width:38px; height:32px; flex-shrink:0; object-fit:contain; display:block; }
 
 .btn{ font-family:'Inter', sans-serif; font-size:13px; font-weight:600; padding:9px 14px; border-radius:10px; border:1px solid transparent; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
-.btn-ochre{ background:var(--coral); color:#fff; }
-.btn-ochre:hover{ background:var(--coral-deep); }
+/* El botón primario de toda la app -- el nombre "ochre" quedó de un diseño
+   anterior (cian), pero SÍ lee de --ochre/--ochre-deep (antes leía de
+   --coral, el color de "peligro": un botón "Guardar" y un botón "Eliminar"
+   terminaban del mismo color -- ver aplicarTema() en js/config.js para la
+   otra mitad de este arreglo). Texto azul oscuro, no blanco: el verde de
+   marca (#3CB892) da solo 2.4:1 de contraste con blanco -- --ink da 7.2:1. */
+.btn-ochre{ background:var(--ochre); color:var(--ink); }
+.btn-ochre:hover{ background:var(--ochre-deep); color:#fff; }
 .btn-ochre:disabled{ opacity:0.6; cursor:not-allowed; }
 .btn-ghost{ background:transparent; color:var(--ink); border-color:var(--paper-line); }
 .btn-ghost:hover{ border-color:var(--ink); }

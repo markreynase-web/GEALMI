@@ -14,11 +14,11 @@
      igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
      (importado por todas las páginas), no acá. -->
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0E1B45">
+<meta name="theme-color" content="#0F172A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GEALMI">
-<link rel="apple-touch-icon" href="/assets/logo-icon.png">
+<link rel="apple-touch-icon" href="/assets/brand/gealmi-apple-touch.png">
 </head>
 <body data-modulo="inicio">
 
@@ -28,14 +28,28 @@
   <div class="main-area">
     <header class="topbar">
       <div class="topbar-title">
-        <h1 id="topbarTitle">Inicio</h1>
-        <div class="topbar-subtitle" id="topbarSubtitle">Bienvenido a tu panel de control</div>
+        <h1>Inicio</h1>
       </div>
       <div class="topbar-search" id="topbarSearch"></div>
       <div id="sesionWidget" class="sesion-widget"></div>
     </header>
 
     <main>
+      <section class="welcome-banner" id="welcomeBanner" aria-labelledby="welcomeTitulo">
+        <div class="welcome-text">
+          <p class="welcome-eyebrow" id="welcomeEyebrow">Bienvenido</p>
+          <h2 class="welcome-title" id="welcomeTitulo">Tu empresa en <span>control, siempre</span>.</h2>
+          <p class="welcome-sub">Gestiona, automatiza y toma mejores decisiones con la plataforma empresarial GEALMI.</p>
+        </div>
+        <div class="welcome-stat">
+          <div class="welcome-stat-top">
+            <span class="welcome-stat-icon" aria-hidden="true"></span>
+            <span class="welcome-stat-label">Módulos activos</span>
+          </div>
+          <span class="welcome-stat-value" id="welcomeModulos">—</span>
+        </div>
+      </section>
+
       <div class="kpis" id="kpisResumen"></div>
 
       <!-- Dos columnas independientes (no grid-2 fila por fila): con grid,
@@ -106,7 +120,7 @@
 </div>
 
 <script type="module">
-import { cargarConfigEmpresa } from '../js/config.js';
+import { cargarConfigEmpresa, modulosHabilitados } from '../js/config.js';
 import { renderSidebar } from '../components/sidebar.js';
 import { renderTopbar } from '../components/topbar.js';
 import { renderFooter } from '../components/footer.js';
@@ -116,6 +130,7 @@ import { fmtNum, escapeHtml } from '../js/utils.js';
 import { crearGraficoLineasComparativo } from '../js/charts.js';
 import { kpiCard, deltaPorcentaje } from '../js/kpiCard.js';
 import { nivelRiesgoStock } from '../js/stockRisk.js';
+import { ICONO_GRID } from '../js/iconos.js';
 
 if (!haySesionActiva()) location.replace('login');
 
@@ -299,10 +314,18 @@ async function seccionActividad() {
     : '<div class="rank-row">Todavía no hay actividad registrada.</div>';
 }
 
-function aplicarSaludo() {
+// Banner de bienvenida: saludo con el nombre real de quien inició sesión y,
+// a su lado, cuántos de SUS módulos contratados están activos ahora mismo
+// (modulosHabilitados ya viene de /api/empresa/actual, sin pedir nada
+// aparte). No es "activos de Y en el catálogo" -- un usuario normal no
+// tiene forma de ver el catálogo completo (eso es de Super Admin), así que
+// mostrar una fracción inventada sería un dato falso.
+function pintarBanner(config) {
   const sesion = obtenerSesion();
   const nombre = (sesion?.usuario?.nombre || '').split(' ')[0] || '';
-  document.getElementById('topbarTitle').textContent = nombre ? `Hola, ${nombre} 👋` : 'Hola 👋';
+  document.getElementById('welcomeEyebrow').textContent = nombre ? `¡Bienvenido, ${nombre}!` : '¡Bienvenido!';
+  document.getElementById('welcomeModulos').textContent = fmtNum(modulosHabilitados(config).length);
+  document.querySelector('#welcomeBanner .welcome-stat-icon').innerHTML = ICONO_GRID;
 }
 
 (async function iniciar() {
@@ -310,7 +333,7 @@ function aplicarSaludo() {
   renderSidebar(config, 'inicio');
   await renderTopbar(config);
   renderFooter();
-  aplicarSaludo();
+  pintarBanner(config);
 
   const actividad = tienePermiso('auditoria.ver') ? seccionActividad() : null;
   const resumen = await obtenerJSON(config.apiBaseUrl, '/inicio/resumen');

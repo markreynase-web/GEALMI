@@ -25,7 +25,7 @@
 
 const RUTA_JSPDF = '/lib/jspdf.umd.min.js';
 const RUTA_AUTOTABLE = '/lib/jspdf.plugin.autotable.min.js';
-const RUTA_LOGO = '/assets/logo-icon.png';
+const RUTA_LOGO = '/assets/brand/gealmi-apple-touch.png';
 
 // A4 vertical, en milímetros.
 const PAG = { w: 210, h: 297, margen: 14, arriba: 14, abajo: 18 };
@@ -40,11 +40,11 @@ const PX_POR_MM = 3.78; // 96 dpi: el gráfico se redibuja a este tamaño para q
 const ESCALA_GRAFICO = 3; // nitidez: píxeles reales por píxel CSS del gráfico
 
 const COLOR = {
-  tinta: [14, 27, 69], apagado: [78, 90, 120], linea: [225, 231, 240], suave: [244, 247, 251],
-  cian: [46, 226, 206], verde: [10, 122, 92], rojo: [175, 75, 67], blanco: [255, 255, 255]
+  tinta: [15, 23, 42], apagado: [75, 85, 99], linea: [226, 232, 240], suave: [241, 245, 249],
+  cian: [60, 184, 146], verde: [10, 122, 92], rojo: [175, 75, 67], blanco: [255, 255, 255]
 };
 const ACENTOS = {
-  teal: [15, 166, 156], blue: [28, 111, 150], green: [10, 122, 92],
+  teal: [60, 184, 146], blue: [28, 111, 150], green: [10, 122, 92],
   orange: [201, 138, 60], purple: [91, 79, 224], red: [175, 75, 67]
 };
 

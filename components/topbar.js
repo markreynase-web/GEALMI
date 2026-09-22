@@ -16,6 +16,7 @@ import { obtenerSesion, tienePermiso, haySesionActiva, cerrarSesion, estaImperso
 import { listarRegistros } from '../js/api.js';
 import { escapeHtml, fmtNum } from '../js/utils.js';
 import { iniciarSondeo, suscribir, marcarLeidas, marcarTodasLeidas, confirmarEnterado, tipoDe, tiempoRelativo } from '../js/notificaciones.js';
+import { ICONO_SEARCH, ICONO_BELL, ICONO_CHEVRON_DOWN, ICONO_LOCK } from '../js/iconos.js';
 
 const MODULOS_BUSCABLES = [
   { id: 'ventas', label: 'Ventas', icon: '💰', campos: ['producto', 'cliente', 'categoria', 'notas'],
@@ -94,7 +95,7 @@ function renderBusqueda(config) {
   if (!haySesionActiva() || !buscables.length) { cont.innerHTML = ''; return; }
 
   cont.innerHTML = `
-    <span class="ico">🔍</span>
+    <span class="ico">${ICONO_SEARCH}</span>
     <input type="search" id="topbarSearchInput" placeholder="Buscar (clientes, productos, ventas...)">
     <div class="topbar-search-resultados" id="topbarSearchResultados"></div>
   `;
@@ -222,7 +223,7 @@ async function renderUsuarioYNotificaciones(config) {
     <div class="topbar-user">
       <div class="topbar-notif">
         <button type="button" class="topbar-notif-btn" id="btnNotif" title="Notificaciones" aria-label="Notificaciones">
-          🔔<span class="topbar-notif-badge" id="badgeNotif" style="display:none;"></span>
+          ${ICONO_BELL}<span class="topbar-notif-badge" id="badgeNotif" style="display:none;"></span>
         </button>
         <div class="topbar-notif-panel" id="panelNotif">
           <div class="topbar-notif-cabecera">
@@ -240,7 +241,7 @@ async function renderUsuarioYNotificaciones(config) {
             <div class="topbar-usuario-nombre">${escapeHtml(sesion.usuario.nombre)}</div>
             <div class="topbar-usuario-rol">${escapeHtml(sesion.usuario.rol)}</div>
           </div>
-          <span class="topbar-usuario-chevron">▾</span>
+          <span class="topbar-usuario-chevron">${ICONO_CHEVRON_DOWN}</span>
         </button>
         <div class="topbar-usuario-panel" id="panelUsuario">
           <button type="button" id="btnCerrarSesionTopbar">⎋ Cerrar sesión</button>
@@ -313,7 +314,7 @@ function renderBannerImpersonacion() {
   banner.id = 'bannerImpersonacion';
   banner.className = 'banner-impersonacion';
   banner.innerHTML = `
-    🔒 Estás viendo como soporte técnico — <b>${escapeHtml(sesion.usuario.empresa_nombre || 'esta empresa')}</b>
+    <span class="banner-impersonacion-icono">${ICONO_LOCK}</span> Estás viendo como soporte técnico — <b>${escapeHtml(sesion.usuario.empresa_nombre || 'esta empresa')}</b>
     <button type="button" id="btnSalirImpersonacion">Salir</button>
   `;
   mainArea.prepend(banner);

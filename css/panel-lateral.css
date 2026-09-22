@@ -44,7 +44,7 @@
 .panel-lateral-icono{
   display:flex; align-items:center; justify-content:center;
   width:38px; height:38px; border-radius:10px;
-  background:var(--orange-soft); color:var(--orange); font-size:17px; flex-shrink:0;
+  background:var(--teal-soft); color:var(--teal-deep); font-size:17px; flex-shrink:0;
 }
 .panel-lateral-header h3{
   font-family:var(--font-display); font-size:16px; font-weight:700; margin:0; color:var(--ink);

@@ -12,18 +12,19 @@
 // hubiera novedades: la campana nunca debe romper una pantalla.
 
 import { obtenerSesion, haySesionActiva, estaImpersonando } from './sesion.js';
+import { ICONO_MESSAGE, ICONO_PACKAGE, ICONO_RECEIPT, ICONO_ALARM, ICONO_CALENDAR, ICONO_USERS, ICONO_BELL } from './iconos.js';
 
 const INTERVALO_MS = 30000;
 
 export const TIPOS = {
-  mensaje: { icono: '💬', clase: 'mensaje', etiqueta: 'Mensaje' },
-  stock_bajo: { icono: '📦', clase: 'stock', etiqueta: 'Inventario' },
-  arqueo_diferencia: { icono: '🧾', clase: 'caja', etiqueta: 'Caja' },
-  caja_abierta: { icono: '⏰', clase: 'caja', etiqueta: 'Caja' },
-  vencimientos: { icono: '📅', clase: 'vence', etiqueta: 'Vencimientos' },
-  rrhh: { icono: '👥', clase: 'rrhh', etiqueta: 'RRHH' }
+  mensaje: { icono: ICONO_MESSAGE, clase: 'mensaje', etiqueta: 'Mensaje' },
+  stock_bajo: { icono: ICONO_PACKAGE, clase: 'stock', etiqueta: 'Inventario' },
+  arqueo_diferencia: { icono: ICONO_RECEIPT, clase: 'caja', etiqueta: 'Caja' },
+  caja_abierta: { icono: ICONO_ALARM, clase: 'caja', etiqueta: 'Caja' },
+  vencimientos: { icono: ICONO_CALENDAR, clase: 'vence', etiqueta: 'Vencimientos' },
+  rrhh: { icono: ICONO_USERS, clase: 'rrhh', etiqueta: 'RRHH' }
 };
-export const tipoDe = (tipo) => TIPOS[tipo] || { icono: '🔔', clase: 'otro', etiqueta: 'Aviso' };
+export const tipoDe = (tipo) => TIPOS[tipo] || { icono: ICONO_BELL, clase: 'otro', etiqueta: 'Aviso' };
 
 let apiBase = null;
 let estado = { no_leidas: 0, pendientes_enterado: 0, importantes: [], recientes: [] };

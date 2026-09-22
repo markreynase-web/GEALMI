@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GEALMI — Super administrador</title>
-<link rel="icon" href="../assets/logo-icon.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/gealmi-icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/base.css">
@@ -16,7 +16,7 @@
   .sa-shell{ max-width:1040px; margin:0 auto; padding:28px 24px 20px; }
   .sa-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
   .sa-brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
-  .sa-brand img{ width:34px; height:34px; }
+  .sa-brand img{ width:34px; height:30px; }
   .sa-brand-text{ display:flex; align-items:center; gap:8px; font-family:'Inter', sans-serif; font-weight:800; font-size:16px; color:var(--ink); }
   .sa-brand-tag{ font-size:11px; font-weight:700; color:var(--teal-deep); background:var(--teal-soft); padding:3px 9px; border-radius:20px; }
   .sa-panel{ background:#fff; border-radius:14px; padding:24px; box-shadow:var(--card-shadow); margin-bottom:20px; }
@@ -36,18 +36,18 @@
      igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
      (importado por todas las páginas), no acá. -->
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0E1B45">
+<meta name="theme-color" content="#0F172A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GEALMI">
-<link rel="apple-touch-icon" href="/assets/logo-icon.png">
+<link rel="apple-touch-icon" href="/assets/brand/gealmi-apple-touch.png">
 </head>
 <body>
 
 <div class="sa-shell">
   <div class="sa-header">
     <a class="sa-brand" href="../" title="Ir a la página principal">
-      <img src="../assets/logo-icon.png" alt="GEALMI">
+      <img src="../assets/brand/gealmi-mark.svg" alt="GEALMI">
       <div class="sa-brand-text">GEALMI <span class="sa-brand-tag">Super Admin</span></div>
     </a>
     <button type="button" class="btn btn-ghost" id="btnCerrarSesion" style="color:var(--ink); border:1px solid var(--paper-line);">Cerrar sesión</button>

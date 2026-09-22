@@ -36,21 +36,17 @@ function oscurecer(hex, factor = 0.78) {
 }
 
 // Personalización de marca por empresa (opt-in, la pone el super admin):
-// sobreescribe --ochre/--ochre-deep Y --coral/--coral-deep.
+// sobreescribe --ochre/--ochre-deep y --brand/--brand-deep (el botón
+// primario de toda la app, .btn-ochre en css/base.css, lee de ahí).
 //
-// El botón primario de toda la app (.btn-ochre, en css/base.css) en
-// realidad usa --coral/--coral-deep, no --ochre -- el nombre de la clase
-// quedó de un diseño anterior y nunca se actualizó. Sin sobreescribir
-// --coral también, el color elegido no se veía en ningún botón real (solo
-// en detalles menores: bordes de foco, la pestaña "activo", el widget de
-// GEALMI AI) -- por eso "no se notaba en la interfaz".
-//
-// Aviso: --coral también se usa para indicadores de "peligro/negativo"
-// (botones de eliminar, KPIs en rojo, la flecha de tendencia hacia abajo).
-// Con el color de marca puesto, esos indicadores usan ese mismo color en
-// vez de rojo -- es el trade-off de que ambos usos compartan una sola
-// variable en el CSS actual; separarlos en dos variables distintas es un
-// cambio más grande que se puede hacer después si hace falta.
+// Arreglo del Recambio de diseño (2026-09-21): antes esto TAMBIÉN
+// sobreescribía --coral/--coral-deep, porque .btn-ochre leía de --coral por
+// un nombre de clase que quedó de un diseño anterior. Eso mezclaba dos cosas
+// que no deberían compartir variable: el color de marca de una empresa Y el
+// color de "peligro" (eliminar, egresos, KPI en rojo) -- una empresa que
+// elegía, por ejemplo, un azul, terminaba con sus botones de eliminar en
+// azul también. Ahora --coral se queda SIEMPRE en rojo, sin importar el
+// color de marca.
 //
 // Sin color guardado (o si llega mal formado), no se toca nada y quedan
 // los colores de GEALMI de siempre.
@@ -60,13 +56,19 @@ function aplicarTema(config) {
     const oscuro = oscurecer(config.colorPrimario);
     raiz.setProperty('--ochre', config.colorPrimario);
     raiz.setProperty('--ochre-deep', oscuro);
-    raiz.setProperty('--coral', config.colorPrimario);
-    raiz.setProperty('--coral-deep', oscuro);
+    raiz.setProperty('--brand', config.colorPrimario);
+    raiz.setProperty('--brand-deep', oscuro);
+    raiz.setProperty('--teal', config.colorPrimario);
+    raiz.setProperty('--teal-deep', oscuro);
+    raiz.setProperty('--teal-strong', oscuro);
   } else {
     raiz.removeProperty('--ochre');
     raiz.removeProperty('--ochre-deep');
-    raiz.removeProperty('--coral');
-    raiz.removeProperty('--coral-deep');
+    raiz.removeProperty('--brand');
+    raiz.removeProperty('--brand-deep');
+    raiz.removeProperty('--teal');
+    raiz.removeProperty('--teal-deep');
+    raiz.removeProperty('--teal-strong');
   }
 }
 

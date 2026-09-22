@@ -129,6 +129,33 @@
    acota con scroll interno en vez de dejar que crezca sin límite. */
 #finMovimientos{ max-height:420px; overflow-y:auto; }
 
+/* Banner de bienvenida (Recambio de diseño, 2026-09-21; pages/inicio.html).
+   Paisaje andino de fondo (mismo assets/auth-paisaje.svg del login) -- ya
+   representa a la marca en la pantalla de acceso, así que reaparece acá
+   como el primer saludo dentro de la app, no como una imagen nueva. */
+.welcome-banner{
+  position:relative; overflow:hidden; display:flex; flex-wrap:wrap; align-items:center; gap:24px;
+  padding:32px; margin-bottom:28px; border-radius:20px; color:#fff;
+  background:
+    linear-gradient(100deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.72) 46%, rgba(15,23,42,0.32) 100%),
+    url('../assets/auth-paisaje.svg') right center / cover no-repeat, var(--ink);
+}
+.welcome-text{ flex:1 1 320px; min-width:0; }
+.welcome-eyebrow{ font-family:var(--font-mono); font-size:11.5px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal); margin:0 0 8px; }
+.welcome-title{ font-family:var(--font-display); font-weight:700; font-size:clamp(22px,2.6vw,30px); line-height:1.2; margin:0 0 8px; }
+.welcome-title span{ color:var(--teal); }
+.welcome-sub{ font-size:14px; line-height:1.5; color:rgba(255,255,255,0.78); max-width:46ch; margin:0; }
+.welcome-stat{
+  flex-shrink:0; display:flex; flex-direction:column; gap:8px; min-width:168px;
+  background:#fff; color:var(--ink); border-radius:14px; padding:16px 20px; box-shadow:0 18px 36px -16px rgba(0,0,0,0.45);
+}
+.welcome-stat-top{ display:flex; align-items:center; gap:8px; }
+.welcome-stat-icon{ display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:var(--teal-soft); color:var(--teal-deep); flex-shrink:0; }
+.welcome-stat-icon svg{ width:15px; height:15px; }
+.welcome-stat-label{ font-size:11.5px; font-weight:600; color:var(--muted); }
+.welcome-stat-value{ font-family:var(--font-mono); font-size:26px; font-weight:700; line-height:1; }
+@media (max-width:640px){ .welcome-banner{ padding:24px; } .welcome-stat{ width:100%; } }
+
 .kpis{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:18px; margin-bottom:36px; }
 .kpi-card{ background:#fff; border-radius:14px; padding:18px 20px; box-shadow:var(--card-shadow); }
 .kpi-card .label{ font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); font-weight:600; }

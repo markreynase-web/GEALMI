@@ -170,9 +170,14 @@
    tarjetas KPI genéricas de los módulos, armadas por dashboard.js a partir
    de columnas arbitrarias de un CSV, que no tienen un ícono honesto que
    asignarles). `data-accento` selecciona el color: red|blue|orange|purple|green|teal. */
+/* Fila superior de la tarjeta: ícono a la izquierda y, si la tarjeta trae una
+   tendencia real (kpiCard({ tendencia })), un sparkline a la derecha -- ver
+   js/kpiCard.js. Sin tendencia, .kpi-card-top solo contiene el ícono y se ve
+   igual que antes (el resto de los dashboards que usan kpiCard() no cambia). */
+.kpi-card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:12px; }
 .kpi-card-icon{
   display:flex; align-items:center; justify-content:center; width:40px; height:40px;
-  border-radius:11px; font-size:17px; margin-bottom:12px;
+  border-radius:11px; font-size:17px; flex-shrink:0;
 }
 .kpi-card[data-acento="red"] .kpi-card-icon{ background:#FBEAF0; color:var(--coral); }
 .kpi-card[data-acento="blue"] .kpi-card-icon{ background:var(--blue-soft); color:var(--blue); }
@@ -182,6 +187,16 @@
 .kpi-card[data-acento="teal"] .kpi-card-icon{ background:var(--teal-soft); color:var(--teal-deep); }
 .kpi-card-bar{ height:5px; border-radius:20px; background:var(--paper-line); margin-top:14px; overflow:hidden; }
 .kpi-card-bar-fill{ height:100%; border-radius:20px; }
+
+/* Sparkline (Rediseño de Inicio, 2026-09-22): mini-gráfico de área, mismo
+   verde/rojo que .kpi-card-delta.up/.down -- una tarjeta sin tendencia real
+   detrás (ver js/kpiCard.js) simplemente no la trae. */
+.kpi-card-spark{ width:72px; height:30px; flex-shrink:0; }
+.kpi-card-spark-svg{ width:100%; height:100%; display:block; overflow:visible; }
+.kpi-card-spark-area{ fill:var(--teal); fill-opacity:0.16; stroke:none; }
+.kpi-card-spark-linea{ fill:none; stroke:var(--teal-deep); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.kpi-card-spark.down .kpi-card-spark-area{ fill:var(--coral); }
+.kpi-card-spark.down .kpi-card-spark-linea{ stroke:var(--coral-deep); }
 .kpi-card[data-acento="red"] .kpi-card-bar-fill{ background:var(--coral); }
 .kpi-card[data-acento="blue"] .kpi-card-bar-fill{ background:var(--blue); }
 .kpi-card[data-acento="orange"] .kpi-card-bar-fill{ background:var(--orange); }

@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="../css/cards.css">
 <link rel="stylesheet" href="../css/tables.css">
 <link rel="stylesheet" href="../css/panel-lateral.css">
+<link rel="stylesheet" href="../css/inicio.css">
 <script src="../lib/chart.js"></script>
 <!-- PWA instalable (Nivel 3 del roadmap) -- rutas absolutas, funcionan
      igual desde la raíz que desde pages/. sw.js se registra en js/sesion.js
@@ -35,328 +36,93 @@
     </header>
 
     <main>
-      <section class="welcome-banner" id="welcomeBanner" aria-labelledby="welcomeTitulo">
-        <div class="welcome-text">
-          <p class="welcome-eyebrow" id="welcomeEyebrow">Bienvenido</p>
-          <h2 class="welcome-title" id="welcomeTitulo">Tu empresa en <span>control, siempre</span>.</h2>
-          <p class="welcome-sub">Gestiona, automatiza y toma mejores decisiones con la plataforma empresarial GEALMI.</p>
+      <section class="ini-saludo">
+        <div class="ini-saludo-texto">
+          <h2 id="iniSaludoTitulo">Hola<span class="ini-saludo-mano" aria-hidden="true">👋</span></h2>
+          <p>Aquí tienes un resumen de tu negocio.</p>
         </div>
-        <div class="welcome-stat">
-          <div class="welcome-stat-top">
-            <span class="welcome-stat-icon" aria-hidden="true"></span>
-            <span class="welcome-stat-label">Módulos activos</span>
+        <div class="ini-saludo-derecha">
+          <p class="ini-saludo-lema">Gestiona hoy, logra más mañana.</p>
+          <div class="ini-rango-fecha" id="iniRangoFecha">
+            <span class="ico" id="iniRangoIcono"></span>
+            <span id="iniRangoTexto">—</span>
           </div>
-          <span class="welcome-stat-value" id="welcomeModulos">—</span>
         </div>
       </section>
 
       <div class="kpis" id="kpisResumen"></div>
 
-      <!-- Dos columnas independientes (no grid-2 fila por fila): con grid,
-           la fila completa toma la altura del panel más alto y el más corto
-           de esa fila queda con un hueco en blanco debajo. Acá cada columna
-           apila sus propios paneles con su propia altura real -- pueden
-           terminar a distinta altura entre sí, pero ninguna deja hueco.
-           column-count (CSS) se probó primero pero Chrome no balancea
-           columnas cuando el contenedor tiene altura automática, así que
-           quedaba todo apilado en una sola columna. -->
-      <div class="inicio-columnas">
-        <div class="inicio-col">
-          <div class="panel" id="panelChart" style="display:none;">
-            <h3>
-              Resumen de ingresos vs. egresos
-              <span style="display:inline-flex; align-items:center;">
-                <select id="chartPeriodo" class="chart-periodo-select">
-                  <option value="anio">Este año</option>
-                  <option value="30d">Últimos 30 días</option>
-                  <option value="6m">Últimos 6 meses</option>
-                  <option value="personalizado">Personalizado</option>
-                </select>
-                <span class="chart-periodo-custom" id="chartPeriodoCustom" style="display:none;">
-                  <input type="date" id="chartDesde"> <input type="date" id="chartHasta">
-                </span>
+      <p class="tabla-vacia" id="sinPermisos" style="display:none;">Tu rol no tiene permisos para ver ningún resumen todavía.</p>
+
+      <div class="ini-fila-3" id="filaGraficos" style="display:none;">
+        <div class="panel" id="panelChart" style="display:none;">
+          <h3>
+            Ingresos vs. gastos
+            <span style="display:inline-flex; align-items:center;">
+              <select id="chartPeriodo" class="chart-periodo-select">
+                <option value="anio">Este año</option>
+                <option value="30d">Últimos 30 días</option>
+                <option value="6m">Últimos 6 meses</option>
+                <option value="personalizado">Personalizado</option>
+              </select>
+              <span class="chart-periodo-custom" id="chartPeriodoCustom" style="display:none;">
+                <input type="date" id="chartDesde"> <input type="date" id="chartHasta">
               </span>
-            </h3>
-            <div class="chart-wrap"><canvas id="chartIngresosEgresos"></canvas></div>
-          </div>
-          <div class="panel" id="panelTopProductos" style="display:none;">
-            <h3>Producto más vendido <span class="tag">Ventas</span></h3>
-            <div id="listaTopProductos"></div>
-          </div>
-          <div class="panel" id="panelStockBajo" style="display:none;">
-            <h3>Productos con stock bajo <span class="tag">Inventario</span></h3>
-            <div id="listaStockBajo"></div>
-          </div>
-          <div class="panel" id="panelVencimientos" style="display:none;">
-            <h3>Próximos vencimientos <span class="tag">Inventario</span></h3>
-            <div id="listaVencimientos"></div>
-          </div>
+            </span>
+          </h3>
+          <div class="chart-wrap chart-wrap-ini"><canvas id="chartIngresosEgresos"></canvas></div>
         </div>
-        <div class="inicio-col inicio-col-angosta">
-          <div class="panel" id="panelTopClientesMini" style="display:none; padding:20px;">
-            <h3 style="margin-bottom:10px;">Top clientes</h3>
-            <div id="listaTopClientesMini"></div>
-          </div>
-          <div class="panel" id="panelAlertasMini" style="display:none; padding:20px;">
-            <h3 style="margin-bottom:10px;">Alertas de stock</h3>
-            <div id="listaAlertasMini"></div>
-          </div>
-          <div class="panel" id="panelActividadMini" style="display:none; padding:20px;">
-            <h3 style="margin-bottom:10px;">Actividad reciente</h3>
-            <div id="listaActividadMini"></div>
-          </div>
-          <div class="panel" id="panelFinanzasResumen" style="display:none;">
-            <h3>Ingresos vs. egresos (resumen) <span class="tag">Finanzas</span></h3>
-            <div id="listaFinanzasResumen"></div>
-          </div>
+        <div class="panel" id="panelDonutCategorias" style="display:none;">
+          <h3>Ventas por categoría <span class="tag">Este mes</span></h3>
+          <div class="ini-donut-wrap"><canvas id="donutCategorias"></canvas></div>
+          <div id="donutCategoriasVacio" class="chart-empty" style="display:none;">Sin ventas registradas este mes.</div>
+        </div>
+        <div class="panel" id="panelResumenFinanciero" style="display:none;">
+          <h3>Resumen financiero <span class="tag">Este mes</span></h3>
+          <div id="listaResumenFinanciero"></div>
         </div>
       </div>
 
-      <p class="tabla-vacia" id="sinPermisos" style="display:none;">Tu rol no tiene permisos para ver ningún resumen todavía.</p>
+      <div class="ini-fila-3" id="filaListas" style="display:none;">
+        <div class="panel" id="panelTopProductos" style="display:none;">
+          <h3>Productos más vendidos <a href="ventas" class="panel-link">Ver todos →</a></h3>
+          <div id="listaTopProductos"></div>
+        </div>
+        <div class="panel" id="panelStockBajo" style="display:none;">
+          <h3>Stock bajo <a href="inventario" class="panel-link">Ver →</a></h3>
+          <div id="listaStockBajo"></div>
+        </div>
+        <div class="panel" id="panelClientesRecientes" style="display:none;">
+          <h3>Clientes recientes <a href="clientes" class="panel-link">Ver todos →</a></h3>
+          <div id="listaClientesRecientes"></div>
+        </div>
+      </div>
+
+      <div class="ini-fila-3" id="filaFinal" style="display:none;">
+        <div class="panel" id="panelVentasRecientes" style="display:none;">
+          <h3>Ventas recientes <a href="ventas" class="panel-link">Ver todas →</a></h3>
+          <div id="listaVentasRecientes"></div>
+        </div>
+        <div class="panel" id="panelPendientes" style="display:none;">
+          <h3>Tareas y pendientes</h3>
+          <div id="listaPendientes"></div>
+        </div>
+        <div class="panel" id="panelSucursales" style="display:none;">
+          <h3>Mapa de sucursales <span class="tag">Este mes</span></h3>
+          <div id="listaSucursales"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="panelVencimientos" style="display:none;">
+        <h3>Próximos vencimientos <span class="tag">Inventario</span></h3>
+        <div id="listaVencimientos"></div>
+      </div>
     </main>
 
     <footer></footer>
   </div>
 </div>
 
-<script type="module">
-import { cargarConfigEmpresa, modulosHabilitados } from '../js/config.js';
-import { renderSidebar } from '../components/sidebar.js';
-import { renderTopbar } from '../components/topbar.js';
-import { renderFooter } from '../components/footer.js';
-import { obtenerSesion, tienePermiso, haySesionActiva } from '../js/sesion.js';
-import { obtenerJSON } from '../js/api.js';
-import { fmtNum, escapeHtml } from '../js/utils.js';
-import { crearGraficoLineasComparativo } from '../js/charts.js';
-import { kpiCard, deltaPorcentaje } from '../js/kpiCard.js';
-import { nivelRiesgoStock } from '../js/stockRisk.js';
-import { ICONO_GRID } from '../js/iconos.js';
-
-if (!haySesionActiva()) location.replace('login');
-
-// Inicio ya NO baja los listados completos de cada módulo: GET /api/inicio/resumen (ver
-// backend/src/routes/inicio.js) devuelve solo los números y las pocas filas que se dibujan,
-// calculados en la base de datos. Una sección que la sesión no puede ver no viene en la respuesta.
-let config;
-let chartInstance = null;
-let pedidoSerie = 0; // descarta la respuesta de un período que el usuario ya dejó atrás
-
-const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-
-function filaRank(nombre, valor, i) {
-  return `<div class="rank-row"><span class="rank-num">${i + 1}</span><span class="rank-name">${escapeHtml(nombre)}</span><span class="rank-val">${fmtNum(valor)}</span></div>`;
-}
-
-// ---------- Gráfico de ingresos y egresos ----------
-
-// El servidor entrega puntos { clave, ingresos, egresos } por día ('AAAA-MM-DD') o por mes
-// ('AAAA-MM'); acá se les pone etiqueta y, en "Este año", se rellenan los 12 meses.
-function seriesParaGrafico(serie) {
-  const { modo, granularidad, puntos } = serie;
-  if (modo === 'anio') {
-    const ingresos = new Array(12).fill(0), egresos = new Array(12).fill(0);
-    puntos.forEach(p => { const i = Number(p.clave.slice(5, 7)) - 1; ingresos[i] += p.ingresos; egresos[i] += p.egresos; });
-    return { etiquetas: MESES, ingresos, egresos };
-  }
-  const etiqueta = granularidad === 'dia'
-    ? (c) => { const [, m, d] = c.split('-'); return `${d}/${m}`; }
-    : (c) => { const [y, m] = c.split('-'); return `${MESES[Number(m) - 1]} ${y}`; };
-  return { etiquetas: puntos.map(p => etiqueta(p.clave)), ingresos: puntos.map(p => p.ingresos), egresos: puntos.map(p => p.egresos) };
-}
-
-function mensajeEnGrafico(texto) {
-  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-  document.getElementById('panelChart').querySelector('.chart-wrap').innerHTML = `<div class="chart-empty">${escapeHtml(texto)}</div>`;
-}
-
-function dibujarGrafico(serie) {
-  const { etiquetas, ingresos, egresos } = seriesParaGrafico(serie);
-  // El contenedor se busca por su propio id (fijo en el HTML), no a través del <canvas>: si una
-  // llamada anterior no tenía datos, ya reemplazó el canvas por el mensaje "sin datos".
-  const wrap = document.getElementById('panelChart').querySelector('.chart-wrap');
-  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-  if (!ingresos.some(v => v) && !egresos.some(v => v)) {
-    wrap.innerHTML = '<div class="chart-empty">Todavía no hay movimientos de Finanzas para graficar en este período.</div>';
-    return;
-  }
-  wrap.innerHTML = '<canvas id="chartIngresosEgresos"></canvas>';
-  const estilos = getComputedStyle(document.documentElement);
-  const colorA = estilos.getPropertyValue('--teal').trim();
-  const colorB = estilos.getPropertyValue('--blue').trim();
-  const ctx = document.getElementById('chartIngresosEgresos').getContext('2d');
-  chartInstance = crearGraficoLineasComparativo(ctx, {
-    etiquetas, serieA: ingresos, serieB: egresos, labelA: 'Ingresos', labelB: 'Egresos', colorA, colorB
-  });
-}
-
-// Al cambiar el período se pide SOLO esa serie (unos pocos puntos), no los movimientos.
-async function cambiarPeriodoDelGrafico() {
-  const modo = document.getElementById('chartPeriodo').value;
-  const desde = document.getElementById('chartDesde').value;
-  const hasta = document.getElementById('chartHasta').value;
-  if (modo === 'personalizado') {
-    if (!desde || !hasta) { mensajeEnGrafico('Elige la fecha de inicio y la de fin para ver el gráfico.'); return; }
-    if (hasta < desde) { mensajeEnGrafico('La fecha "hasta" no puede ser anterior a "desde".'); return; }
-  }
-  const consulta = new URLSearchParams({ modo });
-  if (modo === 'personalizado') { consulta.set('desde', desde); consulta.set('hasta', hasta); }
-  const mio = ++pedidoSerie;
-  const serie = await obtenerJSON(config.apiBaseUrl, `/inicio/finanzas-serie?${consulta}`);
-  if (mio !== pedidoSerie) return;
-  if (!serie) { mensajeEnGrafico('No se pudo cargar el gráfico. Intenta de nuevo.'); return; }
-  dibujarGrafico(serie);
-}
-
-// ---------- Secciones ----------
-
-function seccionVentas(v, kpis) {
-  kpis.push({ orden: 1, html: kpiCard({ acento: 'teal', icono: '💰', label: 'Ventas este mes', value: fmtNum(v.total_mes),
-    sub: `${v.cantidad_mes} venta(s) · histórico ${fmtNum(v.total_historico)}`,
-    delta: deltaPorcentaje(v.total_mes, v.total_mes_anterior) }) });
-
-  document.getElementById('panelTopProductos').style.display = '';
-  document.getElementById('listaTopProductos').innerHTML = v.top_productos.length
-    ? v.top_productos.map((p, i) => filaRank(p.nombre, p.monto, i)).join('')
-    : '<div class="rank-row">Todavía no hay ventas registradas.</div>';
-}
-
-function seccionInventario(inv, kpis) {
-  kpis.push({ orden: 3, html: kpiCard({ acento: 'orange', icono: '📦', label: 'Productos en inventario', value: fmtNum(inv.total),
-    sub: inv.alertas_total ? `<span style="color:var(--coral);">${inv.alertas_total} con stock bajo</span>` : 'Todo el stock por encima del mínimo' }) });
-
-  const filaAlerta = p => {
-    const riesgo = nivelRiesgoStock(p.stock, p.stock_minimo);
-    const badge = riesgo ? `<span class="stock-risk-badge stock-risk-${riesgo.nivel}">${riesgo.icono} ${riesgo.etiqueta}</span>` : '';
-    return `<div class="rank-row"><span class="rank-name">${escapeHtml(p.nombre)}</span>${badge}<span class="rank-val">${fmtNum(p.stock)} u.</span></div>`;
-  };
-
-  document.querySelector('#panelStockBajo h3').innerHTML = '<span>Productos con stock bajo <span class="tag">Inventario</span></span><a href="inventario" class="panel-link">Ver →</a>';
-  document.getElementById('panelStockBajo').style.display = '';
-  document.getElementById('listaStockBajo').innerHTML = inv.alertas.length
-    ? inv.alertas.slice(0, 8).map(filaAlerta).join('')
-    : '<div class="rank-row">Ningún producto está en su stock mínimo o por debajo.</div>';
-
-  document.querySelector('#panelAlertasMini h3').innerHTML = 'Alertas de stock <a href="inventario" class="panel-link">Ver →</a>';
-  document.getElementById('panelAlertasMini').style.display = '';
-  document.getElementById('listaAlertasMini').innerHTML = inv.alertas.length
-    ? inv.alertas.slice(0, 4).map(filaAlerta).join('')
-    : '<div class="rank-row">Sin alertas de stock.</div>';
-
-  // Ventana de -30 a +30 días (la arma el servidor): lo que vence pronto y lo que venció hace poco.
-  document.getElementById('panelVencimientos').style.display = '';
-  document.getElementById('listaVencimientos').innerHTML = inv.vencimientos.length
-    ? inv.vencimientos.map(p => {
-        const urgente = p.dias <= 7;
-        return `<div class="rank-row"><span class="rank-name">${escapeHtml(p.nombre)}</span><span class="rank-val" style="${urgente ? 'color:var(--coral);' : ''}">${escapeHtml(p.fecha_vencimiento)}${p.dias < 0 ? ' (vencido)' : ` (${p.dias} día${p.dias === 1 ? '' : 's'})`}</span></div>`;
-      }).join('')
-    : '<div class="rank-row">Ningún producto vence en los próximos 30 días.</div>';
-}
-
-function seccionClientes(c, kpis) {
-  kpis.push({ orden: 2, html: kpiCard({ acento: 'blue', icono: '👥', label: 'Clientes registrados', value: fmtNum(c.total),
-    sub: c.top[0] ? `Top: ${escapeHtml(c.top[0].nombre)}` : 'Todavía no hay clientes.' }) });
-
-  document.querySelector('#panelTopClientesMini h3').innerHTML = 'Top clientes <a href="clientes" class="panel-link">Ver todos →</a>';
-  document.getElementById('panelTopClientesMini').style.display = '';
-  document.getElementById('listaTopClientesMini').innerHTML = c.top.length
-    ? c.top.map((x, i) => filaRank(x.nombre, x.compras_totales, i)).join('')
-    : '<div class="rank-row">Todavía no hay clientes registrados.</div>';
-}
-
-function seccionFinanzas(f, kpis) {
-  const { ingresos, egresos } = f;
-  // Balance es un neto (ingresos - egresos), no una sola columna sumable. Math.abs() en el
-  // denominador porque un mes anterior en negativo (más egresos que ingresos) no debe invertir el signo del %.
-  const deltaBalance = f.neto_mes_anterior
-    ? (() => { const pct = ((f.neto_mes - f.neto_mes_anterior) / Math.abs(f.neto_mes_anterior)) * 100; return { direccion: pct >= 0 ? 'up' : 'down', texto: `${Math.abs(pct).toFixed(1)}% vs. mes anterior` }; })()
-    : null;
-
-  kpis.push({ orden: 5, html: kpiCard({ acento: 'green', icono: '💵', label: 'Balance (ingresos − egresos)', value: fmtNum(ingresos - egresos),
-    sub: `Ingresos ${fmtNum(ingresos)} · Egresos ${fmtNum(egresos)}`, delta: deltaBalance }) });
-
-  document.getElementById('panelChart').style.display = '';
-  document.getElementById('chartPeriodo').addEventListener('change', (e) => {
-    document.getElementById('chartPeriodoCustom').style.display = e.target.value === 'personalizado' ? '' : 'none';
-    cambiarPeriodoDelGrafico();
-  });
-  document.getElementById('chartDesde').addEventListener('change', cambiarPeriodoDelGrafico);
-  document.getElementById('chartHasta').addEventListener('change', cambiarPeriodoDelGrafico);
-  dibujarGrafico(f.serie); // "Este año" ya vino en el resumen
-
-  const maxVal = Math.max(ingresos, egresos, 1);
-  document.getElementById('panelFinanzasResumen').style.display = '';
-  document.getElementById('listaFinanzasResumen').innerHTML = `
-    <div class="cat-row"><div class="top"><span>Ingresos</span><span>${fmtNum(ingresos)}</span></div>
-      <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${(ingresos / maxVal * 100).toFixed(0)}%; background:var(--teal-deep);"></div></div></div>
-    <div class="cat-row"><div class="top"><span>Egresos</span><span>${fmtNum(egresos)}</span></div>
-      <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${(egresos / maxVal * 100).toFixed(0)}%; background:var(--blue);"></div></div></div>`;
-}
-
-function seccionUsuarios(u, kpis) {
-  kpis.push({ orden: 4, html: kpiCard({ acento: 'purple', icono: '👤', label: 'Usuarios activos', value: fmtNum(u.activos), sub: `${u.total} en total` }) });
-}
-
-async function seccionActividad() {
-  const sesion = obtenerSesion();
-  let filas = [];
-  try {
-    const res = await fetch(`${config.apiBaseUrl}/auditoria?limite=6`, { headers: { Authorization: `Bearer ${sesion.token}` } });
-    if (res.ok) filas = await res.json();
-  } catch { /* sin conexión: se deja la lista vacía */ }
-
-  const ETIQUETA = { crear: '➕ Creó', editar: '✏️ Editó', eliminar: '🗑️ Eliminó' };
-  document.getElementById('panelActividadMini').style.display = '';
-  document.getElementById('listaActividadMini').innerHTML = filas.length
-    ? filas.map(f => {
-        const fecha = new Date(f.creado_el).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-        return `<div class="rank-row"><span class="rank-name">${escapeHtml(f.usuario_nombre || '—')} ${ETIQUETA[f.accion] || f.accion} en ${escapeHtml(f.modulo)}</span><span class="rank-val" style="font-weight:400; color:var(--muted);">${fecha}</span></div>`;
-      }).join('')
-    : '<div class="rank-row">Todavía no hay actividad registrada.</div>';
-}
-
-// Banner de bienvenida: saludo con el nombre real de quien inició sesión y,
-// a su lado, cuántos de SUS módulos contratados están activos ahora mismo
-// (modulosHabilitados ya viene de /api/empresa/actual, sin pedir nada
-// aparte). No es "activos de Y en el catálogo" -- un usuario normal no
-// tiene forma de ver el catálogo completo (eso es de Super Admin), así que
-// mostrar una fracción inventada sería un dato falso.
-function pintarBanner(config) {
-  const sesion = obtenerSesion();
-  const nombre = (sesion?.usuario?.nombre || '').split(' ')[0] || '';
-  document.getElementById('welcomeEyebrow').textContent = nombre ? `¡Bienvenido, ${nombre}!` : '¡Bienvenido!';
-  document.getElementById('welcomeModulos').textContent = fmtNum(modulosHabilitados(config).length);
-  document.querySelector('#welcomeBanner .welcome-stat-icon').innerHTML = ICONO_GRID;
-}
-
-(async function iniciar() {
-  config = await cargarConfigEmpresa();
-  renderSidebar(config, 'inicio');
-  await renderTopbar(config);
-  renderFooter();
-  pintarBanner(config);
-
-  const actividad = tienePermiso('auditoria.ver') ? seccionActividad() : null;
-  const resumen = await obtenerJSON(config.apiBaseUrl, '/inicio/resumen');
-  if (!resumen) {
-    document.getElementById('kpisResumen').innerHTML = '<div class="rank-row">No se pudo cargar el resumen. Revisa tu conexión y recarga la página.</div>';
-    await actividad;
-    return;
-  }
-
-  const kpis = [];
-  if (resumen.ventas) seccionVentas(resumen.ventas, kpis);
-  if (resumen.inventario) seccionInventario(resumen.inventario, kpis);
-  if (resumen.clientes) seccionClientes(resumen.clientes, kpis);
-  if (resumen.finanzas) seccionFinanzas(resumen.finanzas, kpis);
-  if (resumen.usuarios) seccionUsuarios(resumen.usuarios, kpis);
-
-  if (!kpis.length && !actividad) {
-    document.getElementById('sinPermisos').style.display = '';
-    return;
-  }
-  document.getElementById('kpisResumen').innerHTML = kpis.sort((a, b) => a.orden - b.orden).map(k => k.html).join('');
-  await actividad;
-})();
-</script>
+<script type="module" src="../js/inicioDashboard.js"></script>
 </body>
 </html>

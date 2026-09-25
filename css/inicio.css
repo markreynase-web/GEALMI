@@ -1,0 +1,119 @@
+/* css/inicio.css -- pantalla de Inicio (Rediseño 2026-09-22, guiado por el
+   mockup del dashboard que mandó el usuario): saludo + rango de fecha, filas
+   de 3 paneles (gráfico/dona/resumen financiero, luego las tres mini-tablas,
+   luego ventas recientes/pendientes/sucursales). Reutiliza los tokens de
+   base.css y las tarjetas KPI de cards.css -- acá van los componentes que
+   solo existen en esta página. */
+
+/* ---------- Saludo + rango de fecha ---------- */
+.ini-saludo{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:26px; }
+.ini-saludo-texto h2{ margin:0; font-family:var(--font-display); font-size:24px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:10px; }
+.ini-saludo-texto p{ margin:4px 0 0; font-size:13.5px; color:var(--muted); }
+.ini-saludo-mano{ font-size:21px; display:inline-block; animation:ini-agitar 2.2s ease-in-out 1; transform-origin:70% 70%; }
+@keyframes ini-agitar{
+  0%, 100%{ transform:rotate(0deg); } 15%{ transform:rotate(14deg); } 30%{ transform:rotate(-8deg); }
+  45%{ transform:rotate(14deg); } 60%{ transform:rotate(-4deg); } 75%{ transform:rotate(10deg); }
+}
+@media (prefers-reduced-motion: reduce){ .ini-saludo-mano{ animation:none; } }
+.ini-saludo-derecha{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+.ini-saludo-lema{ margin:0; font-size:12.5px; color:var(--muted); font-weight:500; }
+.ini-rango-fecha{
+  display:inline-flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--paper-line);
+  border-radius:10px; padding:8px 14px; font-size:13px; font-weight:600; color:var(--ink); box-shadow:var(--card-shadow);
+}
+.ini-rango-fecha .ico{ display:flex; color:var(--ochre-deep); }
+.ini-rango-fecha .ico svg{ width:15px; height:15px; }
+@media (max-width:640px){
+  .ini-saludo{ flex-direction:column; align-items:flex-start; }
+  .ini-saludo-derecha{ align-items:flex-start; width:100%; }
+}
+
+/* ---------- Filas de 3 paneles ---------- */
+.ini-fila-3{ display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-bottom:24px; align-items:stretch; }
+.ini-fila-3 > .panel{ margin-bottom:0; min-width:0; display:flex; flex-direction:column; }
+#filaGraficos{ grid-template-columns:1.7fr 1fr 1fr; }
+#filaFinal{ grid-template-columns:1.6fr 1fr 1fr; }
+/* Los selectores por id de arriba pesan más que .ini-fila-3 sola -- sin repetirlos
+   acá adentro, #filaGraficos/#filaFinal seguirían ganando y la fila no se apilaría
+   en celular (se vio recortada a los costados, con scroll horizontal). */
+@media (max-width:1100px){
+  .ini-fila-3, #filaGraficos, #filaFinal{ grid-template-columns:1fr; }
+}
+
+.chart-wrap.chart-wrap-ini{ height:280px; }
+.ini-donut-wrap{ position:relative; height:230px; }
+.ini-donut-wrap canvas{ max-width:100%; max-height:100%; }
+
+/* ---------- Resumen financiero ---------- */
+.ini-fin-row{ display:grid; grid-template-columns:32px 1fr auto auto; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--paper-line); }
+.ini-fin-row:last-child{ border-bottom:none; }
+.ini-fin-icono{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ini-fin-icono svg{ width:16px; height:16px; }
+.ini-fin-icono.teal{ background:var(--teal-soft); color:var(--teal-deep); }
+.ini-fin-icono.coral{ background:#FBEAF0; color:var(--coral-deep); }
+.ini-fin-icono.blue{ background:var(--blue-soft); color:var(--blue); }
+.ini-fin-icono.purple{ background:var(--purple-soft); color:var(--purple); }
+.ini-fin-label{ font-size:13px; color:var(--ink); font-weight:500; }
+.ini-fin-valor{ font-size:13.5px; font-weight:700; color:var(--ink); text-align:right; }
+.ini-fin-delta{ font-family:var(--font-mono); font-size:11.5px; font-weight:600; text-align:right; white-space:nowrap; cursor:default; }
+.ini-fin-delta.up{ color:var(--green); }
+.ini-fin-delta.down{ color:var(--coral); }
+
+/* ---------- Mini-tablas (productos / stock bajo / clientes / ventas) ---------- */
+.ini-mini-tabla{ width:100%; border-collapse:collapse; }
+.ini-mini-tabla td{ padding:9px 0; border-bottom:1px solid var(--paper-line); vertical-align:middle; font-size:13px; }
+.ini-mini-tabla tr:last-child td{ border-bottom:none; }
+.ini-mini-icono{ width:34px; padding-right:10px !important; }
+.ini-mini-icono-cuadro{ width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ini-mini-icono-cuadro svg{ width:15px; height:15px; }
+.ini-mini-icono-cuadro.teal{ background:var(--teal-soft); color:var(--teal-deep); }
+.ini-mini-icono-cuadro.coral{ background:#FBEAF0; color:var(--coral-deep); }
+.ini-mini-nombre{ font-weight:600; color:var(--ink); }
+.ini-mini-sub{ display:block; font-size:11px; font-weight:400; color:var(--muted); margin-top:1px; }
+.ini-mini-valor{ text-align:right; font-weight:600; color:var(--ink); white-space:nowrap; padding-left:12px !important; }
+.ini-valor-coral{ color:var(--coral-deep); }
+.ini-mini-badge{ text-align:right; padding-right:10px !important; }
+.ini-badge{
+  font-family:var(--font-mono); font-size:10.5px; font-weight:600; color:var(--muted);
+  background:var(--paper); border:1px solid var(--paper-line); padding:2px 8px; border-radius:20px; white-space:nowrap;
+}
+
+.ini-avatar{ width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+.ini-avatar-teal{ background:var(--teal-deep); }
+.ini-avatar-blue{ background:var(--blue); }
+.ini-avatar-purple{ background:var(--purple); }
+.ini-avatar-orange{ background:var(--orange); }
+.ini-avatar-coral{ background:var(--coral); }
+
+/* ---------- Tareas y pendientes ---------- */
+.ini-pendiente-row{
+  display:flex; align-items:center; gap:12px; padding:10px 4px; border-radius:10px; text-decoration:none;
+  color:inherit; border-bottom:1px solid var(--paper-line); transition:background .12s;
+}
+.ini-pendiente-row:last-child{ border-bottom:none; }
+.ini-pendiente-row:hover{ background:var(--paper); }
+.ini-pendiente-icono{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ini-pendiente-icono svg{ width:16px; height:16px; }
+.ini-pendiente-icono.orange{ background:var(--orange-soft); color:var(--orange); }
+.ini-pendiente-icono.blue{ background:var(--blue-soft); color:var(--blue); }
+.ini-pendiente-icono.purple{ background:var(--purple-soft); color:var(--purple); }
+.ini-pendiente-icono.coral{ background:#FBEAF0; color:var(--coral-deep); }
+.ini-pendiente-texto{ font-size:13px; color:var(--ink); font-weight:500; }
+
+/* ---------- Mapa de sucursales ---------- */
+.ini-sucursal-row{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--paper-line); }
+.ini-sucursal-row:last-child{ border-bottom:none; }
+.ini-sucursal-icono{
+  width:30px; height:30px; border-radius:50%; background:var(--teal-soft); color:var(--teal-deep);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.ini-sucursal-icono svg{ width:15px; height:15px; }
+.ini-sucursal-info{ flex:1; min-width:0; }
+.ini-sucursal-top{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:5px; }
+.ini-sucursal-nombre{ font-size:13px; font-weight:600; color:var(--ink); }
+.ini-sucursal-valor{ font-size:12.5px; font-weight:700; color:var(--ink); }
+.ini-sucursal-bar-bg{ background:var(--paper); border-radius:4px; height:6px; overflow:hidden; }
+.ini-sucursal-bar-fill{ height:100%; background:var(--teal); border-radius:4px; }
+.ini-sucursal-delta{ font-family:var(--font-mono); font-size:11px; font-weight:600; flex-shrink:0; }
+.ini-sucursal-delta.up{ color:var(--green); }
+.ini-sucursal-delta.down{ color:var(--coral); }

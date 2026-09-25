@@ -28,9 +28,10 @@ import { ErrorValidacion, responderError, validar, hoyLima, tienePermiso } from 
 const router = Router();
 router.use(auth, requireEmpresa, resolverRestriccionSucursal);
 
-const MODULOS_DE_INICIO = ['ventas', 'inventario', 'clientes', 'finanzas'];
+const MODULOS_DE_INICIO = ['ventas', 'inventario', 'clientes', 'finanzas', 'compras', 'rrhh'];
 const MODOS_SERIE = ['anio', '30d', '6m', 'personalizado'];
 const MAX_DIAS_PERSONALIZADO = 1830; // 5 años
+const DIAS_TENDENCIA = 14; // ventana de los mini-gráficos ("sparkline") de las tarjetas KPI
 
 // Qué secciones puede ver ESTA sesión. Lanza 403 si su membresía ya no está activa.
 async function seccionesVisibles(req) {
@@ -50,7 +51,9 @@ async function seccionesVisibles(req) {
   const puede = (modulo) => contratados.has(modulo) && tienePermiso(req, `${modulo}.ver`);
   return {
     ventas: puede('ventas'), inventario: puede('inventario'), clientes: puede('clientes'), finanzas: puede('finanzas'),
-    usuarios: tienePermiso(req, 'usuarios.ver') // Usuarios no es un módulo contratable
+    compras: puede('compras'), rrhh: puede('rrhh'),
+    usuarios: tienePermiso(req, 'usuarios.ver'), // Usuarios no es un módulo contratable
+    cajas: tienePermiso(req, 'cajas.ver') // transversal, mismo criterio que components/sidebar.js
   };
 }
 
@@ -95,6 +98,27 @@ async function serieFinanzas(empresaId, sucursal, { modo, desde, hasta }, hoy) {
 }
 
 // ---------------------------------------------------------------------------
+// Tendencia diaria (mini-gráfico "sparkline" de una tarjeta KPI): últimos
+// DIAS_TENDENCIA días, uno por fila, con generate_series para que un día sin
+// movimientos aparezca como 0 en vez de faltar del arreglo (el frontend dibuja
+// puntos igual de separados). `filtroTipo` es 'ingreso'/'egreso'/null (null =
+// no distingue, para tablas sin columna tipo como ventas/clientes).
+// ---------------------------------------------------------------------------
+
+async function tendenciaDiaria(tabla, campoFecha, expresionValor, empresaId, sucursal, hoy, sucursalCampo = 'sucursal_id') {
+  const filtroSucursal = sucursal !== null ? `AND t.${sucursalCampo} = $3` : '';
+  const parametros = sucursal !== null ? [empresaId, hoy, sucursal] : [empresaId, hoy];
+  const { rows } = await pool.query(
+    `SELECT to_char(d.dia, 'YYYY-MM-DD') AS fecha, COALESCE(${expresionValor}, 0) AS valor
+     FROM generate_series($2::date - ${DIAS_TENDENCIA - 1}, $2::date, interval '1 day') AS d(dia)
+     LEFT JOIN ${tabla} t ON t.${campoFecha} = d.dia AND t.empresa_id = $1 ${filtroSucursal}
+     GROUP BY d.dia ORDER BY d.dia`,
+    parametros
+  );
+  return rows.map(r => Number(r.valor));
+}
+
+// ---------------------------------------------------------------------------
 // GET /resumen
 // ---------------------------------------------------------------------------
 
@@ -124,7 +148,25 @@ router.get('/resumen', async (req, res) => {
          GROUP BY 1 ORDER BY 2 DESC, 1 LIMIT 5`,
         [empresaId, sucursal]
       );
-      respuesta.ventas = { ...tot, top_productos: top };
+      // Por categoría, SOLO de este mes (para el donut "Ventas por categoría" de Inicio,
+      // ver el mockup del rediseño -- pensado como "Ingresos por canal", pero GEALMI hoy
+      // no distingue canal de venta; categoria es lo real más parecido que ya existe).
+      const { rows: categorias } = await pool.query(
+        `SELECT COALESCE(NULLIF(btrim(categoria), ''), 'Sin categoría') AS categoria, sum(monto)::float8 AS monto
+         FROM ventas WHERE empresa_id = $1 AND ($2::int IS NULL OR sucursal_id = $2) AND fecha >= $3 AND fecha < $4
+         GROUP BY 1 ORDER BY 2 DESC, 1`,
+        [empresaId, sucursal, inicioMes, inicioMesSiguiente]
+      );
+      const { rows: recientes } = await pool.query(
+        `SELECT id, producto, cliente, categoria, monto::float8 AS monto, fecha::text AS fecha
+         FROM ventas WHERE empresa_id = $1 AND ($2::int IS NULL OR sucursal_id = $2)
+         ORDER BY creado_el DESC LIMIT 6`,
+        [empresaId, sucursal]
+      );
+      respuesta.ventas = {
+        ...tot, top_productos: top, por_categoria: categorias, recientes,
+        tendencia: await tendenciaDiaria('ventas', 'fecha', 'sum(t.monto)', empresaId, sucursal, hoy)
+      };
     }
 
     if (visibles.inventario) {
@@ -156,7 +198,24 @@ router.get('/resumen', async (req, res) => {
          ORDER BY compras_totales DESC, id LIMIT 5`,
         [empresaId]
       );
-      respuesta.clientes = { total: tot.total, top };
+      respuesta.clientes = {
+        total: tot.total, top,
+        // clientes no tiene sucursal_id (es de la empresa, no de una sede): tendenciaDiaria
+        // se llama sin restricción de sucursal a propósito, aunque la sesión esté restringida.
+        tendencia: await tendenciaDiaria('clientes', 'fecha_registro', 'count(t.id)', empresaId, null, hoy)
+      };
+      // "Clientes recientes" (por última compra, no por monto total) necesita leer Ventas --
+      // sin ese permiso se queda con `top` nomás, que el frontend ya sabía mostrar.
+      if (visibles.ventas) {
+        const { rows: recientes } = await pool.query(
+          `SELECT c.id, c.nombre, count(v.id)::int AS compras, max(v.fecha)::text AS ultima_compra
+           FROM clientes c JOIN ventas v ON v.cliente_id = c.id
+           WHERE c.empresa_id = $1 AND ($2::int IS NULL OR v.sucursal_id = $2)
+           GROUP BY c.id, c.nombre ORDER BY max(v.fecha) DESC LIMIT 6`,
+          [empresaId, sucursal]
+        );
+        respuesta.clientes.recientes = recientes;
+      }
     }
 
     if (visibles.finanzas) {
@@ -164,12 +223,40 @@ router.get('/resumen', async (req, res) => {
         `SELECT COALESCE(sum(monto) FILTER (WHERE tipo = 'ingreso'), 0)::float8 AS ingresos,
                 COALESCE(sum(monto) FILTER (WHERE tipo = 'egreso'), 0)::float8 AS egresos,
                 COALESCE(sum(CASE WHEN tipo = 'ingreso' THEN monto ELSE -monto END) FILTER (WHERE fecha >= $2 AND fecha < $3), 0)::float8 AS neto_mes,
-                COALESCE(sum(CASE WHEN tipo = 'ingreso' THEN monto ELSE -monto END) FILTER (WHERE fecha >= $4 AND fecha < $2), 0)::float8 AS neto_mes_anterior
+                COALESCE(sum(CASE WHEN tipo = 'ingreso' THEN monto ELSE -monto END) FILTER (WHERE fecha >= $4 AND fecha < $2), 0)::float8 AS neto_mes_anterior,
+                COALESCE(sum(monto) FILTER (WHERE tipo = 'ingreso' AND fecha >= $2 AND fecha < $3), 0)::float8 AS ingresos_mes,
+                COALESCE(sum(monto) FILTER (WHERE tipo = 'egreso' AND fecha >= $2 AND fecha < $3), 0)::float8 AS egresos_mes,
+                COALESCE(sum(monto) FILTER (WHERE tipo = 'ingreso' AND fecha >= $4 AND fecha < $2), 0)::float8 AS ingresos_mes_anterior,
+                COALESCE(sum(monto) FILTER (WHERE tipo = 'egreso' AND fecha >= $4 AND fecha < $2), 0)::float8 AS egresos_mes_anterior
          FROM finanzas WHERE empresa_id = $1 AND ($5::int IS NULL OR sucursal_id = $5)`,
         [empresaId, inicioMes, inicioMesSiguiente, inicioMesAnterior, sucursal]
       );
       // El gráfico arranca en "Este año": va en la misma respuesta para no hacer una petición más.
-      respuesta.finanzas = { ...tot, serie: await serieFinanzas(empresaId, sucursal, { modo: 'anio' }, hoy) };
+      respuesta.finanzas = {
+        ...tot, serie: await serieFinanzas(empresaId, sucursal, { modo: 'anio' }, hoy),
+        tendencia: await tendenciaDiaria('finanzas', 'fecha', `sum(CASE WHEN t.tipo = 'ingreso' THEN t.monto ELSE -t.monto END)`, empresaId, sucursal, hoy)
+      };
+
+      // "Mapa de sucursales" de Inicio: mismo cálculo que GET /finanzas/resumen-sucursales,
+      // pero acotado a mes actual vs. mes anterior (acá el "período" siempre es el mes, igual
+      // que el resto de Inicio) en vez de un rango que el usuario elige. Solo tiene sentido
+      // mostrarlo si la empresa configuró más de una sucursal -- con una sola, el "mapa" no
+      // dice nada que el resto del dashboard no diga ya.
+      const { rows: sucursales } = await pool.query(
+        `SELECT s.id, s.nombre, s.principal,
+                COALESCE(sum(f.monto) FILTER (WHERE f.tipo = 'ingreso' AND f.fecha >= $2 AND f.fecha < $3), 0)
+                  - COALESCE(sum(f.monto) FILTER (WHERE f.tipo = 'egreso' AND f.fecha >= $2 AND f.fecha < $3), 0) AS neto_mes,
+                COALESCE(sum(f.monto) FILTER (WHERE f.tipo = 'ingreso' AND f.fecha >= $4 AND f.fecha < $2), 0)
+                  - COALESCE(sum(f.monto) FILTER (WHERE f.tipo = 'egreso' AND f.fecha >= $4 AND f.fecha < $2), 0) AS neto_mes_anterior
+         FROM sucursales s
+         LEFT JOIN finanzas f ON f.sucursal_id = s.id AND f.empresa_id = s.empresa_id
+         WHERE s.empresa_id = $1 AND s.activo = true AND ($5::int IS NULL OR s.id = $5)
+         GROUP BY s.id, s.nombre, s.principal ORDER BY s.principal DESC, s.nombre ASC`,
+        [empresaId, inicioMes, inicioMesSiguiente, inicioMesAnterior, sucursal]
+      );
+      if (sucursales.length > 1) {
+        respuesta.sucursales = sucursales.map(s => ({ ...s, neto_mes: Number(s.neto_mes), neto_mes_anterior: Number(s.neto_mes_anterior) }));
+      }
     }
 
     if (visibles.usuarios) {
@@ -179,6 +266,37 @@ router.get('/resumen', async (req, res) => {
       );
       respuesta.usuarios = tot;
     }
+
+    // "Tareas y pendientes": cada campo es independiente y opcional (solo se agrega si la
+    // sesión tiene el permiso correspondiente) -- el frontend arma la lista con los que
+    // vengan. A propósito NO incluye "clientes con deuda": GEALMI no tiene ese concepto
+    // todavía (clientes solo guarda compras_totales, no un saldo pendiente), y mostrar un
+    // número ahí sería inventado.
+    const pendientes = {};
+    if (visibles.cajas) {
+      const { rows: [{ n }] } = await pool.query(
+        `SELECT count(*)::int AS n FROM turnos_caja t JOIN cajas c ON c.id = t.caja_id JOIN sucursales s ON s.id = c.sucursal_id
+         WHERE s.empresa_id = $1 AND t.estado = 'abierto' AND ($2::int IS NULL OR s.id = $2)`,
+        [empresaId, sucursal]
+      );
+      pendientes.cajas_abiertas = n;
+    }
+    if (visibles.compras) {
+      // compras no tiene sucursal_id todavía (ver 022_compras_rrhh_produccion.sql): la cuenta
+      // es de toda la empresa aunque la sesión esté restringida a una sucursal.
+      const { rows: [{ n }] } = await pool.query(`SELECT count(*)::int AS n FROM compras WHERE empresa_id = $1 AND estado = 'pedido'`, [empresaId]);
+      pendientes.compras_por_recibir = n;
+    }
+    if (visibles.rrhh) {
+      const { rows: [{ n }] } = await pool.query(
+        `SELECT count(*)::int AS n FROM documentos_empleado
+         WHERE empresa_id = $1 AND fecha_vencimiento IS NOT NULL AND fecha_vencimiento BETWEEN $2::date AND $2::date + 30
+           AND ($3::boolean OR tipo <> 'examen_medico')`,
+        [empresaId, hoy, tienePermiso(req, 'rrhh.salud')]
+      );
+      pendientes.documentos_por_vencer = n;
+    }
+    if (Object.keys(pendientes).length) respuesta.pendientes = pendientes;
 
     res.json({ hoy, sucursal_restringida: sucursal !== null, ...respuesta });
   } catch (err) {

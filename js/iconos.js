@@ -63,3 +63,10 @@ export const ICONO_CHECK_FILLED = wrap('0 0 24 24', '<circle cx="12" cy="12" r="
 export const ICONO_FOLDER = wrap('0 0 24 24', '<path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h4.5l2 2.5H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19.5H5A1.5 1.5 0 0 1 3.5 18Z"/>');
 export const ICONO_UMBRELLA = wrap('0 0 24 24', '<path d="M12 3v2"/><path d="M3 13c0-5 4-9 9-9s9 4 9 9"/><path d="M12 13v8"/><path d="M9 21h6"/><path d="M5 17c1.5-1.2 3-1.8 4-1.8"/>');
 export const ICONO_HOURGLASS = wrap('0 0 24 24', '<path d="M6 3.5h12M6 20.5h12"/><path d="M7 3.5v3.2c0 2 1.8 3.3 5 5.3 3.2 2 5 3.3 5 5.3v3.2M17 3.5v3.2c0 2-1.8 3.3-5 5.3-3.2 2-5 3.3-5 5.3v3.2"/>');
+
+// Íconos del rediseño de Inicio (2026-09-22): tarjetas KPI con sparkline,
+// "Resumen financiero", "Tareas y pendientes" y "Mapa de sucursales".
+export const ICONO_CART = wrap('0 0 24 24', '<path d="M3 4h2.2l1 3M6.2 7l1.7 8.2a1.5 1.5 0 0 0 1.47 1.2h7a1.5 1.5 0 0 0 1.47-1.19L19.5 7Z"/><circle cx="10" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/>');
+export const ICONO_PERCENT = wrap('0 0 24 24', '<path d="M18.5 5.5 5.5 18.5"/><circle cx="7.2" cy="7.2" r="2.4"/><circle cx="16.8" cy="16.8" r="2.4"/>');
+export const ICONO_CASH = wrap('0 0 24 24', '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 6v0M18 18v0"/>');
+export const ICONO_PIN = wrap('0 0 24 24', '<path d="M12 21s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12Z"/><circle cx="12" cy="9" r="2.6"/>');

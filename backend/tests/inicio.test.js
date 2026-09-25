@@ -313,8 +313,66 @@ test('una empresa sin ningún dato recibe ceros y listas vacías, no errores', a
   assert.deepEqual([c.ventas.total_mes, c.ventas.total_historico, c.ventas.cantidad_mes], [0, 0, 0]);
   assert.deepEqual(c.ventas.top_productos, []);
   assert.deepEqual([c.inventario.total, c.inventario.alertas_total], [0, 0]);
-  assert.deepEqual(c.clientes, { total: 0, top: [] });
+  assert.deepEqual(c.clientes, { total: 0, top: [], tendencia: new Array(14).fill(0), recientes: [] });
   assert.deepEqual([c.finanzas.ingresos, c.finanzas.egresos, c.finanzas.neto_mes], [0, 0, 0]);
   assert.deepEqual(c.finanzas.serie.puntos, []);
   assert.deepEqual(c.usuarios, { activos: 1, total: 1 });
+});
+
+test('ventas: tendencia diaria, por categoría y recientes (rediseño de Inicio)', async () => {
+  const c = (await resumen(A)).cuerpo;
+  // 14 días, terminando hoy; el último valor es lo vendido HOY (100 + 250 + 5, ver cargarDatos).
+  assert.equal(c.ventas.tendencia.length, 14);
+  assert.equal(c.ventas.tendencia.at(-1), 355);
+  // ningún día de cargarDatos() vende más de 400 en un solo día -- 8 de los 14 son "hoy y cerca" con 0.
+  assert.ok(c.ventas.tendencia.slice(0, -1).every(v => v === 0 || v === 400));
+
+  // cargarDatos() no asigna categoria -- todo cae en el bucket "Sin categoría", por el total del MES actual
+  // (100+250+5 de hoy; el de enElMesAnterior() no cuenta).
+  assert.deepEqual(c.ventas.por_categoria, [{ categoria: 'Sin categoría', monto: 355 }]);
+
+  assert.ok(c.ventas.recientes.length >= 3 && c.ventas.recientes.length <= 6);
+  assert.ok(c.ventas.recientes.some(v => v.producto === 'Aceite' && v.monto === 100));
+});
+
+test('clientes: tendencia diaria y recientes (por última compra, requiere ventas.ver)', async () => {
+  const cliente = await crearCliente(ctx, A.empresaId, 'Reciente');
+  await pool.query(
+    `INSERT INTO ventas (fecha, cliente, cliente_id, producto, cantidad, precio_unitario, monto, empresa_id) VALUES ($1,'Reciente',$2,'Café',1,30,30,$3)`,
+    [hoy(), cliente, A.empresaId]
+  );
+  try {
+    const c = (await resumen(A)).cuerpo;
+    assert.equal(c.clientes.tendencia.length, 14);
+    assert.ok(c.clientes.tendencia.at(-1) >= 1, 'el cliente creado hoy cuenta en el último día de la tendencia');
+    const fila = c.clientes.recientes.find(r => r.id === cliente);
+    assert.ok(fila, 'el cliente con una compra hoy aparece en recientes');
+    assert.equal(fila.compras, 1);
+    assert.equal(fila.ultima_compra, hoy());
+
+    // Sin ventas.ver no hay forma honesta de saber "última compra" -- recientes no viene.
+    const soloClientes = conPermisos(A, ['clientes.ver']);
+    const c2 = (await resumen(A, soloClientes)).cuerpo;
+    assert.equal(c2.clientes.recientes, undefined);
+  } finally {
+    await pool.query('DELETE FROM ventas WHERE cliente_id = $1', [cliente]);
+  }
+});
+
+test('mapa de sucursales: solo aparece con más de una sucursal activa', async () => {
+  const solaUnaSucursal = (await resumen(A)).cuerpo; // A solo tiene la "principal" del backfill
+  assert.equal(solaUnaSucursal.sucursales, undefined);
+
+  const extra = await crearSucursal(ctx, A.empresaId, 'Sur');
+  await movimiento(A.empresaId, hoy(), 'ingreso', 500, extra);
+  await movimiento(A.empresaId, enElMesAnterior(), 'ingreso', 200, extra);
+  try {
+    const c = (await resumen(A)).cuerpo;
+    assert.ok(Array.isArray(c.sucursales) && c.sucursales.length >= 2);
+    const sur = c.sucursales.find(s => s.id === extra);
+    assert.equal(sur.neto_mes, 500);
+    assert.equal(sur.neto_mes_anterior, 200);
+  } finally {
+    await pool.query('DELETE FROM finanzas WHERE sucursal_id = $1', [extra]);
+  }
 });
